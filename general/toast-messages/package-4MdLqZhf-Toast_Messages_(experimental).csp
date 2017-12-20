@@ -1,0 +1,117 @@
+<div class="section section-visible" name="Toast Messages (experimental)" data-type="package" data-group="basic" data-id="4MdLqZhf" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" draggable="false" name="Documentation" data-id="CzNxGRqf"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to show large toast messages on the top of a screen.<br></div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="FS3D7aYM"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.1",
+	"icon": "call_to_action",
+	"assets": [],
+	"dependencies": [],
+	"description": "Adds the functionality to show large toast messages on the top of a screen.",
+	"changelog":
+	{
+		"1.1": "Fixed z-index against toolbar.",
+		"1.0": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "general/toast-messages"
+	}
+}</pre></div>
+
+<div class="paragraph body-paragraph locked collapsed" draggable="false" style="" name="Toast Message Template" data-id="8vgqpbV9"><div data-type="content" type="text/html" codemirror="true" contenteditable="false"><template id="toast-message-template">
+  <div class="toast-message"></div>
+</template></div></div><div class="paragraph code-paragraph collapsed" last-execution-state="success" run-on-load="true" style="" name="Toast Message" data-id="GaZttnH6"><pre data-type="content" type="text/javascript">// Create global toast message container
+let toastMessages = document.querySelector('body .toast-messages');
+if (!toastMessages) {
+	toastMessages = document.createElement("transient");
+	toastMessages.classList.add("toast-messages");
+	document.body.appendChild(toastMessages);
+}
+
+const toastMessage = (content, duration = 10000) =&gt; {
+
+	// Get message template, create a clone, and set message subject and message body
+	let template = document.querySelector("#toast-message-template");
+	let fragment = document.importNode(template.content, true);
+	let toastMessage = fragment.firstElementChild;
+
+	// Append content if it is a Node, otherwise set the content as innerHTML
+	if (content instanceof Node) {
+		toastMessage.appendChild(content);
+	} else {
+		toastMessage.innerHTML = content;
+	}
+
+	// Insert message as first child of messages to place it at the top position
+	toastMessages.insertBefore(toastMessage, toastMessages.firstElementChild);
+
+	// Remove message on click
+	toastMessage.addEventListener("click", (event) =&gt; {
+		toastMessage.remove();
+	});
+
+	// Delay adding the show class by two render cycles to make sure possible CSS transitions will trigger
+	window.requestAnimationFrame(() =&gt; {
+		window.requestAnimationFrame(() =&gt; {
+			toastMessage.classList.add("show");
+
+			setTimeout(() =&gt; {
+				toastMessage.addEventListener("transitionend", (event) =&gt; {
+					if (event.propertyName === "opacity") {
+						toastMessage.remove();
+					}
+				});
+
+				toastMessage.classList.remove("show");
+				toastMessage.classList.add("hide");
+			}, duration);
+		});
+	});
+};
+
+// Add toast to the JavaScript VM context
+let vm = Codestrate.VirtualMachines.get("text/javascript");
+vm.addToGlobalContext({
+	toastMessage
+});</pre></div><div class="paragraph style-paragraph collapsed" style="" draggable="false" name="Toast Message Style" data-id="B8Dik9QL"><style data-type="content" type="text/css" codemirror="true">.toast-messages {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	pointer-events: none;
+	/* background-color: rgba(255, 0, 0, .1); */
+	z-index: 300;
+}
+
+.toast-messages .toast-message {
+	position: relative;
+	/* top: -100%; */
+	width: calc(100% - 15px);
+	color: black;
+	margin: 5px;
+	padding: 10px;
+	pointer-events: all;
+	background-color: whitesmoke;
+	transition: all 250ms ease-in-out;
+	opacity: 0;
+	border-radius: 2px;
+	cursor: default;
+}
+
+.toast-messages .toast-message.show {
+	top: 0;
+	opacity: 1.0;
+	/* background-color: deepskyblue; */
+}
+
+.toast-messages .toast-message:hover {
+	opacity: 1.0;
+	/* background-color: orange; */
+}
+
+.toast-messages .toast-message.hide {
+	top: 0;
+	/* background-color: hotpink; */
+}
+
+.toast-messages .toast-message .subject {
+	font-weight: bold;
+}</style></div></div>
