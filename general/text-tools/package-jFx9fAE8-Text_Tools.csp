@@ -1,0 +1,317 @@
+<div class="section section-visible" name="Text Tools" data-type="package" data-id="jFx9fAE8" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="xTzmxJRa" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><p>TODO</p></div></div><div class="paragraph data-paragraph locked collapsed" data-id="n3EQSCGL" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.1",
+	"icon": "text_fields",
+	"assets": [],
+	"dependecies": [],
+	"description": "Adds a body-paragraph text-editing actions to the snackbar.",
+	"changelog":
+	{
+		"1.1": "Moved Text Tools to the snackbar.",
+		"1.0": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "general/text-tools"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="kD6z77Dn" name="Text Tools Code" run-on-load="true" last-execution-state="success" draggable="false" style=""><pre data-type="content" type="text/javascript">const SnackbarUtils = require("#snackbar-utils");
+const SnackbarTools = require("#snackbar-tools");
+const AssetUtils = require("#asset-utils");
+
+/******************************************************************************/
+
+const toolsName = "body-content-tools";
+
+/******************************************************************************/
+
+const addBodyActionButton = (title, icon, className, action, formatBlock = false) =&gt; {
+	let button;
+
+	if (typeof action === "string") {
+		button = SnackbarUtils.createButton(title, icon, toolsName + " " + className, () =&gt; document.execCommand(action, null, formatBlock));
+	} else if (typeof action === "function") {
+		button = SnackbarUtils.createButton(title, icon, toolsName + " " + className, action);
+	} else {
+		return;
+	}
+
+	// Need to prevent mousedown and touchstart or otherwise the event does not work
+	button.addEventListener("mousedown", (event) =&gt; event.preventDefault());
+	button.addEventListener("touchstart", (event) =&gt; event.preventDefault());
+
+	SnackbarUtils.addSnackbarItem(button, -1);
+};
+
+/******************************************************************************/
+
+SnackbarTools.addTools((target) =&gt; {
+	const content = target.closest("[data-type='content']");
+	return (content &amp;&amp;
+					content.getAttribute("type") === "text/html" &amp;&amp;
+					content.getAttribute("contenteditable") === "true");
+}, toolsName);
+
+/******************************************************************************/
+
+addBodyActionButton("Bold", "format_bold", "", "bold");
+addBodyActionButton("Italic", "format_italic", "", "italic");
+addBodyActionButton("Underline", "format_underline", "", "underline");
+addBodyActionButton("Strikethrough", "format_strikethrough", "", "strikethrough");
+
+SnackbarUtils.addDivider(-1, "body-content-tools");
+
+addBodyActionButton("Insert Bullet List", "format_list_bulleted", "", "InsertUnorderedList");
+addBodyActionButton("Insert Numbered List", "format_list_numbered", "", "InsertOrderedList");
+addBodyActionButton("Increase Indent", "format_indent_increase", "", "indent");
+addBodyActionButton("Decrease Indent", "format_indent_decrease", "", "outdent");
+
+SnackbarUtils.addDivider(-1, "body-content-tools");
+
+addBodyActionButton("Paragraph", "", "format-p-button", "formatBlock", "&lt;div&gt;");
+addBodyActionButton("Header 1", "", "format-h1-button", "formatBlock", "&lt;h1&gt;");
+addBodyActionButton("Header 2", "", "format-h2-button", "formatBlock", "&lt;h2&gt;");
+addBodyActionButton("Header 3", "", "format-h3-button", "formatBlock", "&lt;h3&gt;");
+
+SnackbarUtils.addDivider(-1, "body-content-tools");
+
+addBodyActionButton("Clear Formatting", "format_clear", "", (event) =&gt; {
+	if (window.getSelection &amp;&amp; window.getSelection().getRangeAt) {
+
+		// Get selected text
+		const selection = window.getSelection();
+		const range = selection.getRangeAt(0);
+		const selectedText = range.toString();
+
+		// Delete current selection
+		range.deleteContents();
+
+		// Create temporary container
+		const div = document.createElement("div");
+		div.innerHTML = selectedText;
+
+		// Append children of temporary container to document fragment
+		const fragment = document.createDocumentFragment();
+		let child;
+		while ((child = div.firstChild)) {
+			fragment.appendChild(child);
+		}
+
+		// Insert document fragment with clear text at selection
+		range.insertNode(fragment);
+	} else if (document.selection &amp;&amp; document.selection.createRange) {
+		throw new Error(`clear formatting is not supported with this browser`);
+	}
+});
+
+/******************************************************************************/
+
+SnackbarUtils.addDivider(-1, "body-content-tools");
+
+addBodyActionButton("Add Variable", "", "add-variable-button", (event) =&gt; {
+	const paragraph = Codestrate.focussedParagraph;
+	const content = paragraph ? paragraph.querySelector("[data-type='content']") : false;
+	if (!content) return;
+
+	const addVariable = (name) =&gt; {
+		const variable = document.createElement("div");
+		variable.setAttribute("class", "variable");
+		variable.setAttribute("tabindex", "-1");
+		variable.setAttribute("contenteditable", "false");
+		variable.setAttribute("data-name", name);
+
+		// 			variable.addEventListener("keyup", event =&gt; {
+		// 				const newVariableName = variable.innerText.trim();
+
+		// 				// Ignore if variable name did not change, e.g., key events
+		// 				const oldVariableName = variable.getAttribute("data-name");
+		// 				if (newVariableName === oldVariableName) return;
+
+		// 				// Delete variable when variable name is empty
+		// 				if (!newVariableName || newVariableName === "") {
+		// 					variable.remove();
+		// 					return;
+		// 				}
+
+		// 				// Set new variable name
+		// 				variable.setAttribute("data-name", newVariableName);
+		// 			});
+
+		content.appendChildAtCaret(variable);
+	};
+
+	const result = prompt("Set variable name", "", "Add Variable");
+
+	if (result instanceof Promise) {
+		result.then(r =&gt; {
+			if (r) {
+				addVariable(r);
+			}
+		});
+	} else if (result) {
+		addVariable(result);
+	}
+});
+
+addBodyActionButton("Hide Variable Names", "", "hide-variables-button", (event) =&gt; {
+	const paragraph = Codestrate.focussedParagraph;
+	const content = paragraph ? paragraph.querySelector("[data-type='content']") : false;
+	if (content) content.classList.toggle("hide-variable-names");
+});
+
+addBodyActionButton("Convert to HTML", "", "convert-html-button", (event) =&gt; {
+	if (window.getSelection) {
+		const text = window.getSelection().toString();
+		HTMLUtils.pasteHtmlAtCaret(text);
+	}
+});
+
+/******************************************************************************/
+
+SnackbarUtils.addDivider(-1, "body-content-tools");
+
+const addFileButton = document.createElement("span");
+addFileButton.setAttribute("title", "Add File");
+addFileButton.classList.add("body-content-tools", "snackbar-button", "add-file-button");
+
+const label = document.createElement("label");
+label.classList.add("material-icons");
+label.innerHTML = "file_upload";
+
+const input = document.createElement("input");
+input.setAttribute("type", "file");
+// input.setAttribute("accept", "image/*");
+
+input.addEventListener("change", event =&gt; {
+	const files = Array.from(input.files);
+
+	AssetUtils.uploadFiles(files, (asset) =&gt; {
+		const paragraph = Codestrate.focussedParagraph;
+		const content = paragraph ? paragraph.querySelector("[data-type='content']") : false;
+		if (!content) return;
+
+		const element = AssetUtils.getElementFromAsset(asset);
+		if (element) {
+			if (!HTMLUtils.appendChildAtCaret(element, (range) =&gt; {
+				return content.contains(range.commonAncestorContainer);
+			})) {
+				content.appendChild(element);
+			}
+		}
+	}, null, error =&gt; {
+		console.error(error);
+	});
+
+	input.value = "";
+});
+
+label.appendChild(input);
+addFileButton.appendChild(label);
+SnackbarUtils.addSnackbarItem(addFileButton, -1);</pre></div><div class="paragraph code-paragraph collapsed" name="List Indent / Outdent" run-on-load="true" draggable="false" last-execution-state="success" style="" data-id="aCh6hNdg"><pre data-type="content" type="text/javascript">// Add tab and shift+tab support to indent and outdent lists
+importLib([
+	"mousetrap.min.js",
+	"mousetrap-global-bind.min.js"
+]).then(() =&gt; {
+
+	Mousetrap.bindGlobal("tab", (event) =&gt; {
+		// console.log("1", event, event.target, event.target.closest('ul,ol'));
+		// if (event.target.closest('ul,ol')) {
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+		document.execCommand("indent", null, false);
+		// }
+	});
+
+	Mousetrap.bindGlobal("shift+tab", (event) =&gt; {
+		// console.log("2", event, event.target, event.target.closest('ul,ol'));
+		// if (event.target.closest('ul,ol')) {
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+		document.execCommand("outdent", null, false);
+		// }
+	});
+});</pre></div>
+<div class="paragraph code-paragraph collapsed" name="Paste Plain Text to Body Paragraphs" run-on-load="true" last-execution-state="success" style="" draggable="false" data-id="Tc6JR26S"><pre data-type="content" type="text/javascript">let shiftKeyDown = false;
+
+window.addEventListener("keydown", (event) =&gt; {
+	if (event.keyCode === 16) {
+		shiftKeyDown = true;
+	}
+}, true);
+
+window.addEventListener("keyup", (event) =&gt; {
+	if (event.keyCode === 16) {
+		shiftKeyDown = false;
+	}
+}, true);
+
+document.body.addEventListener("paste", (event) =&gt; {
+
+	// Ignore paste handler on shift key up
+	if (!shiftKeyDown) return;
+
+	const target = event.target;
+
+	// Apply paste plain HTML to body paragraphs only
+	if (!target.closest('[data-type="content"][contenteditable="true"]')) return;
+
+	// Prevent default paste
+	event.preventDefault();
+
+	// Get plain text
+	const text = event.clipboardData.getData("text/plain");
+
+	// Insert plain text without any formatting
+	document.execCommand("insertHTML", false, text);
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="UArqpeRC" name="Text Tools Style" draggable="false" style=""><style data-type="content" type="text/css" codemirror="true" class="themable">html #snackbar:not([body-content-tools="true"]) .body-content-tools {
+	display: none;
+}
+
+/******************************************************************************/
+
+html #snackbar .format-p-button i:after {
+	content: var(--format-paragraph);
+	font-family: "Material Design Icons";
+}
+
+html #snackbar .format-h1-button i:after {
+	content: var(--format-header-1);
+	font-family: "Material Design Icons";
+}
+
+html #snackbar .format-h2-button i:after {
+	content: var(--format-header-2);
+	font-family: "Material Design Icons";
+}
+
+html #snackbar .format-h3-button i:after {
+	content: var(--format-header-3);
+	font-family: "Material Design Icons";
+}
+
+/******************************************************************************/
+
+html #snackbar .add-variable-button i:after {
+	content: var(--tag-plus);
+	font-family: "Material Design Icons";
+}
+
+html #snackbar .hide-variables-button i:after {
+	content: var(--tag-outline);
+	font-family: "Material Design Icons";
+}
+
+html #snackbar .convert-html-button i:after {
+	content: var(--language-html5);
+	font-family: "Material Design Icons";
+}
+
+/******************************************************************************/
+
+html #snackbar .add-file-button label {
+	cursor: pointer;
+}
+
+html #snackbar .add-file-button input {
+	display: none;
+}</style></div></div>
