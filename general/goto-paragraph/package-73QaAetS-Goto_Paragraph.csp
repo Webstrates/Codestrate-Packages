@@ -1,0 +1,220 @@
+<div class="section section-visible" data-id="73QaAetS" name="Goto Paragraph" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="LVsc7BNx" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds a search to the toolbar, which enables to search and scroll to paragraphs by their ID or name.</div><h3>Search Options</h3><div>There are three search modes:</div><div><ul><li><b>Name</b>: Searches for a name of a paragraph.</li><li><b>ID</b>: Use the prefix <code>id:</code> to search for the ID of a paragraph.</li><li><b>Paragraph-ID</b>: Use the prefix <code>data-id:</code> to search for the <code>data-id</code> attribute of a paragraph.</li></ul></div><h3>Shortcut</h3><div>The shortcut to focus the search is <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd>.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="xtYuvXdc" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0",
+	"icon": "search",
+	"assets": [
+		"awesomplete.js"
+	],
+	"dependencies": [],
+	"description": "Adds a paragraph search to the toolbar.",
+	"changelog":
+	{
+		"1.0": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "general/goto-paragraph"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="P2uGR6Mk" run-on-load="true" name="Goto Paragraph Code" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">const GlobalToolbarUtils = require("#global-toolbar-utils");
+
+/******************************************************************************/
+
+GlobalToolbarUtils.addSearch("", "paragraph-search", "Goto Paragraph", 0, (searchInput) =&gt; {
+	search(searchInput.value);
+});
+
+/******************************************************************************/
+
+const searchInput = document.querySelector("input.toolbar-search-input");
+
+/******************************************************************************/
+
+const search = (text) =&gt; {
+	let paragraph;
+	let content;
+
+	if (!text) {
+		alert("Enter a paragraph name or ID.", "Empty Search");
+		searchInput.blur();
+		return;
+
+	} else if (text.startsWith("data-id:")) {
+		const dataId = text.substring(8);
+		paragraph = document.querySelector(`.paragraph[data-id="${dataId}"]`);
+		if (paragraph) content = paragraph.querySelector("[data-type='content']");
+
+	} else if (text.startsWith("id:")) {
+		const id = text.substring(3);
+		content = document.querySelector(`#${id}[data-type="content"]`);
+		if (content) paragraph = content.closest(".paragraph");
+
+	} else {
+		paragraph = document.querySelector(`.paragraph[name="${text}"]`);
+		if (paragraph) content = paragraph.querySelector("[data-type='content']");
+	}
+
+	if (!paragraph || !content) {
+		alert(`The paragraph "${text}" wasn't found.`, "Paragraph Not Found");
+		searchInput.blur();
+	} else {
+		const section = paragraph.closest(".section");
+
+		if (section) {
+			section.classList.remove("section-hidden");
+			section.classList.remove("collapsed");
+			section.classList.add("section-visible");
+		}
+
+		paragraph.classList.remove("collapsed");
+
+		searchInput.value = "";
+		searchInput.blur();
+
+		Codestrate.simulateClick(paragraph);
+
+		setTimeout(false, 0);
+		paragraph.scrollIntoView({block: "start", behavior: "instant"});
+		window.scrollBy(0, -74);
+	}
+};
+
+/******************************************************************************/
+
+importLib([
+	"mousetrap.min.js",
+	"mousetrap-global-bind.min.js"
+]).then(() =&gt; {
+	Mousetrap.bindGlobal("ctrl+alt+p", (event) =&gt; {
+		if (searchInput) searchInput.select();
+		return false;
+	});
+});
+
+/******************************************************************************/
+
+importLib([
+	"awesomplete.js"
+]).then(() =&gt; {
+	if (searchInput) {
+		const myAwesomeplete = new Awesomplete(searchInput, {
+			autoFirst: true,
+			maxItems: 100
+		});
+
+		searchInput.addEventListener("awesomplete-selectcomplete", (event) =&gt; {
+			search(event.text.value);
+		});
+
+		const list = [];
+
+		const getLabel = (sec, par) =&gt; `${sec} &gt; ${par}`;
+
+		document.liveQuerySelectorAll(".paragraph").added((paragraph) =&gt; {
+			const section = paragraph.closest(".section");
+
+			const listElement = {
+				label: getLabel(section.getAttribute("name"), paragraph.getAttribute("name")),
+				value: `data-id:${paragraph.getAttribute("data-id")}`
+			};
+
+			list.push(listElement);
+			myAwesomeplete.list = list;
+
+			section.liveAttribute("name").changed((value, oldValue) =&gt; {
+				listElement.label = getLabel(value, paragraph.getAttribute("name"));
+			});
+
+			paragraph.liveAttribute("name").changed((value, oldValue) =&gt; {
+				listElement.label = getLabel(section.getAttribute("name"), value);
+			});
+		});
+
+		document.liveQuerySelectorAll(".paragraph").removed((paragraph) =&gt; {
+			const listElement = list.find(el =&gt; el.value === `data-id:${paragraph.getAttribute("data-id")}`);
+			if (listElement) {
+				const index = list.indexOf(listElement);
+				list.splice(index, 1);
+				myAwesomeplete.list = list;
+			} 
+		});
+	}
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="bcCnFNzQ" name="Goto Paragraph Style" draggable="false" style=""><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="themable">html .awesomplete [hidden] {
+	display: none;
+}
+
+html .awesomplete .visually-hidden {
+	position: absolute;
+	clip: rect(0, 0, 0, 0);
+}
+
+html .awesomplete {
+	display: inline-block;
+	position: relative;
+	display: flex;
+	flex: 0 1 100%;
+}
+
+html .awesomplete > input {
+	display: block;
+}
+
+html .awesomplete > ul {
+	position: absolute;
+	left: 0;
+	top: 44px;
+	color: var(--material-color-black);
+	z-index: 1;
+	min-width: 100%;
+	box-sizing: border-box;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	background: var(--material-color-white);
+	max-height: 33vh;
+	overflow-y: auto;
+}
+
+html .awesomplete > ul:empty {
+	display: none;
+}
+
+html .awesomplete > ul {
+	border-radius: 2px;
+	background: var(--material-color-white);
+	box-shadow: var(--material-shadow-z4);
+}
+
+html .awesomplete > ul {
+	transition: 0.3s cubic-bezier(0.4, 0.2, 0.5, 1.4);
+	transform-origin: 1.43em -.43em;
+}
+
+html .awesomplete > ul[hidden],
+html .awesomplete > ul:empty {
+	opacity: 0;
+	transform: scale(0);
+	display: block;
+	transition-timing-function: ease;
+}
+
+html .awesomplete > ul > li {
+	position: relative;
+	padding: 8px;
+	cursor: pointer;
+}
+
+html .awesomplete > ul > li:hover {
+	background: rgba(var(--color-accent-rgb), 0.25);
+}
+
+html .awesomplete mark {
+	background: rgba(var(--color-accent-rgb), 0.5);
+}
+
+html .awesomplete > ul > li[aria-selected="true"] {
+	background: rgba(var(--color-accent-rgb), 0.5);
+}
+
+html .awesomplete li[aria-selected="true"] mark {
+	background: rgba(var(--color-accent-rgb), 1);
+	color: var(--color-accent-text);
+}</style></div></div>
