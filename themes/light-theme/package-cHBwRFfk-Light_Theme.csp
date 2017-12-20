@@ -1,0 +1,126 @@
+<div class="section section-visible" name="Light Theme" data-id="cHBwRFfk" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="65H4Ysj6" draggable="false" style="" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>An theme with an inverted color scheme for a brighter Codestrate.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="Q6KFBYkY" draggable="false" style="" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0.1",
+	"icon": "palette",
+	"description": "An theme with an inverted color scheme for a brighter Codestrate.",
+	"assets": [],
+	"dependencies": [
+		{
+			"id": "w2AXGDAm",
+			"name": "Theme Creator",
+			"optional": true,
+			"usage": "The Theme Creator is needed to update themes."
+		}
+	],
+	"changelog":
+	{
+		"1.0.1": "Updated dependency to be optional.",
+		"1.0": "Initial Version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "themes/light-theme"
+	}
+}</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="QHQAMayX" name="Add Global Menu Entry" style="" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript" class="" contenteditable="false">const GlobalMenuUtils = require("#global-menu-utils");
+
+/******************************************************************************/
+
+const toggleThemeButton = GlobalMenuUtils.createButton("Toggle Light Theme", null, event =&gt; {
+	if (document.documentElement.hasAttribute("transient-theme") &amp;&amp;
+		  (document.documentElement.getAttribute("transient-theme") === "Light")) {
+		document.documentElement.removeAttribute("transient-theme");
+	} else {
+		document.documentElement.setAttribute("transient-theme", "Light");
+	}
+});
+
+/******************************************************************************/
+
+const subMenuName = "Themes";
+
+GlobalMenuUtils.addMenuItemToSubMenu(toggleThemeButton, subMenuName);</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="rTQ75TU9" name="Update Theme" style="" last-execution-state="success"><pre data-type="content" type="text/javascript" class="" contenteditable="false">try {
+	const ThemeCreatorCode = require("#theme-creator-code");
+} catch (e) {
+	alert(`You need to install the optional dependency "Theme Creator" (w2AXGDAm) to update themes!`, "Missing Theme Creator");
+	return;
+}
+
+/******************************************************************************/
+
+ThemeCreatorCode.updateTheme("cHBwRFfk", "Light");</pre></div><div class="paragraph style-paragraph collapsed" data-id="dyLiA5CB" draggable="false" style="" name="Theme Variables" orig-data-id="Z2h2eCWM"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Light"]:root {
+
+	/* Fonts */
+	--font-primary: "Roboto", "Avenir", sans-serif;
+	--font-secondary: "Roboto", "Avenir", sans-serif;
+	--font-monospace: "Roboto Mono", "Menlo", monospace;
+
+	/* Colors */
+	--color-primary: var(--material-color-white);
+	--color-primary-shade-1: var(--material-color-grey-100);
+	--color-primary-shade-2: var(--material-color-grey-200);
+	--color-primary-shade-3: var(--material-color-grey-300);
+
+	--color-primary-text: var(--material-color-grey-900);
+	--color-secondary-text: var(--material-color-grey-700);
+	--color-tertiary-text: var(--material-color-grey-500);
+
+	--color-accent: var(--material-color-deep-orange);
+	--color-accent-text: var(--material-color-black);
+
+		/* Colors RGB */
+	--color-primary-rgb: var(--material-color-white-rgb);
+	--color-primary-shade-1-rgb: var(--material-color-grey-100-rgb);
+	--color-primary-shade-2-rgb-rgb: var(--material-color-grey-200-rgb);
+	--color-primary-shade-3-rgb: var(--material-color-grey-300-rgb);
+
+	--color-primary-text-rgb: var(--material-color-grey-900-rgb);
+	--color-secondary-text-rgb: var(--material-color-grey-700-rgb);
+	--color-tertiary-text-rgb: var(--material-color-grey-500-rgb);
+
+	--color-accent-rgb: var(--material-color-deep-orange-rgb);
+	--color-accent-text-rgb: var(--material-color-black-rgb);
+
+	/* Transitions */
+	--navigation-transition: 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="vdtqQKCs" orig-data-id="63U8sryX" name="CodeMirror Monokai Theme"><style data-type="content" type="text/css" codemirror="true">/* Based on Sublime Text's Monokai theme */
+
+html[transient-theme="Light"] .cm-s-monokai.CodeMirror {
+	background: none;
+	color: var(--color-text-primary) !important;
+}
+html[transient-theme="Light"] .cm-s-monokai .CodeMirror-gutters {
+	background: none;
+	border-right: 0px;
+}
+html[transient-theme="Light"] .cm-s-monokai div.CodeMirror-selected {
+	background: var(--color-primary);
+}
+html[transient-theme="Light"] .cm-s-monokai .CodeMirror-cursor {
+	border-left: 1px solid var(--color-primary-text);
+}
+
+html[transient-theme="Light"] .cm-s-monokai span.cm-number, html[transient-theme="Light"] .cm-s-monokai span.cm-string, html[transient-theme="Light"] .cm-s-monokai span.cm-atom { color: #762; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-comment { color: #262; font-style: italic; line-height: 1em; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-meta { color: #555; font-style: italic; line-height: 1em; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-variable { color: black; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-variable-2 { color: #b11; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-qualifier { color: #555; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-keyword { color: #730; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-builtin { color: #30a; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-link { color: #762; }
+html[transient-theme="Light"] .cm-s-monokai span.cm-error { background-color: #ffb8b8; }
+
+html[transient-theme="Light"] .cm-s-monokai .CodeMirror-activeline-background { background: rgba(var(--color-accent-rgb), 0.1); }
+html[transient-theme="Light"] .cm-s-monokai .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
+
+
+html[transient-theme="Light"] .cm-s-monokai span.cm-matchhighlight {
+	background: #353;
+}
+html[transient-theme="Light"] .cm-s-monokai span.cm-tag {
+	color: rgb(234, 53, 134);
+}
+
+html[transient-theme="Light"] .cm-s-monokai span.cm-property,
+html[transient-theme="Light"] .cm-s-monokai span.cm-attribute {
+	color: #12AF16;
+}</style></div></div>
