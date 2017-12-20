@@ -1,0 +1,730 @@
+<div class="section section-visible" data-id="3ZRvf4XW" name="Package Icons" data-type="package"><div class="paragraph body-paragraph locked collapsed" data-id="HBwJWPc8" name="Documentation" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2>
+<div>Sidebar for managing of packages and package repositories.</div><h2>Two Views</h2><div>The sidebar has two views: Packages and Repositories. In the packages view, which is the default view, one can see all packages of the selected repository as well as just locally installed packages. The user can switch between the views by pressing the indigo menu button on the top of the sidebar.</div><h2>Packages</h2><div>Packages are displayed as a list of package icons. The color of the package icons indicate the current state (see list below). When hovering over an package a tooltip shows the name of the package. Three buttons allow for basic package routines: installing/updating, removing, pushing. The icon of each package can be set in the section-properties of each package.</div><div><br></div><div>The "Refresh Packages List" makes it possible to update the package icons without having to reload the page (e.g. when there were updates on a repository). Local changes as adding packages or removing them is directly updated inside the package view.</div><h3>Package Colors</h3><div>The color of the icon indicate the state of the package:</div><div><ul><li><b style="color: rgb(238, 238, 238);">Lightgrey</b>: Package is available on the prototype for download.</li><li><b style="color: rgb(76, 175, 80);">Green</b>: The package is installed and up to date.</li><li><b style="color: rgb(255, 152, 0);">Orange</b>: The package is installed but has a changed version.</li><li><b style="color: rgb(0, 150, 136);">Teal</b>: The package is installed but versions couldn't be compared with repository.</li><li><b style="color: rgb(3, 169, 244);">Cyan</b>: The package is installed but not available in the repository.</li><li><b style="color: rgb(66, 66, 66);">Darkgrey</b>: Only persistent parts of the package are installed.</li></ul><h2>Repositories</h2></div><div>In the repositories view users can add, remove and select package repositories. The list of repositories is stored in a webstrate anywhere cookie. So currently one has to be logged in to add new repositories to your own list.</div><div><br></div><div>Like package icons the repository icons allow to select them and thus update the package view or remove repositories from the list. The default package at the moment is "mb-packages".</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="sf8c5xPE" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.2.1",
+	"icon": "developer_board",
+	"assets": [],
+	"dependencies": [],
+	"description": "Sidebar for packages.",
+	"changelog":
+	{
+		"1.2.1": "Fixed z-index to let the icons stay under the snackbar.",
+		"1.2": "Renaming from stores to repositories.",
+		"1.1": "Style fixes and global package store manager.",
+		"1.0": "Initial Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "general/package-icons"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="SfPkA4eF" draggable="false" style="" name="Package Icons Init" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript" contenteditable="null">const PackageIconsCode = require("#package-icons-code");
+
+PackageIconsCode.initPackageIcons();</pre></div><div class="paragraph code-paragraph collapsed" data-id="xnKWtfn4" draggable="false" style="" name="Package Icons Update" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript" contenteditable="null">const PackageIconsCode = require("#package-icons-code");
+
+/******************************************************************************/
+
+document.liveQuerySelectorAll(".section").added(element =&gt; {
+	element.liveAttribute("data-type").changed((value, oldValue) =&gt; {
+		if (oldValue === undefined) return;
+		
+		if (value === "package") {
+			PackageIconsCode.showPackageIcon(element.getAttribute("data-id"));
+		} else if (oldValue === "package") {
+			PackageIconsCode.hidePackageIcon(element.getAttribute("data-id"));
+		}
+	});
+});
+
+document.liveQuerySelectorAll(".section[data-type='package']").removed(element =&gt; {
+	PackageIconsCode.removePackageIcon(element.getAttribute("data-id"));
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="jEWEZ7ZT" name="Package Icons Code" style=""><pre data-type="content" type="text/javascript" id="package-icons-code" contenteditable="null">const SectionPullingUtils = require("#section-pulling-utils");
+const PackageManagementHelper = require("#package-management-helper");
+const PackageRepositoryManager = require("#package-repository-manager");
+
+/******************************************************************************/
+
+const packageSectionQuerySelector = ".section[data-type='package']";
+
+let currentPackages = [];
+
+/******************************************************************************/
+
+exports.initPackageIcons = async() =&gt; {
+	let transient = document.querySelector("#package-icons");
+	
+	if (transient) return;
+	
+	transient = document.createElement("transient");
+	transient.id = "package-icons";
+
+	const packages = document.createElement("div");
+	packages.id = "package-icons-packages";
+
+	const repositories = document.createElement("div");
+	repositories.id = "package-icons-repositories";
+	repositories.classList.add("hidden");
+
+	// Add Packages Menu
+	const packagesMenu = createElement(["package-icon", "package-icon-menu"], false);
+	
+	const packagesSwap = createElement(["package-button", "package-button-swap"], () =&gt; {
+		exports.togglePackagesRepositories();
+	});
+
+	const packagesRefresh = createElement(["package-button", "package-button-second", "package-button-refresh-packages"], () =&gt; {
+		exports.refreshPackageIcons();
+	});
+	packagesRefresh.setAttribute("title", "Refresh Packages List");
+
+	packagesMenu.appendChild(packagesRefresh);
+	packagesMenu.appendChild(packagesSwap);
+	packages.appendChild(packagesMenu);
+	
+	// Add Packages All Utility
+	const packagesAll = createElement(["package-icon", "package-icon-all"], false);
+
+	const packagesInstallAll = createElement(["package-button", "package-button-install-all"], async() =&gt; {
+		const url = SectionPullingUtils.generatePullUrl(PackageRepositoryManager.currentPackageRepositoryName,
+																										PackageRepositoryManager.currentPackageRepositoryTag);
+		const iframe = await SectionPullingUtils.loadPrototype(url + "?exec=no");
+		if (!iframe) return;
+
+		// Extract packages from pulled Codestrate and remove it
+		const prototypePackageSections = Array.from(
+			iframe.contentWindow.document.querySelectorAll(packageSectionQuerySelector));
+		const transient = iframe.parentNode;
+		transient.remove();
+
+		const localPackageSections = Array.from(document.querySelectorAll(packageSectionQuerySelector));
+
+		PackageManagementHelper.installAndUpdateSelectedPackages(prototypePackageSections, localPackageSections, currentPackages, url);
+	});
+	packagesInstallAll.setAttribute("title", "Install All Packages");
+
+	const packagesRemoveAll = createElement(["package-button", "package-button-second", "package-button-remove-all"], () =&gt; {
+		const localPackageSections = Array.from(document.querySelectorAll(packageSectionQuerySelector));
+		PackageManagementHelper.removePackages(localPackageSections, currentPackages, true);
+	});
+	packagesRemoveAll.setAttribute("title", "Remove All Packages");
+
+	packagesAll.appendChild(packagesInstallAll);
+	packagesAll.appendChild(packagesRemoveAll);
+	packages.appendChild(packagesAll);
+	
+	// Add repository Menu
+	const repositoriesMenu = createElement(["package-icon", "package-icon-menu"], false);
+
+	const repositoriesSwap = createElement(["package-button", "package-button-swap"], () =&gt; {
+		exports.togglePackagesRepositories();
+	});
+
+	const repositoriesAdd = createElement(["package-button", "package-button-second", "package-button-add-repository"], async() =&gt; {
+		// Open dialog for repository selection
+		const pullData = await SectionPullingUtils.showPullSectionsDialog("", "HEAD", "Add Package Repository");
+		if (!pullData) return;
+		
+		PackageRepositoryManager.addPackageRepository(pullData.pullFrom, pullData.pullVersion);
+		exports.refreshRepositoryIcons();
+	});
+	repositoriesAdd.setAttribute("title", "Add Package Repository");
+
+	repositoriesMenu.appendChild(repositoriesAdd);
+	repositoriesMenu.appendChild(repositoriesSwap);
+	repositories.appendChild(repositoriesMenu);
+
+	transient.appendChild(packages);
+	transient.appendChild(repositories);
+
+	document.body.appendChild(transient);
+
+	exports.refreshPackageIcons();
+	exports.refreshRepositoryIcons();
+};
+
+/******************************************************************************/
+
+exports.refreshPackageIcons = async() =&gt; {
+	const packages = document.querySelector("#package-icons-packages");
+
+	if (!packages) return;
+
+	const refresh = document.querySelector(".package-button-refresh-packages");
+	refresh.classList.add("refreshing");
+
+	const oldPackageIconPackages = packages.querySelectorAll(".package-icon-package:not(.package-icon-menu)");
+	oldPackageIconPackages.forEach(packageIconPackage =&gt; packages.removeChild(packageIconPackage));
+
+	const newPackageIconPackages = await exports.getPackageIconPackages();
+	if (Array.isArray(newPackageIconPackages)) {
+		newPackageIconPackages.forEach(packageIconPackage =&gt; packages.appendChild(packageIconPackage));
+	}
+
+	refresh.classList.remove("refreshing");
+};
+
+/******************************************************************************/
+
+exports.refreshRepositoryIcons = async() =&gt; {
+	const repositories = document.querySelector("#package-icons-repositories");
+
+	if (!repositories) return;
+
+	const oldPackageIconRepositories = repositories.querySelectorAll(".package-icon-repository:not(.package-icon-menu)");
+	oldPackageIconRepositories.forEach(packageIconRepository =&gt; repositories.removeChild(packageIconRepository));
+
+	const newPackageIconRepositories = exports.getPackageIconRepositories();
+	if (Array.isArray(newPackageIconRepositories)) {
+		newPackageIconRepositories.forEach(packageIconRepository =&gt; repositories.appendChild(packageIconRepository));
+	}
+};
+
+/******************************************************************************/
+
+exports.getPackageIconPackages = () =&gt; {
+	
+	return new Promise((resolve, reject) =&gt; {
+	
+		(async() =&gt; {
+
+			// Pull Codestrate in iFrame
+			const url = SectionPullingUtils.generatePullUrl(PackageRepositoryManager.currentPackageRepositoryName,
+																											PackageRepositoryManager.currentPackageRepositoryTag);
+			const iframe = await SectionPullingUtils.loadPrototype(url + "?exec=no");
+			if (!iframe) return;
+
+			// Extract packages from pulled Codestrate and remove it
+			const prototypePackageSections = Array.from(
+					iframe.contentWindow.document.querySelectorAll(packageSectionQuerySelector));
+			const transient = iframe.parentNode;
+			transient.remove();
+
+			const localPackageSections = Array.from(document.querySelectorAll(packageSectionQuerySelector));
+
+			currentPackages = prototypePackageSections.map(packageSection =&gt; packageSection.getAttribute("data-id"));
+
+			// Get stati of packages
+			const packageStati = SectionPullingUtils.getSectionStati(
+				SectionPullingUtils.getMultipleSectionProperties(prototypePackageSections),
+				SectionPullingUtils.getMultipleSectionProperties(localPackageSections));
+
+			const packageIconPackages = [];
+
+			packageStati.forEach(packageStatus =&gt; {
+				const packageIconPackage = exports.getPackageIconPackage(packageStatus, url);
+				packageIconPackages.push(packageIconPackage);
+			});
+
+			resolve(packageIconPackages);
+		})();
+	});
+};
+
+/******************************************************************************/
+
+exports.getPackageIconPackage = (packageStatus, url = false) =&gt; {
+
+	url = url || SectionPullingUtils.generatePullUrl(PackageRepositoryManager.currentPackageRepositoryName,
+																									 PackageRepositoryManager.currentPackageRepositoryTag);
+
+	// Create element
+	const packageIconPackage = document.createElement("div");
+	packageIconPackage.classList.add("package-icon", "package-icon-package");
+
+	// Set attributes
+	packageIconPackage.setAttribute("data-id", packageStatus.id);
+	packageIconPackage.setAttribute("name", packageStatus.name);
+	packageIconPackage.setAttribute("prototype", packageStatus.prototype);
+	packageIconPackage.setAttribute("local", packageStatus.local);
+	if (packageStatus.local) {
+		packageIconPackage.setAttribute("uninstalled", packageStatus.localProperties.uninstalled);
+	}
+	packageIconPackage.setAttribute("version-changed", packageStatus.versionChanged);
+
+	// Add label
+	const label = document.createElement("div");
+	label.classList.add("package-label");
+	label.innerHTML = packageStatus.name;
+	packageIconPackage.appendChild(label);
+
+	// Add icon
+	const icon = document.createElement("i");
+	icon.classList.add("material-icons");
+	if (packageStatus.icon) icon.innerHTML = packageStatus.icon;
+	packageIconPackage.appendChild(icon);
+
+	// Add uninstall and push buttons
+	if (packageStatus.local) {
+		if (!packageStatus.localProperties.uninstalled &amp;&amp;
+				PackageRepositoryManager.currentPackageRepositoryTag === "HEAD") {
+			const pushButton = createElement(["package-button", "push-package-button", "package-button-third"], async() =&gt; {
+				const iframe = await SectionPullingUtils.loadPrototype(url + "?exec=no");
+				if (!iframe) return;
+
+				const localPackageSections = Array.from(document.querySelectorAll(packageSectionQuerySelector));
+
+				PackageManagementHelper.pushPackages(localPackageSections, [packageStatus.id], iframe, url);
+			});
+			packageIconPackage.appendChild(pushButton);
+		}
+		
+		const removeButton = createElement(["package-button", "remove-package-button", "package-button-second"], () =&gt; {
+			const localPackageSections = Array.from(document.querySelectorAll(packageSectionQuerySelector));
+
+			PackageManagementHelper.removePackages(localPackageSections, [packageStatus.id]);
+		});
+		packageIconPackage.appendChild(removeButton);
+	}
+	
+	// Add install button
+	if (packageStatus.prototype) {
+		const installButton = createElement(["package-button", "install-package-button"], async() =&gt; {
+			const iframe = await SectionPullingUtils.loadPrototype(url + "?exec=no");
+			if (!iframe) return;
+
+			// Extract packages from pulled Codestrate and remove it
+			const prototypePackageSections = Array.from(
+				iframe.contentWindow.document.querySelectorAll(packageSectionQuerySelector));
+			const transient = iframe.parentNode;
+			transient.remove();
+
+			const localPackageSections = Array.from(document.querySelectorAll(packageSectionQuerySelector));
+
+			PackageManagementHelper.installAndUpdateSelectedPackages(
+				prototypePackageSections, localPackageSections, [packageStatus.id], url);
+		});
+		packageIconPackage.appendChild(installButton);
+	} else {
+		const installButton = createElement(["package-button", "install-package-button", "disabled"], false);
+		packageIconPackage.appendChild(installButton);
+	}
+	
+	return packageIconPackage;
+};
+
+/******************************************************************************/
+
+exports.getPackageIconRepositories = () =&gt; {
+	const packageRepositories = PackageRepositoryManager.packageRepositories;
+
+	const packageIconRepositorys = [];
+
+	if (Array.isArray(packageRepositories)) {
+		packageRepositories.forEach(repository =&gt; {
+			const packageIconRepository = exports.getPackageIconRepository(repository.packageRepositoryName, repository.packageRepositoryTag);
+			packageIconRepositorys.push(packageIconRepository);
+		});
+	}
+
+	return packageIconRepositorys;
+};
+
+/******************************************************************************/
+
+exports.getPackageIconRepository = (packageRepositoryName, packageRepositoryTag) =&gt; {
+
+	// Create element
+	const packageIconRepository = document.createElement("div");
+	packageIconRepository.classList.add("package-icon", "package-icon-repository");
+
+	// Set attributes
+	packageIconRepository.setAttribute("packageRepositoryName", packageRepositoryName);
+	packageIconRepository.setAttribute("packageRepositoryTag", packageRepositoryTag);
+	if ((packageRepositoryName === PackageRepositoryManager.currentPackageRepositoryName) &amp;&amp;
+			(packageRepositoryTag === PackageRepositoryManager.currentPackageRepositoryTag)) {
+		packageIconRepository.setAttribute("active",
+				(packageRepositoryName === PackageRepositoryManager.currentPackageRepositoryName) &amp;&amp;
+				(packageRepositoryTag === PackageRepositoryManager.currentPackageRepositoryTag));
+	}
+
+	const icon = document.createElement("i");
+	icon.classList.add("material-icons");
+	packageIconRepository.appendChild(icon);
+
+	const label = document.createElement("div");
+	label.classList.add("package-label");
+	label.innerHTML = packageRepositoryName + " " + packageRepositoryTag;
+	packageIconRepository.appendChild(label);
+
+	const removeButton = createElement(["package-button", "remove-repository-button", "package-button-second"], () =&gt; {
+		PackageRepositoryManager.removePackageRepository(packageRepositoryName, packageRepositoryTag);
+		exports.refreshRepositoryIcons();
+	});
+	packageIconRepository.appendChild(removeButton);
+
+	const selectButton = createElement(["package-button", "select-repository-button"], () =&gt; {
+		PackageRepositoryManager.selectPackageRepository(packageRepositoryName, packageRepositoryTag);
+		exports.refreshPackageIcons();
+		exports.refreshRepositoryIcons();
+	});
+	packageIconRepository.appendChild(selectButton);
+
+	return packageIconRepository;
+};
+
+/******************************************************************************/
+
+exports.togglePackagesRepositories = () =&gt; {
+	const packageIconsPackages = document.querySelector("#package-icons-packages");
+	const packageIconsRepositories = document.querySelector("#package-icons-repositories");
+
+	packageIconsPackages.classList.toggle("hidden");
+	packageIconsRepositories.classList.toggle("hidden");
+};
+
+/******************************************************************************/
+
+exports.removePackageIcon = (packageId) =&gt; {
+	const packageIcon = document.querySelector(`.package-icon[data-id="${packageId}"]`);
+	if (!packageIcon) return false;
+
+	const parent = packageIcon.parentNode;
+	parent.removeChild(packageIcon);
+	return true;
+};
+
+/******************************************************************************/
+
+exports.hidePackageIcon = (packageId) =&gt; {
+	const packageIcon = document.querySelector(`.package-icon[data-id="${packageId}"]`);
+	if (!packageIcon) return false;
+
+	packageIcon.style.display = "none";
+	return true;
+};
+
+exports.showPackageIcon = (packageId) =&gt; {
+	const packageIcon = document.querySelector(`.package-icon[data-id="${packageId}"]`);
+	if (!packageIcon) exports.refreshPackageIcons();
+
+	packageIcon.style.display = "block";
+	return true;
+};
+
+/******************************************************************************/
+
+const createElement = (cssClasses, action) =&gt; {
+	const element = document.createElement("div");
+	element.classList.add(...cssClasses);
+	if (typeof action === "function") element.addEventListener("click", action);
+
+	const icon = document.createElement("i");
+	icon.classList.add("material-icons");
+
+	element.appendChild(icon);
+
+	return element;
+};
+
+/******************************************************************************/
+
+const getRandomColor = () =&gt; {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i &lt; 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};</pre></div><div class="paragraph style-paragraph collapsed" data-id="4BGSHqL7" name="Package Icons Style" style=""><style data-type="content" type="text/css" codemirror="true" class="themable" contenteditable="null">html #package-icons {
+	position: fixed;
+	right: 0;
+	top: 0;
+	height: 100vh;
+	width: 240px;
+	transition: transform 250ms ease-in-out 0s;
+	z-index: 25;
+	transform: translate(200px, 0);
+	overflow: auto;
+}
+
+html #package-icons::-webkit-scrollbar,
+html #package-icons #package-icons-packages::-webkit-scrollbar,
+html #package-icons #package-icons-repositories::-webkit-scrollbar {
+  display: none;
+}
+
+html #package-icons:hover {
+	transform: translate(0, 0);
+}
+
+/******************************************************************************/
+
+html #package-icons #package-icons-packages,
+html #package-icons #package-icons-repositories {
+	position: fixed;
+	top: 0;
+	right: 0;
+	overflow: auto;
+	height: 100%;
+	width: 100%;
+	transition: transform 250ms ease-in-out 0s,
+							opacity 250ms ease-in-out 0s,
+							padding-top var(--navigation-transition);
+	padding-top: 64px;
+}
+
+html body[transient-toolbar-hidden="true"] #package-icons #package-icons-packages,
+html body[transient-toolbar-hidden="true"] #package-icons #package-icons-repositories {
+	padding-top: 0;
+}
+
+html #package-icons #package-icons-packages.hidden,
+html #package-icons #package-icons-repositories.hidden {
+	transform: translate(240px, 0);
+	opacity: 0;
+}
+
+/******************************************************************************/
+
+html #package-icons .package-icon,
+html #package-icons .package-button {
+	border-radius: 50%;
+	height: 64px;
+	width: 64px;
+	text-align: center;
+	line-height: 64px;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/******************************************************************************/
+
+html #package-icons .package-icon {
+	position: relative;
+	margin: 16px 8px 16px 160px;
+	overflow: visible;
+	background: var(--material-color-grey-200);
+	color: var(--material-color-grey-900);
+	animation: show 150ms ease-in-out;
+	animation-fill-mode: forwards;
+	box-shadow: var(--material-shadow-z2);
+}
+@keyframes show {
+	0% {
+		transform: translate(128px, 0);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
+}
+
+/******************************************************************************/
+
+html #package-icons .package-button-refresh-packages i {
+	animation: spin 1000ms linear infinite;
+	animation-play-state: paused;
+}
+
+html #package-icons .package-button-refresh-packages.refreshing i {
+	animation-play-state: running;
+}
+@keyframes spin {
+	100% {
+		transform: rotate(-360deg);
+	}
+}
+
+/******************************************************************************/
+
+html #package-icons .package-icon .package-label {
+	position: absolute;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: none;
+	height: 28px;
+	line-height: 24px;
+	padding: 2px 6px;
+	font-size: 14px;
+	background: #000000;
+	color: #FFFFFF;
+	max-width: 192px;
+	transform: translate(-45%, -60px) rotate(4deg);
+}
+
+html #package-icons .package-icon:hover .package-label {
+	display: inline-block;
+}
+
+/******************************************************************************/
+
+html #package-icons .package-icon .package-button {
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: var(--material-color-white);
+	cursor: pointer;
+	opacity: 0;
+	transform: translate(0, 0);
+	box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0),
+		var(--material-shadow-z2);
+	transition: opacity 150ms ease-in-out 250ms,
+		transform 150ms ease-in-out 250ms,
+		box-shadow var(--navigation-transition);
+}
+
+html #package-icons .package-icon:hover .package-button {
+	opacity: 1;
+}
+
+html #package-icons .package-icon .package-button:hover {
+	box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.25),
+		var(--material-shadow-z8);
+}
+
+html #package-icons .package-icon:hover .package-button-second {
+	transform: translate(-72px, 0);
+}
+	
+html #package-icons .package-icon:hover .package-button-third {
+	transform: translate(-144px, 0);
+}
+
+/******************************************************************************/
+
+html #package-icons .material-icons {
+	font-size: 32px;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="2Chhy49u" name="Package Icons State Colors"><style data-type="content" type="text/css" codemirror="true" class="themable" contenteditable="null">html #package-icons .package-icon-package[local="true"][version-changed="false"] {
+	background: var(--material-color-green);
+	color: var(--material-color-white);
+}
+
+html #package-icons .package-icon-package[local="true"][version-changed="true"] {
+	background: var(--material-color-orange);
+	color: var(--material-color-white);
+}
+
+html #package-icons .package-icon-package[local="true"][version-changed="undefined"] {
+	background: var(--material-color-teal);
+	color: var(--material-color-white);
+}
+
+html #package-icons .package-icon-package[local="true"][uninstalled="true"] {
+	background: var(--material-color-grey-800) !important;
+	color: var(--material-color-white);
+}
+
+html #package-icons .package-icon-package[local="true"][prototype="false"] {
+	background: var(--material-color-light-blue);
+	color: var(--material-color-white);
+}
+
+html #package-icons .package-icon-repository[active="true"] {
+	background: var(--material-color-green);
+	color: var(--material-color-white);
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="4YhsGV4U" name="Package Icons Button Colors" style=""><style data-type="content" type="text/css" codemirror="true" class="themable" contenteditable="null">html #package-icons .package-icon-menu,
+html #package-icons .package-icon-all {
+	background: var(--material-color-indigo);
+	color: var(--material-color-white);
+}
+
+html #package-icons .package-button-refresh-packages {
+	background: var(--material-color-indigo);
+}
+
+html #package-icons .package-button-add-repository {
+	background: var(--material-color-indigo);
+}
+
+html #package-icons .package-button-swap {
+	background: var(--material-color-indigo);
+}
+
+/**************************************************************************************************/
+
+html #package-icons .package-icon .package-button.disabled {
+	background: var(--material-color-grey-800) !important;
+	cursor: default;
+}
+
+html #package-icons .package-icon .package-button.disabled:hover {
+	box-shadow: var(--material-shadow-z2);
+}
+
+/**************************************************************************************************/
+
+html #package-icons .package-icon .install-package-button,
+html #package-icons .package-icon[local="true"][uninstalled="true"] .install-package-button,
+html #package-icons .package-icon .select-repository-button,
+html #package-icons .package-icon .package-button-install-all {
+	background: var(--material-color-green);
+}
+
+html #package-icons .package-icon[local="true"][uninstalled="false"][version-changed="true"] .install-package-button {
+	background: var(--material-color-orange);
+}
+
+html #package-icons .package-icon[local="true"][uninstalled="false"][version-changed="undefined"] .install-package-button {
+	background: var(--material-color-teal);
+}
+
+html #package-icons .package-icon .remove-package-button,
+html #package-icons .package-icon .remove-repository-button,
+html #package-icons .package-icon .package-button-remove-all {
+	background: var(--material-color-red);
+}
+
+html #package-icons .package-icon .push-package-button {
+	background: var(--material-color-light-blue);
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="eW5ajidK" name="Package Icons Material Icons" draggable="false" style=""><style data-type="content" type="text/css" codemirror="true" class="themable" contenteditable="null">html #package-icons .package-icon-menu i:after {
+	content: "menu";
+}
+
+html #package-icons .package-icon-all > i:after {
+	content: var(--database);
+	font-family: "Material Design Icons";
+}
+
+html #package-icons .package-button-refresh-packages i:after {
+	content: "cached";
+}
+
+html #package-icons .package-button-add-repository i:after {
+	content: "add";
+}
+
+html #package-icons .package-button-swap i:after {
+	content: "swap_horiz";
+}
+
+html #package-icons .package-icon .package-button-install-all i:after  {
+	content: "done_all";
+}
+
+html #package-icons .package-icon .package-button-remove-all i:after {
+	content: "clear_all";
+}
+
+/**************************************************************************************************/
+
+html #package-icons .package-icon.package-icon-package > i:empty:after {
+	content: var(--cube-outline);
+	font-family: "Material Design Icons";
+}
+
+html #package-icons .package-icon.package-icon-repository > i:after {
+	content: var(--database);
+	font-family: "Material Design Icons";
+}
+
+html #package-icons .package-icon .install-package-button i:after,
+html #package-icons .package-icon[local="true"][uninstalled="true"] .install-package-button i:after{
+	content: "file_download";
+}
+
+html #package-icons .package-icon .select-repository-button i:after {
+	content: "check";
+}
+
+html #package-icons .package-icon[local="true"] .install-package-button i:after {
+	content: "update";
+}
+
+html #package-icons .package-icon .remove-package-button i:after,
+html #package-icons .package-icon .remove-repository-button i:after {
+	content: "delete";
+}
+
+html #package-icons .package-icon .push-package-button i:after {
+	content: "file_upload";
+}</style></div></div>
