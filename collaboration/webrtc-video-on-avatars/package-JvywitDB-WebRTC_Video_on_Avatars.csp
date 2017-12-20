@@ -1,0 +1,270 @@
+<div class="section section-visible" name="WebRTC Video on Avatars" data-type="package" data-group="basic" data-id="JvywitDB" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="3gpHCaHH"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds WebRTC video communication to avatars.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="r79E9WYH"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0",
+	"icon": "video_call",
+	"assets": [],
+	"dependencies": [
+		{
+			"id": "USSKFQPD",
+			"name": "Avatars"
+		}
+	],
+	"description": "Adds WebRTC video communication to avatars.",
+	"changelog":
+	{
+		"1.0": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "collaboration/webrtc-video-on-avatars"
+	}
+}</pre></div>
+
+<div class="paragraph code-paragraph collapsed" name="Event Handling" run-on-load="true" last-execution-state="success" data-id="rjKcVvbm" style=""><pre data-type="content" type="text/javascript">webstrate.on("signal", (message, senderId) =&gt; {
+
+	if (message.type === "Call") {
+
+		// Received request for video call.
+		if (message.cmd === "video") {
+			console.log("Requesting video");
+
+			const result = confirm(`User ${senderId} calls you. Do you want to accept the call?`);
+
+			if (result) {
+				VideoManager.start(senderId);
+
+				// Signal accept
+				webstrate.signal({ type: "Call", cmd: "accept" }, senderId);
+			} else {
+				// Signal reject
+				webstrate.signal({ type: "Call", cmd: "reject" }, senderId);
+			}
+		} else if (message.cmd === "accept") {
+			// Approved video call request
+			console.log("Accepting video");
+
+			VideoManager.start(senderId);
+		} else if (message.cmd === "reject") {
+			console.log("Rejecting video");
+			alert(`User ${senderId} rejected call.`);
+		}
+
+		return;
+	}
+});
+
+const createUserVideo = (clientId) =&gt; {
+	const avatar = document.querySelector(`.avatars .avatar[client-id="${clientId}"]`);
+
+	var videoWrapper = document.createElement("div");
+	videoWrapper.classList.add("video-wrapper");
+
+	var video = document.createElement("video");
+	video.classList.add("remote-video");
+	videoWrapper.appendChild(video);
+	avatar.appendChild(videoWrapper);
+
+	return video;
+};
+
+const listenForStreams = (clientId, meta, accept) =&gt; {
+	console.log('create user video', clientId);
+	const videoElement = createUserVideo(clientId);
+
+	if (videoElement) {
+		console.log('create user element', videoElement);
+
+		var conn = accept(function(stream) {
+			// Add stream to video element and play it
+			videoElement.srcObject = stream;
+			videoElement.play();
+
+			conn.onclose(function() {
+				if (stream) {
+					stream.getVideoTracks().forEach(t =&gt; t.stop());
+					stream.getAudioTracks().forEach(t =&gt; t.stop());
+				}
+
+				videoElement.closest('.video-wrapper').remove();
+
+				// document.body.webstrate.on("signalStream", listenForStreams);
+			});
+		});
+	}
+
+	// Listen for further streams...
+	// document.body.webstrate.on("signalStream", listenForStreams);
+};
+
+document.body.webstrate.on("signalStream", listenForStreams);</pre></div><div class="paragraph code-paragraph collapsed" name="Video Manager" data-id="AjDjPGuu"><pre data-type="content" type="text/javascript" id="video-manager">const createUserVideo = (clientId) =&gt; {
+	const avatar = document.querySelector(`.avatar[client-id="${clientId}"]`);
+
+	// no avatar for client id found
+	if (!avatar) return;
+
+	let video = avatar.querySelector('video');
+	if (video) {
+		return video;
+	}
+
+	const videoWrapper = document.createElement("div");
+	videoWrapper.classList.add("video-wrapper");
+
+	video = document.createElement("video");
+	video.classList.add("local-video");
+	video.setAttribute("muted", "");
+
+	videoWrapper.appendChild(video);
+	avatar.appendChild(videoWrapper);
+
+	return video;
+};
+
+const signalStream = (clientId, accept) =&gt; {
+	// Get audio and video feed.
+
+	if (clientId === webstrate.clientId) return;
+
+	try {
+		const videoElement = createUserVideo(webstrate.clientId);
+
+		if (!videoElement.__cons) {
+			videoElement.__cons = [];
+		}
+
+		if (videoElement.__stream) {
+			// And send it to the requesting client.
+			var meta = { title: "My Video Stream" };
+			var conn = accept(videoElement.__stream, meta, function() {
+				// Connection has been established.
+			});
+
+			videoElement.__cons.push(conn);
+		} else {
+			const mediaDevices = navigator.mediaDevices;
+			mediaDevices.getUserMedia({ audio: true, video: true })
+				.then(function(stream) {
+
+				videoElement.__stream = stream;
+				videoElement.srcObject = stream;
+				videoElement.play();
+
+				// And send it to the requesting client.
+				var meta = { title: "My Video Stream" };
+				var conn = accept(stream, meta, function() {
+					// Connection has been established.
+				});
+
+				videoElement.__cons.push(conn);
+			});
+		}
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+exports.hearMe = () =&gt; {
+	document.body.webstrate.signalStream(signalStream);
+};
+
+exports.stopHearMe = () =&gt; {
+	document.body.webstrate.stopStreamSignal(signalStream);
+
+	const video = createUserVideo(webstrate.clientId);
+	if (video.__cons) {
+		video.__cons.forEach(c =&gt; c.close());
+		delete video.__cons;
+	}
+
+	if (video.__stream) {
+		const stream = video.__stream;
+		stream.getVideoTracks().forEach(t =&gt; t.stop());
+		stream.getAudioTracks().forEach(t =&gt; t.stop());
+		delete video.__stream;
+	}
+
+	video.closest('.video-wrapper').remove();
+};</pre></div><div class="paragraph code-paragraph collapsed" name="Augment Avatar" run-on-load="true" last-execution-state="success" data-id="FpYrQpAQ" style=""><pre data-type="content" type="text/javascript">const VideoManager = require('#video-manager');
+
+const augmentAvatar = (avatar) =&gt; {
+	const hearMe = document.createElement("div");
+	hearMe.classList.add("hear-me");
+
+	const icon = document.createElement("i");
+	icon.classList.add("material-icons");
+	hearMe.appendChild(icon);
+
+	hearMe.addEventListener("click", event =&gt; {
+
+		if (avatar.classList.contains("talking")) {
+			VideoManager.stopHearMe();
+			avatar.classList.remove("talking");
+		} else {
+			VideoManager.hearMe();
+			avatar.classList.add("talking");
+		}
+	});
+
+	avatar.appendChild(hearMe);
+};
+
+document.liveQuerySelectorAll('.avatars .avatar.self').added(augmentAvatar);</pre></div><div class="paragraph style-paragraph collapsed" name="Augmented Avatar Style" data-id="rVRxSnSj" style=""><style data-type="content" type="text/css" codemirror="true">.avatars .avatar .hear-me {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 45px;
+	height: 45px;
+	background-color: deepskyblue;
+	border-radius: 50%;
+	border: 2px solid white;
+	box-shadow: 0px 0px 5px #000;
+	opacity: 0;
+	transition: transform 250ms ease-in-out 250ms, opacity 250ms ease-in-out 250ms;
+}
+
+.avatars .avatar .hear-me i:after {
+	content: "videocam";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate3d(-50%, -50%, 0);
+}
+
+.avatars .avatar .hear-me:hover {
+	background-color: green;
+}
+
+.avatars .avatar.talking .hear-me i:after {
+	content: "videocam_off";
+}
+
+.avatars .avatar:hover .hear-me {
+	opacity: 1.0;
+	transform: translate3d(-50px, 0, 0);
+	pointer-events: all;
+	cursor: pointer;
+}</style></div><div class="paragraph style-paragraph collapsed" draggable="false" name="WebRTC Style" data-id="KQw7yyGg" style=""><style data-type="content" type="text/css" codemirror="true">.avatars .avatar .video-wrapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	-webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%); 
+	-webkit-transform: rotate(0.000001deg); 
+	-webkit-border-radius: 50%; 
+	-moz-border-radius: 50%;
+	transform: translateZ(0);
+}
+
+.avatars .avatar .video-wrapper video {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	height: 100%;
+	transform: translate3d(-50%, -50%, 0);
+}
+
+.avatars .avatar.self .video-wrapper video {
+	transform: translate3d(-50%, -50%, 0) scaleX(-1);
+}</style></div></div>
