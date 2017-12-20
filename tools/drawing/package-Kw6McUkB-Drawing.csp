@@ -1,0 +1,1316 @@
+<div class="section section-visible" name="Drawing" data-type="package" data-group="basic" data-id="Kw6McUkB" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="34EydchL"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Add drawing capabililties to body paragraphs and slides. Latter requires the presentation package.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="MqSH2XDP"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.2.2",
+	"icon": "filter_frames",
+	"assets": [],
+	"dependencies": [
+		{
+			"id": "rEpvSgsq",
+			"name": "Transformer"
+		}
+	],
+	"description": "Add drawing capabililties to body paragraphs and slides. Latter requires the presentation package.",
+	"changelog":
+	{
+		"1.0": "Initital Release",
+		"1.1": "Snackbar and Toolbar integration.",
+		"1.2": "Update offset on transient-fullscreen.",
+		"1.2.1": "Canvas works with presentation package. Add `canvas` class to `slide-content` element.",
+		"1.2.2": "Added workaround to make Drawing package work with Presentation package."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "tools/drawing"
+	}
+}</pre></div>
+
+<div class="paragraph body-paragraph collapsed" draggable="false" data-id="KVCXKNxU" name="Carousel Canvas Block">
+			<div data-type="content" type="text/html" codemirror="true" contenteditable="true"><div key="canvas-paragraph" class="paragraph-prototype">
+	<i class="material-icons">gesture</i>
+	<div class="">Canvas Paragraph</div>
+
+	<div class="template">
+		<div class="paragraph body-paragraph" data-id="3n74Rq2r">
+			<div class="canvas" data-type="content" type="text/html" codemirror="true" contenteditable="true"></div>
+		</div>
+	</div>
+</div></div>
+		</div><div class="paragraph body-paragraph locked collapsed" draggable="false" data-id="fbspmVgB" name="Canvas Mutation Observer">
+			<div data-type="content" type="text/html" codemirror="true" contenteditable="false">The Canvas Mutation Observer code paragraph is <i>run-on-load</i> and observes the codestrate for body paragraphs that have the class <i>canvas</i>. A body paragraph will be <i>upgraded</i> in a canvas when the canvas class is set; and <i>downgraded</i> when the <i>canvas</i> class is removed.</div>
+		</div><div class="paragraph code-paragraph collapsed" name="Canvas Mutation Observer" last-execution-state="success" run-on-load="true" data-id="Bt6rHkFc">
+        <pre data-type="content" type="text/javascript">importLib([
+	"quadtree.js"
+]).then(() =&gt; {
+	const { Canvas } = require('#canvas');
+	const { ToolPalette, ColorTool } = require('#canvas-instruments');
+
+	const createInstruments = (target) =&gt; {
+		if (!target.__canvas) {
+			let canvas = new Canvas(target);
+			target.__canvas = canvas;
+
+			let toolPalette = new ToolPalette(target);
+			target.__toolPalette = toolPalette;
+
+			let colorTool = new ColorTool("color");
+			colorTool.on("change", (event) =&gt; {
+				if (event.type === "color") {
+					canvas.penColor = event.value;
+				}
+			});
+			toolPalette.addTool(colorTool);
+		}
+	};
+
+	const destroyInstruments = (target) =&gt; {
+		if (target.__canvas) {
+			target.__canvas.destroy();
+			delete target.__canvas;
+
+			target.__toolPalette.destroy();
+			delete target.__toolPalette;
+		}
+	};
+
+	document.liveQuerySelectorAll('.paragraph.body-paragraph .canvas')
+		.added(createInstruments)
+		.removed(destroyInstruments);
+
+	let canvasSelector = document.liveQuerySelectorAll('.paragraph.body-paragraph [data-type="content"]');
+	canvasSelector.added(target =&gt; {
+		target.liveAttribute("class").changed(() =&gt; {
+
+			if (target.matches('.canvas')) {
+				createInstruments(target);
+			} else {
+				destroyInstruments(target);
+			}
+		});
+	});
+});</pre>
+      </div><div class="paragraph body-paragraph locked collapsed" name="Felt Pen" data-id="u53iewMe">
+			<div data-type="content" type="text/html" codemirror="true" contenteditable="false">The Pen Tips code paragraph implements a felt pen algorithm that generates felt-pen-like stroke paths.</div>
+		</div><div class="paragraph code-paragraph collapsed" name="Pen Tips" data-id="DaKNkN4T">
+        <pre data-type="content" type="text/javascript" id="pen-tips">/**
+ * Calculates the mid-point between the two points A and B and then returns
+ * the mid-point.
+ *
+ * @param {any} pointA The point A.
+ * @param {any} pointB The point B.
+ * @returns The mid-point between point A and point B.
+ */
+const midPointBetween = (pointA, pointB) =&gt; {
+	return {
+		x: pointA.x + (pointB.x - pointA.x) / 2,
+		y: pointA.y + (pointB.y - pointA.y) / 2
+	};
+};
+
+exports.FeltPen = {
+
+	/**
+   * Generates a path with regard to thickness of each point in path. This
+   * implementation was done by @clemens.
+   *
+   * @param {any} points Path points with x- and y-position and a thickness per
+   * point.
+   * @returns The path as string.
+   */
+	generateD: (points, pressureFactor) =&gt; {
+
+		const newPoints = [];
+		newPoints.push(points[0]);
+
+		for (let j = 1; j &lt; points.length - 1; j++) {
+			let p1 = points[j - 1];
+			let p = points[j];
+			let p2 = points[j + 1];
+			let c = {
+				x: p2.x - p1.x,
+				y: p2.y - p1.y
+			};
+			let n = {
+				x: -c.y,
+				y: c.x
+			};
+			let len = Math.sqrt(n.x * n.x + n.y * n.y);
+			if (len === 0) continue;
+			let u = {
+				x: n.x / len,
+				y: n.y / len
+			};
+
+			let thickness = p.pressure * pressureFactor;
+
+			newPoints.push({
+				x: p.x + u.x * thickness,
+				y: p.y + u.y * thickness
+			});
+		}
+		newPoints.push(points[points.length - 1]);
+
+		for (let j = points.length - 2; j &gt; 0; j--) {
+			let p1 = points[j + 1];
+			let p = points[j];
+			let p2 = points[j - 1];
+			let c = {
+				x: p2.x - p1.x,
+				y: p2.y - p1.y
+			};
+			let n = {
+				x: -c.y,
+				y: c.x
+			};
+			let len = Math.sqrt(n.x * n.x + n.y * n.y);
+			if (len === 0) continue;
+			let u = {
+				x: n.x / len,
+				y: n.y / len
+			};
+
+			let thickness = p.pressure * pressureFactor;
+
+			newPoints.push({
+				x: p.x + u.x * thickness,
+				y: p.y + u.y * thickness
+			});
+		}
+		let p1 = newPoints[0];
+		let p2 = newPoints[1];
+		let pathString = "M" + p1.x + " " + p1.y;
+		for (let j = 1; j &lt; newPoints.length; j++) {
+			let midPoint = midPointBetween(p1, p2);
+			if (isNaN(p1.x) || isNaN(p1.y) || isNaN(midPoint.x) || isNaN(midPoint.y)) {
+				console.log("NaN");
+			}
+			pathString = pathString += " Q " + p1.x + " " + p1.y + " " + midPoint.x + " " + midPoint.y;
+			p1 = newPoints[j];
+			p2 = newPoints[j + 1];
+		}
+
+		return pathString;
+	}
+};</pre>
+      </div><div class="paragraph body-paragraph locked collapsed" name="Canvas" data-id="sFpH6puY">
+			<div data-type="content" type="text/html" codemirror="true" contenteditable="false">The Canvas code paragraph modifies a body paragraph of class canvas to allow whiteboard-like drawing. Therefore, it adds a SVG element to the body paragraph, if it does not exist. It further adds event listeners to the body paragraph to listen for pen and eraser events. Currently these events are hard-coded, but may be dynamically assignable by the user. On pen down event, it generates a path and on pen move it generates a stroke based on the pen points. On eraser move events, it checks for intersections of the eraser movement and path elements in the SVG element. If the eraser movement and a path element intersect, the path element will be removed.</div>
+		</div><div class="paragraph code-paragraph collapsed" name="Canvas" data-id="NqCrNXKW">
+        <pre data-type="content" type="text/javascript" id="canvas">const { Transformer } = require('.transformer');
+const { Pen } = require('#pen');
+const EraserUtils = require('#eraser-utils');
+const svgNS = "http://www.w3.org/2000/svg";
+
+const DEFAULT_OPTIONS = {
+	isElementsIndexEnabled: true,
+	isAllowedPenEvent: [
+		// Pen event
+		(event) =&gt; {
+			if (event.pointerType === "pen") {
+				event.preventDefault();
+				return true;
+			}
+			return false;
+		},
+		// ctrl+mouse event
+		(event) =&gt; {
+			if (event.shiftKey &amp;&amp; event.pointerType === "mouse") {
+				event.preventDefault();
+				return true;
+			}
+			return false;
+		}
+	],
+	isAllowedEraserEvent: [
+		// touch event
+		(event) =&gt; {
+			if (event.pointerType === "touch") {
+				event.preventDefault();
+				return true;
+			}
+			return false;
+		},
+		// alt+mouse event
+		(event) =&gt; {
+			if (event.altKey &amp;&amp; event.pointerType === "mouse") {
+				event.preventDefault();
+				return true;
+			}
+			return false;
+		}
+	],
+	correctPoint: (point) =&gt; {
+		return point;
+	}
+};
+
+exports.Canvas = class Canvas {
+
+	constructor(target, options = {}) {
+		this.target = target;
+
+		// Merge options with default options
+		this.options = Object.assign({}, DEFAULT_OPTIONS, options);
+
+		this.penColor = "black";
+		this.tools = {};
+
+		this.target.liveQuerySelectorAll('svg').added((svg) =&gt; {
+
+			// Only initialize elements index for svg of this canvas
+			if (svg.parentElement === this.target) {
+				// Initialize elements index if enabled, but not initialized
+				if (this.options.isElementsIndexEnabled &amp;&amp; !this._elementsIndex) {
+					this._initElementsIndex(svg);
+				}
+			}
+		}).removed((svg) =&gt; {
+			// Only clear element index for svg of this canvas
+			if (svg.parentElement === this.target &amp;&amp; this._elementsIndex) {
+				try {
+					this._elementsIndex.clear();
+					this._elementsIndex = null;
+				}
+				catch (error) {
+					console.warn(`error when svg element removed ${error}`);
+				}
+			}
+		});
+
+		this.offset = this.target.getBoundingClientRect();
+
+		// Update offset on scroll
+		let ticking = false;
+		window.addEventListener("scroll", () =&gt; {
+			if (!ticking) {
+				window.requestAnimationFrame(() =&gt; {
+					this.offset = this.target.getBoundingClientRect();
+					ticking = false;
+				});
+			}
+			ticking = true;
+		});
+
+		// Also update offset on class change, e.g., fullscreen change
+		let paragraph = target.closest('.paragraph');
+		paragraph.liveAttribute("class").changed(() =&gt; {
+			this.offset = this.target.getBoundingClientRect();
+		});
+		
+		paragraph.liveAttribute("transient-fullscreen").changed(() =&gt; {
+			this.offset = this.target.getBoundingClientRect();
+		});
+
+		// In case the canvas transitions
+		this.target.addEventListener("transitionend", (e) =&gt; {
+			this.offset = this.target.getBoundingClientRect();
+		});
+
+		if (!!window.PointerEvent) {
+			this.target.addEventListener("pointerdown", (e) =&gt; this._onPointerDown(e));
+			this.target.addEventListener("pointermove", (e) =&gt; this._onPointerMove(e));
+			this.target.addEventListener("pointerup", (e) =&gt; this._onPointerUp(e));
+
+			// Enabling to draw on canvas by entering it
+			this.target.addEventListener("pointerover", (e) =&gt; {
+				// On any button down
+				if (e.buttons &gt; 0) {
+					this._onPointerDown(e);
+				}
+			});
+
+			// Stop drawing on canvas when leaving it
+			this.target.addEventListener("pointerout", (e) =&gt; {
+				// On any button down
+				if (e.buttons &gt; 0) {
+					this._onPointerUp(e);
+				}
+			});
+		} else {
+			this.target.addEventListener("touchstart", (e) =&gt; {
+				this._dispatchTouchEvent(e, this._onPointerDown);
+			});
+			this.target.addEventListener("touchmove", (e) =&gt; {
+				this._dispatchTouchEvent(e, this._onPointerMove);
+			});
+			this.target.addEventListener("touchend", (e) =&gt; {
+				this._dispatchTouchEvent(e, this._onPointerUp);
+			});
+		}
+	}
+
+	/**
+	 * Upgrade touch events with pointer event properties
+	 */
+	_dispatchTouchEvent(event, dispatch) {
+		Array.prototype.forEach.call(event.changedTouches, touch =&gt; {
+			touch.pointerId = touch.identifier + 2;
+			touch.pressure = (touch.force &amp;&amp; touch.force &gt; 0.1 ? touch.force : 0) * 2;
+			touch.preventDefault = function() {
+				event.preventDefault();
+			};
+			touch.stopPropagation = function() {
+				event.stopPropagation();
+			};
+			touch.stopImmediatePropagation = function() {
+				event.stopImmediatePropagation();
+			};
+			if (touch.touchType === "direct") {
+				touch.pointerType = "touch";
+			} else if (touch.touchType === "stylus") {
+				touch.pointerType = "pen";
+			}
+
+			// window.console.log("pointerType", touch.pointerType);
+
+			dispatch.call(this, touch);
+		});
+	}
+
+	_isValidPenEvent(event) {
+		// Only process events that are on the target
+		if (event.target !== this.target) return false;
+
+		let allowed = this.options.isAllowedPenEvent;
+		let len = allowed.length;
+		for (let i = 0; i &lt; len; i++) {
+			if (allowed[i].call(this, event)) {
+				event.preventDefault();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	_isValidEraserEvent(event) {
+		// only process events that are on the target
+		if (event.target !== this.target) return false;
+
+		let allowed = this.options.isAllowedEraserEvent;
+		let len = allowed.length;
+		for (let i = 0; i &lt; len; i++) {
+			if (allowed[i].call(this, event)) {
+				event.preventDefault();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	_getSVG() {
+		// Check if target already has an svg element
+		let svg = Array.from(this.target.children).find(e =&gt; {
+			return e.tagName.toLowerCase() === "svg";
+		});
+
+		// Create an svg element if it does not have one
+		if (!svg) {
+			svg = document.createElementNS(svgNS, "svg");
+			svg.setAttribute("xmlns", svgNS);
+			svg.setAttribute("xlink", "http://www.w3.org/1999/xlink");
+			svg.setAttribute("xmlns:xlink", "");
+			svg.setAttribute("class", "drawing-canvas");
+
+			this.target.insertBefore(svg, this.target.firstElementChild);
+		}
+
+		return svg;
+	}
+
+	_initElementsIndex(svg) {
+		let svgBounds = svg.getBoundingClientRect();
+
+		this._elementsIndex = new Quadtree({
+			x: 0,
+			y: 0,
+			width: svgBounds.width,
+			height: svgBounds.height
+		}, 4);
+
+		svg.liveQuerySelectorAll('path').added(path =&gt; {
+			path.__observer = path.liveAttribute("complete").changed((value, oldValue) =&gt; {
+				if (value === "true") {
+					// window.console.log("path complete");
+					this._addElementsToIndex(svg, [path]);
+				}
+			});
+		}).removed(path =&gt; {
+			if (path.__indexObject) {
+				this._elementsIndex.removeObject(path.__indexObject);
+				this._elementsIndex.cleanup();
+				path.__observer.stop();
+			}
+		});
+
+		// Add existing paths to index
+		// let elementsToIndex = svg.querySelector('[index="true"]');
+		// this._addElementsToIndex(svg, elementsToIndex);
+	}
+
+	_calculateBounds(svgBounds, element) {
+		let globalBounds = element.getBoundingClientRect();
+		return {
+			x: globalBounds.left - svgBounds.left,
+			y: globalBounds.top - svgBounds.top,
+			width: globalBounds.width,
+			height: globalBounds.height
+		};
+	}
+
+	_addElementsToIndex(svg, elements) {
+		let svgBounds = svg.getBoundingClientRect();
+
+		Array.prototype.forEach.call(elements, element =&gt; {
+			let bounds = this._calculateBounds(svgBounds, element);
+			bounds.element = element;
+			element.__indexObject = bounds;
+			this._elementsIndex.insert(bounds);
+		});
+	}
+
+	_createPen(event) {
+
+		let pen = new Pen((path) =&gt; this.onPathAdded(path), {
+			color: this.penColor,
+			pressureFactor: 1.5
+		});
+
+		this.tools[event.pointerId] = pen;
+
+		return pen;
+	}
+
+	_getPen(event) {
+		return this.tools[event.pointerId];
+	}
+
+	_getPoint(event) {
+
+		let point;
+
+		// Check if target element is using Transformer
+		if (this.target.transformer) {
+			let transformerPoint = new Transformer.Point(event.clientX, event.clientY);
+			point = this.target.transformer.fromGlobalToLocal(transformerPoint);
+		} else {
+			let matrix = Transformer.Matrix.from(this.target);
+			point = {
+				x: (event.clientX - this.offset.left) / matrix.scaleX,
+				y: (event.clientY - this.offset.top) / matrix.scaleY
+			};
+		}
+
+		return this.options.correctPoint(point);
+	}
+
+	_onPointerDown(event) {
+		if (this._isValidPenEvent(event)) {
+			this.onPenDown(event);
+		} else if (this._isValidEraserEvent(event)) {
+			this.onEraserDown(event);
+		}
+	}
+
+	_onPointerMove(event) {
+		if (this._isValidPenEvent(event)) {
+			this.onPenMove(event);
+		} else if (this._isValidEraserEvent(event)) {
+			this.onEraserMove(event);
+		}
+	}
+
+	_onPointerUp(event) {
+		if (this._isValidPenEvent(event)) {
+			this.onPenUp(event);
+		} else if (this._isValidEraserEvent(event)) {
+			this.onEraserUp(event);
+		}
+	}
+
+	onPenDown(event) {
+		let pen = this._createPen(event);
+		let point = this._getPoint(event);
+		point.pressure = event.pressure || 1.0;
+		pen.addPoint(point);
+	}
+
+	onPenMove(event) {
+		let pen = this._getPen(event);
+		if (pen) {
+			let point = this._getPoint(event);
+			point.pressure = event.pressure || 1.0;
+			pen.addPoint(point);
+		}
+	}
+
+	onPenUp(event) {
+		let pen = this._getPen(event);
+
+		if (pen &amp;&amp; pen instanceof Pen) {
+			let point = this._getPoint(event);
+			point.pressure = event.pressure || 1.0;
+			pen.addPoint(point);
+			pen.destroy();
+		}
+
+		delete this.tools[event.pointerId];
+	}
+
+	onEraserDown(event) {
+		this.tools[event.pointerId] = {
+			type: "eraser",
+			point: this._getPoint(event)
+		};
+	}
+
+	onEraserMove(event) {
+		let eraser = this.tools[event.pointerId];
+		if (eraser) {
+			// Get svg element
+			let svg = this._getSVG();
+			let point = this._getPoint(event);
+			let eraserPoint = eraser.point;
+			eraser.point = point;
+
+			let thickness = 5;
+
+			setTimeout(() =&gt; {
+
+				// 				let bounds = {
+				// 					x: point.x - thickness,
+				// 					y: point.y - thickness,
+				// 					width: thickness * 2,
+				// 					height: thickness * 2
+				// 				};
+
+				let x1 = Math.min(eraserPoint.x, point.x);
+				let y1 = Math.min(eraserPoint.y, point.y);
+				let x2 = Math.max(eraserPoint.x, point.x);
+				let y2 = Math.max(eraserPoint.y, point.y);
+				let width = x2 - x1 || 1;
+				let height = y2 - y1 || 1;
+
+				let bounds = {
+					x: x1,
+					y: y1,
+					width: width,
+					height: height,
+					point1: {
+						x: x1,
+						y: y1
+					},
+					point2: {
+						x: x1 + width,
+						y: y1 + height
+					}
+				};
+
+				// window.console.log(bounds);
+
+				let candidates = this._elementsIndex.retrieve(bounds).map((item) =&gt; {
+					return item.element;
+				});
+
+				// window.console.log(`children: ${svg.childNodes.length}, candidates: ${candidates.length}, subset: ${Math.round((candidates.length / svg.childNodes.length) * 100)}`);
+
+				// window.console.log(candidates);
+
+				let promise = EraserUtils.eraseIntersectingPaths(bounds, candidates);
+				promise.then((intersectingPaths) =&gt; {
+					Array.prototype.forEach.call(intersectingPaths, ip =&gt; {
+						this._elementsIndex.removeObject(ip.__indexObject);
+						this._elementsIndex.cleanup();
+						ip.remove();
+					});
+				});
+			}, 0);
+		}
+	}
+
+	onEraserUp(event) {
+		delete this.tools[event.pointerId];
+	}
+
+	onPathAdded(path) {
+		// Get svg element
+		let svg = this._getSVG();
+		svg.appendChild(path);
+	}
+
+	destroy() {
+
+		// TODO Removing event listeners does not work because in the constructor event
+		// handlers are anonymous functions
+		// this.target.removeEventListener("pointerdown", this.onPenDown);
+		// this.target.removeEventListener("pointermove", this.onPenMove);
+		// this.target.removeEventListener("pointerup", this.onPenUp);
+	}
+};</pre>
+      </div><div class="paragraph code-paragraph collapsed" name="Pen" data-id="yxxxBQKW">
+        <pre data-type="content" type="text/javascript" id="pen">const svgNS = "http://www.w3.org/2000/svg";
+const pathCutLength = 100;
+const connectingPointsOnCut = 5;
+
+const DEFAULT_OPTIONS = {
+	penTip: require('#pen-tips').FeltPen,
+	color: "black",
+	pressureFactor: 1.0
+};
+
+exports.Pen = class Pen {
+
+	constructor(onPathCreated, options = {}) {
+		this.onPathCreated = onPathCreated;
+
+		// Merge options with default options
+		this.options = Object.assign(DEFAULT_OPTIONS, options);
+
+		this._paths = [];
+		this._points = [];
+	}
+
+	get paths() {
+		return this._paths;
+	}
+
+	addPoint(point) {
+
+		// Also reset path when &gt; pathCutLength to circumvent performance issue when
+		// drawing long paths
+		let len = this._points.length;
+		if (!len || len &gt; pathCutLength) {
+
+			// Remove previous points except for # of connecting points to connect new path
+			// with previous path
+			if (len &gt; pathCutLength) {
+				this._points.splice(0, pathCutLength - connectingPointsOnCut);
+				this._pathComplete();
+			}
+
+			this._path = document.createElementNS(svgNS, "path");
+			this._path.setAttribute("fill", this.options.color);
+			this._paths.push(this._path);
+
+			this.onPathCreated(this._path);
+		}
+
+		this._points.push(point);
+
+		let d = this.options.penTip.generateD(this._points, this.options.pressureFactor);
+		this._path.setAttribute("d", d);
+	}
+
+	_pathComplete() {
+		if (this._path) {
+
+			// Only complete path if bounds larger than 0, otherwise remove
+			let bounds = this._path.getBoundingClientRect();
+
+			if (bounds.width &gt; 0 || bounds.height &gt; 0) {
+				this._path.setAttribute("complete", "true");
+			} else {
+				this._path.remove();
+			}
+		}
+	}
+
+	destroy() {
+		this._pathComplete();
+		this._points.length = 0;
+		this._paths.length = 0;
+	}
+};</pre>
+      </div><div class="paragraph code-paragraph collapsed" name="Canvas Instruments" data-id="ujr23FGQ">
+        <pre data-type="content" type="text/javascript" id="canvas-instruments">class EventHandler {
+
+	constructor() {
+		this._listeners = [];
+	}
+
+	on(name, handler) {
+		this._listeners.push({
+			name: name,
+			handler: handler
+		});
+	}
+
+	off(name, listener) {
+		throw new Error(`Not yet implemented`);
+	}
+
+	triggerEvent(name, event) {
+		this._listeners.forEach((listener) =&gt; {
+			if (listener.name === name) {
+				listener.handler.call(this, event);
+			}
+		});
+	}
+}
+
+class Tool extends EventHandler {
+
+	constructor(name) {
+		super();
+
+		if (typeof name !== "string") {
+			throw new Error(`parameter name needs to be of type string`);
+		}
+
+		this.name = name;
+		this.element = this.createElement();
+		this.element.classList.add("tool");
+	}
+
+	createElement() {
+		throw new Error(`createElement not implemented, but it should return a container element`);
+	}
+
+	set visible(value) {
+		if (value) {
+			this.element.classList.remove("hide");
+		}
+		else {
+			this.element.classList.add("hide");
+		}
+	}
+
+	get visible() {
+		return !this.element.classList.contains("hide");
+	}
+
+	destroy() {
+		// empty
+	}
+}
+
+exports.Tool = Tool;
+
+class ColorTool extends Tool {
+
+	constructor(name, options) {
+		super(name);
+
+		this.options = Object.assign({}, {
+			colors: ["black", "red", "green", "blue"],
+			className: "colors",
+			eventName: "change",
+			eventType: "color"
+		}, options);
+
+		// add class name to element
+		this.element.classList.add(this.options.className);
+
+		this.options.colors.forEach((c, idx) =&gt; {
+			const color = document.createElement("li");
+			color.classList.add("color");
+			color.style.backgroundColor = c;
+			this.element.appendChild(color);
+
+			if (!idx) {
+				this._selectColor(color);
+			}
+		});
+
+		this.element.addEventListener("pointerdown", (e) =&gt; {
+			this._consumeEvent(e);
+			this._onPointerDown(e);
+		});
+		this.element.addEventListener("pointermove", this._consumeEvent);
+		this.element.addEventListener("pointerup", this._consumeEvent);
+
+		this.element.addEventListener("touchstart", (e) =&gt; {
+			this._consumeEvent(e);
+			this._onPointerDown(e);
+		});
+		this.element.addEventListener("touchmove", this._consumeEvent);
+		this.element.addEventListener("touchend", this._consumeEvent);
+	}
+
+	createElement() {
+		return document.createElement("ul");
+	}
+
+	_getColor(event) {
+		return event.target.closest('.color');
+	}
+
+	select(colorValue) {
+		let colors = Array.from(this.element.querySelectorAll('.color'));
+		let color = colors.find((c) =&gt; c.style.backgroundColor === colorValue);
+		if (color) {
+			this._selectColor(color);
+			return true;
+		}
+		return false;
+	}
+
+	_selectColor(color) {
+		Array.prototype.forEach.call(this.element.querySelectorAll('.color'), (c) =&gt; {
+			c.classList.remove("active");
+		});
+		color.classList.add("active");
+
+		// Dispatch change event
+		this.triggerEvent(this.options.eventName, {
+			type: this.options.eventType,
+			value: color.style.backgroundColor
+		});
+	}
+
+	_onPointerDown(event) {
+		let color = this._getColor(event);
+		if (color) {
+			this._selectColor(color);
+		}
+	}
+
+	_consumeEvent(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+	}
+}
+
+exports.ColorTool = ColorTool;
+
+class ToolPalette {
+
+	constructor(target) {
+		this.target = target;
+
+		this.element = document.createElement("transient");
+		this.element.classList.add("tool-palette");
+
+		this._tools = {};
+
+		target.insertBefore(this.element, target.firstElementChild);
+	}
+
+	addTool(tool) {
+		if (!(tool instanceof Tool)) {
+			throw new Error(`tool needs to be instanceof Tool`);
+		}
+
+		if (this._tools[tool.name]) {
+			throw new Error(`tool with the same name already exists`);
+		}
+
+		// Add tool
+		this._tools[tool.name] = tool;
+
+		// Add tool's element to tool palette
+		this.element.appendChild(tool.element);
+	}
+
+	get tools() {
+		// Do not allow to modify tools from outside tool palette
+		return Object.freeze(this._tools);
+	}
+
+	getTool(name) {
+		if (!name) {
+			throw new Error(`name parameter is required`);
+		}
+
+		// Return named tool
+		return this._tools[name];
+	}
+
+	destroy() {
+		// Destroy each tool
+		for (let n in this._tools) {
+			let tool = this._tools[n];
+
+			// Remove element from parent
+			this.element.remove();
+
+			// Destroy tool
+			tool.destroy();
+
+			// Delete tool from tools object
+			delete this._tools[n];
+		}
+	}
+}
+
+exports.ToolPalette = ToolPalette;</pre>
+      </div><div class="paragraph style-paragraph collapsed" name="Canvas Style" data-id="FygJSFcB">
+			<style data-type="content" type="text/css" codemirror="true" class="persistent">#test-canvas,
+.canvas {
+	position: relative;
+	min-height: 300px;
+	background-color: white;
+
+	overflow: hidden;
+	touch-action: none;
+	/* cursor: none; */
+	cursor: pointer;
+	overflow: hidden !important;
+}
+
+#test-canvas > svg.drawing-canvas,
+.canvas > svg.drawing-canvas {
+	position: absolute;
+	z-index: 1;
+
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+
+	/* background-color: hotpink; */
+}
+
+#test-canvas > .tool-palette,
+.canvas > .tool-palette {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	z-index: 2;
+
+	transform: translate3d(-50%, -10px, 0);
+
+	/* transform: translate3d(-50%, 100%, 0);
+	transition: transform 250ms ease-in-out;
+	background-color: orange; */
+}
+
+@media only screen 
+	and (min-device-width : 768px) 
+	and (max-device-width : 1024px)  {
+		#test-canvas > .tool-palette,
+		.canvas > .tool-palette {
+			top: 0;
+
+			/* Height 0 fixes 100% height issue on iOS */
+			height: 0;
+
+			transform: translate3d(-50%, 10px, 0);
+		}
+}
+
+/* #test-canvas:hover > .tool-palette,
+.canvas:hover > .tool-palette {
+transform: translate3d(-50%, -10px, 0);
+} */
+
+#test-canvas > .tool-palette .colors,
+.canvas > .tool-palette .colors {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#test-canvas > .tool-palette .colors .color,
+.canvas > .tool-palette .colors .color {
+	position: relative;
+	float: left;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	margin: 5px;
+
+	box-sizing: border-box;
+}
+
+#test-canvas > .tool-palette .colors .color.active:after,
+.canvas > .tool-palette .colors .color.active:after {
+	content: "";
+	position: absolute;
+	left: -5px;
+	top: -5px;
+	width: 40px;
+	height: 40px;
+
+	border: 3px solid rgba(0, 0, 0, .75);
+	border-radius: 50%;
+	box-sizing: border-box;
+}</style>
+		</div><div class="paragraph code-paragraph collapsed" last-execution-state="success" name="Drawing Main Code" draggable="false" data-id="txWtHcbH"><pre data-type="content" type="text/javascript">const enableDrawing = drawable =&gt; {
+	// console.log(drawable);
+
+	let penColor = "white";
+	let ctx;
+
+	const begin = point =&gt; {
+		const DrawingUtil = require('#drawing-util');
+		ctx = DrawingUtil.begin(drawable, penColor);
+		ctx.addPoint(point);
+	};
+
+	const move = point =&gt; {
+		ctx.addPoint(point);
+	};
+
+	const end = point =&gt; {
+		// empty
+	};
+
+	const MouseHandler = require('#drawing-mouse-handler');
+	MouseHandler.enable(drawable, {
+		begin,
+		move,
+		end
+	});
+
+	const ApplePenHandler = require('#drawing-apple-pen-handler');
+	ApplePenHandler.enable(drawable, {
+		begin,
+		move,
+		end
+	});
+};
+
+document.liveQuerySelectorAll('.drawable').added(enableDrawing);</pre></div><div class="paragraph code-paragraph collapsed" name="Drawing Event Utils" draggable="false" data-id="YzesPAT2"><pre data-type="content" type="text/javascript" id="event-util">exports.getCoordinate = (target, event) =&gt; {
+
+	const rect = target.getBoundingClientRect();
+
+	return {
+		x: Math.floor(event.clientX - rect.left),
+		y: Math.floor(event.clientY - rect.top)
+	};
+};</pre></div><div class="paragraph style-paragraph collapsed" draggable="false" name="No Cursor in Fullscreen" data-id="GLCTkjwd"><style data-type="content" type="text/css" codemirror="true">/*
+@media (pointer: fine) and (hover: hover) {
+	.canvas {
+		background-color: limegreen;
+		cursor: auto;
+	}
+}
+
+@media (pointer: fine) and (hover: none) {
+	.canvas {
+		background-color: hotpink !important;
+		cursor: none !important;
+	}
+}
+*/
+
+/* .body-paragraph.fullscreen .canvas {
+	cursor: none !important;
+} */</style></div><div class="paragraph code-paragraph collapsed" name="Intersection Utils" data-id="bpPfV4Uj">
+        <pre data-type="content" type="text/javascript" id="intersection-utils">const calculateQuadraticLineIntersect = (p1, p2, p3, a1, a2) =&gt; {
+	var lerp = function(a, b, x) { return (a + x * (b - a)); };
+
+	var intersections = [];
+
+	// Inverse line normal
+	var normal = {
+		x: a1.y - a2.y,
+		y: a2.x - a1.x,
+	};
+
+	// Q-coefficients
+	var c2 = {
+		x: p1.x + p2.x * -2 + p3.x,
+		y: p1.y + p2.y * -2 + p3.y
+	};
+
+	var c1 = {
+		x: p1.x * -2 + p2.x * 2,
+		y: p1.y * -2 + p2.y * 2,
+	};
+
+	var c0 = {
+		x: p1.x,
+		y: p1.y
+	};
+
+	// Transform to line 
+	var coefficient = a1.x * a2.y - a2.x * a1.y;
+	var a = normal.x * c2.x + normal.y * c2.y;
+	var b = (normal.x * c1.x + normal.y * c1.y) / a;
+	var c = (normal.x * c0.x + normal.y * c0.y + coefficient) / a;
+
+	// Solve the roots
+	var roots = [];
+	d = b * b - 4 * c;
+	if (d &gt; 0) {
+		var e = Math.sqrt(d);
+		roots.push((-b + Math.sqrt(d)) / 2);
+		roots.push((-b - Math.sqrt(d)) / 2);
+	} else if (d === 0) {
+		roots.push(-b / 2);
+	}
+
+	// Calc the solution points
+	for (var i = 0; i &lt; roots.length; i++) {
+		var minX = Math.min(a1.x, a2.x);
+		var minY = Math.min(a1.y, a2.y);
+		var maxX = Math.max(a1.x, a2.x);
+		var maxY = Math.max(a1.y, a2.y);
+		var t = roots[i];
+		if (t &gt;= 0 &amp;&amp; t &lt;= 1) {
+			// Possible point -- pending bounds check
+			var point = {
+				x: lerp(lerp(p1.x, p2.x, t), lerp(p2.x, p3.x, t), t),
+				y: lerp(lerp(p1.y, p2.y, t), lerp(p2.y, p3.y, t), t)
+			};
+			var x = point.x;
+			var y = point.y;
+			// Bounds checks
+			if (a1.x == a2.x &amp;&amp; y &gt;= minY &amp;&amp; y &lt;= maxY) {
+				// Vertical line
+				intersections.push(point);
+			} else if (a1.y == a2.y &amp;&amp; x &gt;= minX &amp;&amp; x &lt;= maxX) {
+				// Horizontal line
+				intersections.push(point);
+			} else if (x &gt;= minX &amp;&amp; y &gt;= minY &amp;&amp; x &lt;= maxX &amp;&amp; y &lt;= maxY) {
+				// Line passed bounds check
+				intersections.push(point);
+			}
+		}
+	}
+	return intersections;
+};
+
+const parseQuadraticSegments = (svgPath) =&gt; {
+	var pathData = svgPath.getAttributeNS(null, "d");
+
+	var segments = [];
+
+	var startPointMatch = pathData.match(/M(\s*)(\S+) (\S+)/);
+
+	var startPoint = {
+		x: parseInt(startPointMatch[1]),
+		y: parseInt(startPointMatch[2])
+	};
+
+	var quadraticPattern = /Q (\S+) (\S+) (\S+) (\S+)/;
+	var quadraticPatternGlobal = /Q (\S+) (\S+) (\S+) (\S+)/g;
+
+	var quadraticMatches = pathData.match(quadraticPatternGlobal);
+
+	quadraticMatches.forEach(function (v) {
+		var result = v.match(quadraticPattern);
+
+		var controlPoint = {
+			x: parseInt(result[1]),
+			y: parseInt(result[2])
+		};
+
+		var endPoint = {
+			x: parseInt(result[3]),
+			y: parseInt(result[4])
+		};
+
+		segments.push({
+			start: startPoint,
+			control: controlPoint,
+			end: endPoint
+		});
+
+		startPoint = endPoint;
+	});
+
+	return segments;
+};
+
+exports.intersect = (svgPath, a1, a2) =&gt; {
+	var pathElements = parseQuadraticSegments(svgPath);
+
+	var intersected = false;
+
+	pathElements.forEach(function(segment) {
+		var intersections = calculateQuadraticLineIntersect(segment.start, segment.control, segment.end, a1, a2);
+
+		if(intersections.length &gt; 0) {
+			intersected = true;
+		}
+	});
+
+	return intersected;
+};</pre>
+      </div><div class="paragraph code-paragraph collapsed" draggable="false" name="Eraser Utils" data-id="zsS4m8J3"><pre data-type="content" type="text/javascript" id="eraser-utils">const Intersection = require('#intersection-utils');
+
+exports.eraseIntersectingPaths = (bounds, paths) =&gt; {
+
+	return new Promise((resolve, reject) =&gt; {
+		let result = Array.prototype.filter.call(paths, child =&gt; {
+			try {
+				if(Intersection.intersect(child, bounds.point1, bounds.point2)) {
+					return child;
+				}
+			} catch(error) {
+				console.log(error);
+			}
+			return null;
+		});
+
+		resolve(result);
+	});
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="aff8H5di" name="Snackbar/Toolbar Integration" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript">const GlobalToolbarUtils = require("#global-toolbar-utils");
+const ParagraphUtils = require("#paragraph-utils");
+const SnackbarUtils = require("#snackbar-utils");
+const SnackbarTools = require("#snackbar-tools");
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const packageClass = "drawing-package";
+const drawingClass = "canvas";
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+GlobalToolbarUtils.addDivider(1, packageClass);
+GlobalToolbarUtils.addButton("Add Drawing", "", "drawing " + packageClass, 1, () =&gt; {
+	const paragraph = ParagraphUtils.createBodyParagraph();
+	const content = paragraph.querySelector("[data-type='content']");
+	content.classList.add(drawingClass);
+	
+	ParagraphUtils.insertParagraphAfterFocussed(paragraph);
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SnackbarTools.addTools((target) =&gt; {
+	return (Codestrate.focussedParagraph &amp;&amp;
+					Codestrate.focussedParagraph.querySelector("[data-type='content'][contenteditable='true']") &amp;&amp;
+					Codestrate.focussedParagraph.querySelector("[data-type='content'][contenteditable='true']").classList.contains(drawingClass));
+}, "canvas-tools");
+
+SnackbarUtils.addDivider(1, "body-tools " + packageClass);
+
+SnackbarUtils.addButton("Toggle Drawing", "", "body-tools drawing " + packageClass, 1, () =&gt; {
+// 	Codestrate.focussedParagraph.querySelector("[data-type='content']").classList.toggle(drawingClass);
+	
+	const paragraph = Codestrate.focussedParagraph;
+	const content = paragraph.querySelector('[data-type="content"]');
+	
+	// content is also a slide
+	if (content.matches('.slide')) {
+		const slideContent = content.querySelector('.slide-content');
+		slideContent.classList.toggle(drawingClass);
+		
+		// dirty hack to initialize Canvas
+		let parent = slideContent.parentElement;
+		slideContent.remove();
+		parent.appendChild(slideContent);
+	}
+	else {
+		content.classList.toggle(drawingClass);		
+	}
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="sBa3Chfb" name="Drawing Toolbar/Snackbar Style"><style data-type="content" type="text/css" codemirror="true" class="themable">html #snackbar[canvas-tools="true"] .body-content-tools {
+	display: none;
+}
+
+html #snackbar[canvas-tools="true"]:not([content-tools]) .drawing {
+	display: flex;
+}
+
+html #global-toolbar .drawing i:after,
+html #snackbar .drawing i:after {
+	content: "filter_frames";
+}
+
+/*html #snackbar[canvas-tools="true"] .drawing {
+	background: radial-gradient(rgba(var(--color-accent-text-rgb), 0.8) 0%, rgba(var(--color-accent-text-rgb), 1) 52%, rgba(0, 0, 0, 0) 55%);
+}
+
+html #snackbar[canvas-tools="true"] .drawing {
+	color: var(--color-accent);
+}*/</style></div></div>
