@@ -11,7 +11,7 @@
 	},
 	"github": {
 		"url": "https://github.com/Webstrates/Codestrate-Packages",
-		"folder": "general/text-tools"
+		"folder": "tools/text-tools"
 	}
 }</pre></div><div class="paragraph code-paragraph collapsed" data-id="kD6z77Dn" name="Text Tools Code" run-on-load="true" last-execution-state="success" draggable="false" style=""><pre data-type="content" type="text/javascript">const SnackbarUtils = require("#snackbar-utils");
 const SnackbarTools = require("#snackbar-tools");
