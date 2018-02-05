@@ -1,4 +1,4 @@
-<h2>Description</h2>Adds a button to style paragraphs for dis- and enabling.<h2>How it works</h2><p>Disabling works by adding a 'meta="none"' attribute to the &lt;style&gt; tag of the style paragraph.</p>
+<h2>Description</h2>Adds a button to style paragraphs for dis- and enabling.<h2>How it works</h2><p>Disabling works by adding a <code>meta="none"</code> attribute to the <code>&lt;style&gt;</code> tag of the style paragraph.</p>
 
 # Properties
 
