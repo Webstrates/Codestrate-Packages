@@ -1,0 +1,14 @@
+<h2>Description</h2><p>Makes it possible to create new theme sections.</p><h2>Themable Style Paragraphs</h2><p>When creating packages or sections, style paragraphs, which should be available in themes, i.e. which describe properties a user should be able to modify in a theme, can be declared "themable" by adding the "themable" class to them. This indicates the Theme Creator, that these should be available in a theme.</p><p>When declaring a stye paragraph as themable, every style selector should begin with "html ". This is because this "html" will be replaced when creating a new theme (see Usage -&gt; Creation of a theme).</p><h2>Usage</h2><h3>Creation of a theme</h3><p>In order to create a new theme, one just has to use the button "Create New Theme" inside the "Themes" submenu of the global menu. This will create a new package with the selected name of the theme. All template paragraphs as well as themable paragraphs will be copied into the new theme. These can then be modified to alter the theme.</p><p>The copied style paragraphs with the "themable" class will be modified in the following way:</p><p><ul><li>The old <code>data-id</code> will be written in a <code>orig-data-id</code> attribute to support later updating of the theme.</li><li>The paragrah will receive a newly generated <code>data-id</code>.</li><li>The <code>themable</code> class will be removed.</li><li>The word <code>html</code> inside the styles will be replaced by <code>html[transient-theme="THEME_NAME"]</code>. So changes to the theme will only be applied when activating the theme.</li></ul></p><h3>Updating a theme</h3><p>If new packages, i.e. new themable paragraphs are added to the Codestrate, it is possible to update a theme by running the "Update Theme" code paragraph within a theme. Updating a theme will perform the following steps:</p><p><ul><li>Add new themable style paragraphs to the theme</li><li>Sort all style paragraphs of the theme</li><li>Update the name of existing style paragraphs</li><li>If the content of a style paragraph of the theme has the attribute "media='none'" it's content will become updated with the current style of the themable style paragraph</li></ul></p><p>Updating works by comparing the <code>orig-data-id</code> of the theme paragraphs with the <code>data-id</code> of the paragraphs with the <code>themable</code> class.</p>
+
+# Properties
+
+| Property | Value |
+| :--- | :--- |
+| Name | Theme Creator |
+| ID | w2AXGDAm |
+| Version | 1.0.3 |
+| Description | Utility to create new themes. |
+| Tags | `themes, devtools, utility` |
+| Assets | - |
+| Dependencies | - |
+| Changelog | `{"1.0.3":"Updated the template to make the dependency on this package optional.","1.0.2":"Remove 'persistent' class from style paragraphs.","1.0.1":"Better properties template.","1.0":"Initial version."}` |
