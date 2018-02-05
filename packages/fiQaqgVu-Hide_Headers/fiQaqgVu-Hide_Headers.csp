@@ -1,0 +1,52 @@
+<div class="section section-visible" data-id="fiQaqgVu" name="Hide Headers" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="tr6ph2Cr"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>A small utility to hide headers of paragraphs using the <code>minimal</code>&nbsp;CSS class.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="Qan3PUu6" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0.2",
+	"icon": "border_clear",
+	"description": "Adds the 'minimal' class to hide headers.",
+	"tags": [
+		"themes",
+		"utility"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"1.0.2": "Updated style to stop content from jumping.",
+		"1.0.1": "Show header on hover.",
+		"1.0": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/fiQaqgVu-Hide_Headers"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="nRm3TtXs" name="Hide Headers Code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">document.liveQuerySelectorAll("[data-type='content']").added((content) =&gt; {
+	content.liveAttribute("class").changed((value, oldValue) =&gt; {
+		if (content.classList.contains("hide-header")) {
+			content.closest(".paragraph").classList.add("hide-header");
+		} else {
+			content.closest(".paragraph").classList.remove("hide-header");
+		}
+	});
+});</pre></div><div class="paragraph style-paragraph collapsed" name="Hide Headers Style" data-id="hhQ5bTAE"><style data-type="content" type="text/css" codemirror="true" class="themable">html .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .paragraph-header {
+	z-index: 1;
+	position: absolute;
+	top: -30px;
+	box-shadow: var(--material-shadow-z4);
+}
+
+html .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):not([transient-focussed]):not(:hover) .paragraph-header {
+	display: none;
+}
+
+html .paragraph.hide-header:not(.collapsed) :not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror {
+	padding: 15px;
+	margin: 5px;
+	background: var(--color-primary-shade-3);
+	border-radius: 2px;
+}
+
+html .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-activeline-background,
+html .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-rulers,
+html .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutters,
+html .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutter-wrapper {
+	display: none;
+}</style></div></div>
