@@ -1,0 +1,244 @@
+<div class="section section-visible" name="Permissions" data-type="package" data-group="basic" data-id="2acKLAiX" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="V97VARVD" draggable="false"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2>The permissions section adds a user interface to change permissions of the codestrate. The section adds a menu item to the global menu to access the permissions user interface through a dialog.</div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="6W7YshS2" style=""><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.2",
+	"icon": "vpn_key",
+	"description": "Adds an menu entry to change the permissions of the codestrate.",
+	"tags": [
+		"devtools"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"1.2": "Fixed conflict of permissions object on webstrate object by adding it to the Codestrate object instead.",
+		"1.1.1": "Fixed submenu name of menu entry.",
+		"1.1": "Added menu entry (was in Global Menu section before).",
+		"1.0": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/2acKLAiX-Permissions"
+	}
+}</pre></div>
+
+<div class="paragraph code-paragraph collapsed" run-on-load="true" name="Permission Code" draggable="false" last-execution-state="success" data-id="Z643HnjW" style=""><pre data-type="content" type="text/javascript">var Permissions = (function () {
+
+	this.version = "0.0.3";
+
+	/**
+   * Clear all document permissions aka. removes data-auth attribute.
+   */
+	const clearPermissions = function () {
+		const htmlElement = document.documentElement;
+		delete htmlElement.dataset.auth;
+	};
+
+	/**
+   * Get permissions object of current document.
+   */
+	this.get = function () {
+		const htmlElement = document.documentElement;
+		const auth = htmlElement.dataset.auth;
+		return auth ? JSON.parse(auth) : [];
+	};
+
+	/**
+   * Applies permissions to current document.
+   * 
+   * @param [] auth Array containing document permissions (e.g., [{username:"raedle",
+   * provider:"github",permissions:"rw"}.{username:"anonymous",provider:"",
+   * permissions:"r"}])
+   */
+	this.set = function (auth) {
+		const htmlElement = document.documentElement;
+
+		if (auth &amp;&amp; auth.length) {
+			htmlElement.dataset.auth = JSON.stringify(auth);
+		}
+		else {
+			clearPermissions();
+		}
+	};
+
+	/**
+   * Grant permissions to username using the given authentication provider.
+   * 
+   * @param String username Username of user that is granted specific permissions to
+   * the current document.
+   * @param String permissions Document permissions for username (e.g., "r" or "rw").
+   * @param String provider="" Authentication provider, e.g., "github" for GitHub.
+   */
+	this.grant = function (username, permissions, provider = "") {
+		const auth = getPermissions();
+		const userPermission = auth.find(item =&gt; item.username === username &amp;&amp; item.provider === provider);
+		if (userPermission) {
+			userPermission.permissions = permissions;
+		}
+		else {
+			auth.push({
+				username,
+				provider,
+				permissions
+			});
+		}
+
+		set(auth);
+	};
+
+	/**
+   * @param String username Revoke permissions for username.
+   * @param String provider="" Revoke permissions given the particular authentication provider.
+   */
+	this.revoke = function (username, provider = "") {
+		const auth = getPermissions();
+		const permissionIndex = auth.findIndex(item =&gt; item.username === username &amp;&amp; item.provider === provider);
+		if (permissionIndex &gt; -1) {
+			auth.splice(permissionIndex, 1);
+		}
+
+		set(auth);
+	};
+
+	/**
+   * List permissions of current document.
+   */
+	this.list = function () {
+		const auth = getPermissions();
+		console.log("Document permissions");
+		auth.forEach(({username, permissions, provider}) =&gt; {
+			console.log("Username %s has %s permissions using %s provider.", username, permissions, provider);
+		});
+	};
+
+	return this;
+}).call({});
+
+window.Codestrate.permissions = Permissions;</pre></div><div class="paragraph code-paragraph collapsed" name="Permissions Dialog" run-on-load="true" last-execution-state="success" data-id="NDi9y4Pu" style=""><pre data-type="content" type="text/javascript">Codestrate.showPermissions = () =&gt; {
+
+	const transient = document.createElement("transient");
+	transient.classList.add("permissions-dialog");
+
+	const permissions = Codestrate.permissions.get();
+
+	let content = `
+	&lt;table&gt;
+		&lt;thead&gt;
+			&lt;th&gt;Username&lt;/th&gt;
+			&lt;th&gt;Provider&lt;/th&gt;
+			&lt;th&gt;Permissions&lt;/th&gt;
+			&lt;th&gt;Delete&lt;/th&gt;
+		&lt;/thead&gt;
+		&lt;tbody id="permissions-list"&gt;
+			${permissions.map((p) =&gt; {
+				return `&lt;tr class="permission"&gt;
+									&lt;td class="username" contenteditable="true"&gt;${p.username}&lt;/td&gt;
+									&lt;td class="provider" contenteditable="true"&gt;${p.provider}&lt;/td&gt;
+									&lt;td class="permissions" contenteditable="true"&gt;${p.permissions}&lt;/td&gt;
+									&lt;td class="delete"&gt;
+										&lt;i class="material-icons"&gt;delete&lt;/i&gt;
+									&lt;/td&gt;
+								&lt;/tr&gt;`;
+			}).join("")}
+		&lt;/tbody&gt;
+	&lt;/table&gt;`;
+
+	const elements = require('#dialog-template', {
+		title: "Codestrate permissions",
+		message: content,
+		actions: `
+			&lt;div class="button add"&gt;Add&lt;/div&gt;
+			&lt;div class="button apply"&gt;Apply&lt;/div&gt;
+			&lt;div class="button close"&gt;Close&lt;/div&gt;
+		`,
+		className: ""
+	});
+
+	elements.forEach(e =&gt; transient.appendChild(e));
+
+	const addBtn = transient.querySelector('.add');
+	const applyBtn = transient.querySelector('.apply');
+	const closeBtn = transient.querySelector('.close');
+	const list = transient.querySelector('#permissions-list');
+
+	list.addEventListener("click", (event) =&gt; {
+		const target = event.target;
+		if (target.closest('.delete')) {
+			let permission = target.closest('.permission');
+			permission.remove();
+		}
+	});
+
+	const add = () =&gt; {
+		const newPermission = document.createElement("tr");
+		newPermission.classList.add("permission");
+		newPermission.innerHTML = `
+			&lt;td class="username" contenteditable="true"&gt;&lt;/td&gt;
+			&lt;td class="provider" contenteditable="true"&gt;&lt;/td&gt;
+			&lt;td class="permissions" contenteditable="true"&gt;&lt;/td&gt;
+			&lt;td class="delete"&gt;
+				&lt;i class="material-icons"&gt;delete&lt;/i&gt;
+			&lt;/td&gt;
+		`;
+		list.appendChild(newPermission);
+	};
+
+	const apply = () =&gt; {
+		let elementPermissions = Array.from(list.querySelectorAll('.permission'));
+		let permissions = elementPermissions.map((p) =&gt; {
+			return {
+				username: p.querySelector('.username').textContent,
+				provider: p.querySelector('.provider').textContent,
+				permissions: p.querySelector('.permissions').textContent,
+			};
+		});
+
+		const oldPermissions = Codestrate.permissions.get();
+		Codestrate.permissions.set(permissions);
+		toast("Applied new permissions", 5000, () =&gt; Codestrate.permissions.set(oldPermissions), "Undo");
+	};
+
+	const close = () =&gt; {
+		transient.remove();
+	};
+
+	addBtn.addEventListener("click", add);
+	applyBtn.addEventListener("click", apply);
+	closeBtn.addEventListener("click", close);
+
+	document.body.appendChild(transient);
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="yr7rUXQf" name="Global Menu Entry" draggable="false" style="" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const GlobalMenuUtils = require('#global-menu-utils');
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const showPermissions = GlobalMenuUtils.createButton("Show Permissions", null, () =&gt; {
+	Codestrate.showPermissions();
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GlobalMenuUtils.addMenuItemToSubMenu(showPermissions, "Codestrate");</pre></div><div class="paragraph style-paragraph collapsed" data-id="n86qmxNM" name="Permissions Dialog Style" style=""><style data-type="content" type="text/css" codemirror="true" class="themable">html .permissions-dialog .dialog table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+html .permissions-dialog .dialog td,
+html .permissions-dialog .dialog th {
+	padding: 8px;
+	text-align: left;
+	outline: none;
+}
+
+html .permissions-dialog .dialog tr:nth-child(even) {
+	background: var(--color-primary-shade-2);
+}
+
+html .permissions-dialog .dialog tr:hover {
+	background-color: var(--color-primary-shade-3);
+}
+
+html .permissions-dialog .delete {
+	cursor: pointer;
+}
+
+html .permissions-dialog .delete:hover i {
+	color: var(--material-color-red);
+}</style></div></div>
