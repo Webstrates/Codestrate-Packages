@@ -1,0 +1,131 @@
+<div class="section section-visible" data-id="qRcedryV" data-type="package" name="Output" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="fuLwB9hN" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2>Adds an <code>output()</code> function to easily print output into a body paragraph.</div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="2Jdaxtda" style=""><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "0.2.4",
+	"icon": "receipt",
+	"description": "Adds an output() function to easily print output into a body paragraph.",
+	"tags":[
+		"utility",
+		"code paragraphs"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"0.2.4": "Fixed request of JavaScript virtual machine from \"JavaScript\" to \"text/javascript\".",
+		"0.2.3": "Updated style to stop content from jumping.",
+		"0.2.2": "Output paragraph styling also for body-paragraphs.",
+		"0.2.1": "'this' in output now correctly refers to the calling paragraph.",
+		"0.2": "Use paragraph utils and cleanup, added styling for data-output.",
+		"0.1": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/qRcedryV-Output"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="U8eupwkv" draggable="false" style="" name="Output Code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const ParagraphUtils = require("#paragraph-utils");
+
+/******************************************************************************/
+
+const createParagraph = function(type) {
+	const newParagraph = document.createElement("div");
+	newParagraph.classList.add("paragraph");
+	newParagraph.classList.add(`${type}-paragraph`);
+	return newParagraph;
+};
+
+function createDataParagraph(content) {
+	const outputParagraph = ParagraphUtils.createDataParagraph(JSON.stringify(content, null, 2));
+	outputParagraph.setAttribute("name", "Output " + this.getAttribute("name"));
+	outputParagraph.classList.add("output");
+
+	const outputContent = outputParagraph.querySelector("[data-type='content']");
+	outputContent.classList.add("output");
+	outputContent.contentEditable = false;
+
+	this.parentElement.insertBefore(outputParagraph, this.nextElementSibling);
+}
+
+function createBodyParagraph(content) {
+	const outputParagraph = ParagraphUtils.createBodyParagraph();
+	outputParagraph.setAttribute("name", "Output " + this.getAttribute("name"));
+	outputParagraph.classList.add("output");
+
+	const outputContent = outputParagraph.querySelector("[data-type='content']");
+	outputContent.classList.add("output");
+	outputContent.contentEditable = false;
+	outputContent.appendChild(content);
+
+	this.parentElement.insertBefore(outputParagraph, this.nextElementSibling);
+}
+
+/******************************************************************************/
+
+function output(content) {
+	if (this.nextElementSibling &amp;&amp; this.nextElementSibling.querySelector(".output[data-type='content']")) {
+		this.nextElementSibling.remove();
+	}
+
+	if (content instanceof Element) {
+		createBodyParagraph.call(this, content);
+	} else if (typeof content === "string" || typeof content === "number") {
+		let el = document.createElement("div");
+		el.innerHTML = content;
+		createBodyParagraph.call(this, el);
+	} else { //We'll assume it's a Javascript object
+		createDataParagraph.call(this, content);
+	}
+}
+
+document.liveQuerySelectorAll("[data-type='content']").added((content) =&gt; {
+	content.liveAttribute("class").changed((value, oldValue) =&gt; {
+		if (content.classList.contains("output")) {
+			content.closest(".paragraph").classList.add("output");
+		} else {
+			content.closest(".paragraph").classList.remove("output");
+		}
+	});
+});
+
+/******************************************************************************/
+
+const vm = Codestrate.VirtualMachines.get("text/javascript");
+
+vm.addToGlobalContext({
+	output
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="ftrWXYaM" name="Output Style"><style data-type="content" type="text/css" codemirror="true" class="themable">html .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) {
+	background: var(--color-primary-shade-1);
+	border-radius: 24px;
+	border: 4px solid;
+	border-top: 6px solid;
+	border-bottom: 6px solid;
+	border-color: var(--color-primary-shade-3);
+	box-shadow: var(--material-shadow-z6),
+		inset 0 0 16px rgba(0, 0, 0, 0.5);
+	margin-bottom: 24px;
+}
+
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror,
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) [data-type="content"] {
+	padding: 24px;
+}
+
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror {
+	background: none !important;
+}
+
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-activeline-background,
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-rulers,
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutters,
+html .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutter-wrapper {
+	display: none;
+}
+
+html .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .paragraph-header {
+	z-index: 1;
+	position: absolute;
+	top: -36px;
+	box-shadow: var(--material-shadow-z4);
+}
+
+html .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):not([transient-focussed]):not(:hover) .paragraph-header {
+	display: none;
+}</style></div></div>
