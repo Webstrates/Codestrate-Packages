@@ -1,0 +1,323 @@
+<div class="section section-visible" data-id="3ZTfwCvn" name="Command Palette" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="WAJPJaG6"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds a command palette as a shortcut to the codestrate.</div>
+<ul>
+	<li>Windows: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></li>
+	<li>macOS: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></li>
+</ul></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="TnSwTVtf"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0.2",
+	"icon": "assistant",
+	"description": "Adds a command palette as a shortcut to the codestrate.",
+	"tags": [
+		"utility"
+	],
+	"assets": [
+		"awesomplete.js"
+	],
+	"dependencies": [],
+	"changelog":
+	{
+		"1.0.2": "Material ripple.",
+		"1.0.1": "Shortcut on Windows ctrl and on macOS Cmd.",
+		"1.0": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/3ZTfwCvn-Command_Palette"
+	}
+}</pre></div><div class="paragraph body-paragraph collapsed" data-id="tiLdGVnN" name="Command Palette Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><template id="command-palette-template">
+	<transient id="command-palette">
+		<div class="command-palette-modal"></div>
+		<span class="command-palette-search">
+			<span class="command-palette-button-run command-palette-button">
+				<i class="material-icons"></i>
+			</span>
+			<input class="command-palette-input" placeholder="Command">
+			<span title="Close" class="command-palette-button-close command-palette-button material-ripple-primary-text">
+				<i class="material-icons"></i>
+			</span>
+		</span>
+	</transient>
+</template></div></div><div class="paragraph code-paragraph collapsed" data-id="m9ZfAY6G" name="Command Palette Code" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript">const commandPaletteTemplate = document.querySelector("#command-palette-template");
+const commandPaletteFragment = document.importNode(commandPaletteTemplate.content, true);
+document.body.appendChild(commandPaletteFragment);
+
+/******************************************************************************/
+
+const menuButtons = [];
+
+const commandPalette = document.querySelector("#command-palette");
+const commandPaletteButtonRun = commandPalette.querySelector(".command-palette-button-run");
+const commandPaletteInput = commandPalette.querySelector(".command-palette-input");
+const commandPaletteButtonClose = commandPalette.querySelector(".command-palette-button-close");
+
+/******************************************************************************/
+
+const runCommand = (id) =&gt; {
+	commandPaletteInput.value = "";
+	commandPalette.classList.remove("visible");
+
+	const menuButton = menuButtons.find(el =&gt; el.id === id);
+
+	if (menuButton) {
+		Codestrate.simulateClick(menuButton.element);
+	} else {
+		alert("Command not found!", "Command Palette");
+		console.log("No menu button for id '" + id + "' found!");
+	}
+};
+
+/******************************************************************************/
+
+commandPaletteInput.addEventListener("keydown", e =&gt; {
+	if (e.keyCode === 13) {
+		e.preventDefault();
+	} else if (e.keyCode === 27) {
+		e.preventDefault();
+		commandPalette.classList.remove("visible");
+	}
+});
+
+commandPaletteButtonClose.addEventListener("click", () =&gt; {
+	commandPalette.classList.remove("visible");
+});
+
+/******************************************************************************/
+
+importLib([
+	"mousetrap.min.js",
+	"mousetrap-global-bind.min.js"
+]).then(() =&gt; {
+	Mousetrap.bindGlobal("mod+shift+p", (event) =&gt; {
+		commandPalette.classList.toggle("visible");
+
+		if (commandPalette.classList.contains("visible")) {
+			commandPaletteInput.value = "";
+			commandPaletteInput.focus();
+		}
+
+		return false;
+	});
+});
+
+/******************************************************************************/
+
+importLib([
+	"awesomplete.js"
+]).then(() =&gt; {
+	if (commandPaletteInput) {
+		const myAwesomeplete = new Awesomplete(commandPaletteInput, {
+			autoFirst: true,
+			maxItems: 100,
+			minChars: 0
+		});
+
+		commandPaletteInput.addEventListener("awesomplete-selectcomplete", (event) =&gt; {
+			runCommand(event.text.value);
+		});
+
+		const list = [];
+
+		const getLabel = (sec, par) =&gt; `${sec} &gt; ${par}`;
+
+		document.liveQuerySelectorAll("#global-menu .menu-button").added((menuButton) =&gt; {
+			const id = Codestrate.util.randomString();
+
+			const myListElement = {
+				element: menuButton,
+				id: id
+			};
+
+			menuButtons.push(myListElement);
+
+			const listElement = {
+				label: menuButton.innerText,
+				value: id
+			};
+
+			list.push(listElement);
+			myAwesomeplete.list = list;
+		});
+	}
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="NWmXiMi9" name="Command Palette Style"><style data-type="content" type="text/css" codemirror="true">html .command-palette-modal {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--color-primary-text);
+	opacity: 0.25;
+	z-index: 397;
+	transition: opacity var(--navigation-transition);
+	opacity: 0;
+	pointer-events: none;
+}
+
+html .visible .command-palette-modal {
+	opacity: 0.25;
+}
+
+html .command-palette-search {
+	display: flex;
+	flex-direction: row;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	min-width: 384px;
+	z-index: 398;
+	box-shadow: var(--material-shadow-z24);
+	border-radius: 2px;
+	background: var(--color-primary-shade-1);
+	transition: opacity var(--navigation-transition),
+							transform var(--navigation-transition);
+	opacity: 0;
+	transform: translate(-50%, -50%) translate(0, 96px) scale(0.75);
+	pointer-events: none;
+}
+
+html .visible .command-palette-search {
+	opacity: 1;
+	transform: translate(-50%, -50%);
+	pointer-events: all;
+}
+
+/******************************************************************************/
+
+html #command-palette .command-palette-button {
+	display: flex;
+	padding: 4px;
+	width: 48px;
+	height: 48px;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	border-radius: 50%;
+	flex-shrink: 0;
+	user-select: none;
+}
+
+html #command-palette .command-palette-search {
+	background: var(--color-primary-shade-1);
+	border-radius: 4px;
+	display: flex;
+	flex: 0 1 512px;
+}
+
+html #command-palette .command-palette-input {
+	flex: 0 1 100%;
+	outline: none;
+	background: none;
+	border: none;
+	color: var(--color-primary-text);
+	text-overflow: ellipsis;
+	font-size: 1em;
+	letter-spacing: 0.02rem;
+}
+
+html #command-palette .command-palette-input::placeholder {
+	color: var(--color-tertiary-text);
+}
+
+html #command-palette .command-palette-button-search,
+html #command-palette .command-palette-button-close {
+	width: 40px;
+	height: 40px;
+	margin: 4px;
+}
+
+html #command-palette .command-palette-button-run {
+	cursor: default;
+}
+
+html #command-palette .command-palette-button-run i:after {
+	content: "keyboard_arrow_right";
+}
+
+html #command-palette .command-palette-button-close i:after {
+	content: "clear";
+}
+
+/******************************************************************************/
+
+html #command-palette .awesomplete [hidden] {
+	display: none;
+}
+
+html #command-palette .awesomplete .visually-hidden {
+	position: absolute;
+	clip: rect(0, 0, 0, 0);
+}
+
+html #command-palette .awesomplete {
+	display: inline-block;
+	position: relative;
+	display: flex;
+	flex: 0 1 100%;
+}
+
+html #command-palette .awesomplete > input {
+	display: block;
+}
+
+html #command-palette .awesomplete > ul {
+	position: absolute;
+	left: 0;
+	top: 48px;
+	color: var(--color-primary-text);
+	z-index: 398;
+	min-width: 100%;
+	box-sizing: border-box;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	max-height: 320px;
+	overflow-y: auto;
+	border-radius: 0 0 4px 4px;
+	background: var(--color-primary-shade-1);
+	box-shadow: var(--material-shadow-z24);
+	transition: 0.3s cubic-bezier(0.4, 0.2, 0.5, 1.4);
+	transform-origin: 1.43em -.43em;
+}
+
+html #command-palette .awesomplete > ul::-webkit-scrollbar-thumb {
+	border-radius: 0px;
+	background-color: var(--color-primary-shade-3);
+}
+
+html #command-palette .awesomplete > ul:empty {
+	display: none;
+}
+
+html #command-palette .awesomplete > ul[hidden],
+html #command-palette .awesomplete > ul:empty {
+	opacity: 0;
+	transform: scale(0);
+	display: block;
+	transition-timing-function: ease;
+}
+
+html #command-palette .awesomplete > ul > li {
+	position: relative;
+	padding: 8px;
+	cursor: pointer;
+}
+
+html #command-palette .awesomplete > ul > li:hover {
+	background: rgba(var(--color-primary-shade-3-rgb), 0.25);
+	color: var(--color-primary-text);
+}
+
+html #command-palette .awesomplete mark {
+	background: rgba(var(--color-primary-shade-3-rgb), 0.5);
+	color: var(--color-primary-text);
+}
+
+html #command-palette .awesomplete > ul > li[aria-selected="true"] {
+	background: rgba(var(--color-primary-shade-3-rgb), 0.5);
+	color: var(--color-primary-text);
+}
+
+html #command-palette .awesomplete li[aria-selected="true"] mark {
+	background: rgba(var(--color-primary-shade-3-rgb), 1);
+	color: var(--color-primary-text);
+	border-radius: 1px;
+}</style></div></div>
