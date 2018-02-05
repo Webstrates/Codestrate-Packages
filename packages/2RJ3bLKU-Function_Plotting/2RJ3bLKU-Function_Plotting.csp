@@ -1,0 +1,101 @@
+<div class="section section-visible" data-id="2RJ3bLKU" name="Function Plotting" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="K7urNtpY"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Function Plotting</h2><div>Adds a global <code>fplot</code> function for creating plots with <a href="https://mauriciopoppe.github.io/function-plot/" target="_blank">Function Plot</a>.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="mqm9tyHs" draggable="false" style=""><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "0.1.1",
+	"icon": "show_chart",
+	"description": "Adds a global fplot function for creating plots with Function Plot.",
+	"tags": [
+		"function",
+		"code paragraphs"
+	],
+	"assets": [
+		"d3.v3.min.js",
+		"function-plot-min.js"
+	],
+	"dependencies": [
+		{
+			"id": "qRcedryV",
+			"name": "Output"
+		}
+	],
+	"changelog":
+	{
+		"0.1.1": "'this' in fplot now correctly refers to the calling paragraph.",
+		"0.1": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/2RJ3bLKU-Function_Plotting"
+	}
+}</pre></div><div class="paragraph body-paragraph collapsed" data-id="ABn4E7Gs" name="Assets" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><a href="function-plot-min.js" target="_blank">function-plot-min.js</a><div><a href="d3.v3.min.js" target="_blank">d3.v3.min.js</a><br></div></div></div><div class="paragraph code-paragraph collapsed" data-id="sAdMBZ4v" name="Function plotting code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">importLib(["d3.v3.min.js", "function-plot-min.js"]).then(() =&gt; {
+	function fplot(f) {
+		const fplotDiv = document.createElement("div");
+		let outputBound = output.bind(this);
+		outputBound(fplotDiv);
+		fplotDiv.classList.add("fplot");
+		if (typeof f === "string") {
+			f = require(f);
+		}
+		const functionPre = document.createElement("pre");
+		functionPre.classList.add("function");
+		functionPre.innerText = JSON.stringify(f);
+		fplotDiv.appendChild(functionPre);
+	}
+	
+	document.liveQuerySelectorAll(".fplot").added((fplotDiv) =&gt; {
+		if (fplotDiv.querySelector("transient")) return;
+		const f = JSON.parse(fplotDiv.querySelector(".function").innerText);
+		const fplotView = document.createElement("transient");
+		fplotDiv.appendChild(fplotView);
+		if (!f.target) {
+			f.target = fplotView;
+		}
+// 		console.log(f);
+		functionPlot(f);
+	});
+
+	const vm = Codestrate.VirtualMachines.get("text/javascript");
+
+	vm.addToGlobalContext({
+		fplot
+	});	
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="bAuFXPkk" name="Function plot style"><style data-type="content" type="text/css" codemirror="true">.fplot {
+	padding-top: 4px;
+}
+
+.fplot pre.function {
+	display: none;
+}
+
+.fplot .function-plot {
+	background-color: white;
+}</style></div><div class="paragraph body-paragraph locked" data-id="ghReCz4F" name="Examples"><div data-type="content" type="text/html" codemirror="true" contenteditable="false"><h2>
+	Examples:
+</h2></div></div><div class="paragraph code-paragraph" data-id="S7jYCJpt" name="Quadratic curve" last-execution-state="success"><pre data-type="content" type="text/javascript">fplot({
+  data: [{
+    fn: 'x^2'
+  }]
+});</pre></div><div class="paragraph code-paragraph" data-id="Aqs5FH77" last-execution-state="success" name="Curve with options"><pre data-type="content" type="text/javascript">fplot({
+  title: 'y = x * x',
+  width: 580,
+  height: 400,
+  disableZoom: true,
+  xAxis: {
+    label: 'x - axis',
+    domain: [-6, 6]
+  },
+  yAxis: {
+    label: 'y - axis'
+  },
+  data: [{
+    fn: 'x^2'
+  }]
+});</pre></div><div class="paragraph code-paragraph" data-id="h6Ve48Gs" last-execution-state="success" name="Plotting from data paragraph"><pre data-type="content" type="text/javascript">fplot("#butterfly-plot");</pre></div><div class="paragraph data-paragraph" data-id="FTa2SG8L" name="Butterfly plot data"><pre data-type="content" type="application/json" id="butterfly-plot">{
+  "yAxis": {"domain": [-4.428571429, 4.428571429]},
+  "xAxis": {"domain": [-7, 7]},
+  "data": [{
+    "x": "sin(t) * (exp(cos(t)) - 2 cos(4t) - sin(t/12)^5)",
+    "y": "cos(t) * (exp(cos(t)) - 2 cos(4t) - sin(t/12)^5)",
+    "range": [-31.4, 31.4],
+    "fnType": "parametric",
+    "graphType": "polyline"
+  }]
+}</pre></div></div>
