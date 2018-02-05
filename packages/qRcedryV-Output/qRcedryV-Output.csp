@@ -3,7 +3,7 @@
 	"icon": "receipt",
 	"description": "Adds an output() function to easily print output into a body paragraph.",
 	"tags":[
-		"utility",
+		"function",
 		"code paragraphs"
 	],
 	"assets": [],
