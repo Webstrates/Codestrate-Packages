@@ -1,0 +1,153 @@
+<div class="section section-visible" data-id="TRQ4yFDP" name="Plot" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="qFWPWSbP"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Plot using plotly</h2><div>Adds a <code>plot</code> function to the global scope that can be used to plot data using the <a href="https://plot.ly/javascript/">plotly.js</a>.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="NVtdsrUk" draggable="false" style=""><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "0.4.1",
+	"icon": "insert_chart",
+	"description": "Adds a global plot function using plotly.js",
+	"tags": [
+		"function",
+		"code paragraphs"
+	],
+	"assets": [
+		"plotly.min.js"
+	],
+	"dependencies": [
+		{
+			"id": "qRcedryV",
+			"name": "Output"
+		}
+	],
+	"changelog":
+	{
+		"0.4.1": "'this' in plot now correctly refers to the calling paragraph.",
+		"0.4": "Added multi-user support",
+		"0.3": "Added support for data in data paragraphs",
+		"0.2": "Fixed dependency to output",
+		"0.1": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/TRQ4yFDP-Plot"
+	}
+}</pre></div><div class="paragraph style-paragraph collapsed" data-id="aswkRsND" name="Plot style" style=""><style data-type="content" type="text/css" codemirror="true">.plotly-plot {
+	padding-top: 10px;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.plotly-plot pre.data, .plotly-plot pre.options, .plotly-plot pre.layout {
+	display: none;
+}</style></div><div class="paragraph body-paragraph collapsed" data-id="ZUpXZFEn" name="Assets"><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><a href="plotly.min.js" target="_blank">plotly.min.js</a></div></div><div class="paragraph code-paragraph collapsed" data-id="nGDWsZXn" run-on-load="true" last-execution-state="success" name="plot code"><pre data-type="content" type="text/javascript">importLib(["plotly.min.js"]).then(() =&gt; {
+
+	function plot(data, layout, options) {
+		// Create a div to contain the plot
+		const plotDiv = document.createElement("div");
+		plotDiv.classList.add("plotly-plot");
+		// If data is a string, lets require it as a data paragraph
+		if (typeof data === "string") {
+			data = require(data);
+		}
+		// We'll store the data in a hidden pre element
+		const dataPre = document.createElement("pre");
+		dataPre.classList.add("data");
+		dataPre.innerText = JSON.stringify(data);
+		plotDiv.appendChild(dataPre);
+		// Same with layout
+		if (layout) {
+			const layoutPre = document.createElement("pre");
+			layoutPre.classList.add("layout");
+			layoutPre.innerText = JSON.stringify(layout);
+			plotDiv.appendChild(layoutPre);
+		}
+		// And options
+		if (options) {
+			const optionsPre = document.createElement("pre");
+			optionsPre.classList.add("options");
+			optionsPre.innerText = JSON.stringify(options);
+			plotDiv.appendChild(optionsPre);
+		}
+		
+		// Now we'll output the div
+		let newOutput = output.bind(this);
+		newOutput(plotDiv);
+	}
+	
+	// We listen for .plotly-plot being added
+	document.liveQuerySelectorAll(".plotly-plot").added((plotDiv) =&gt; {
+		// When a plot is added extract the data from the pres
+		if (plotDiv.querySelector("transient")) return;
+		let data;
+		const dataPre = plotDiv.querySelector(".data");
+		if (dataPre) data = JSON.parse(dataPre.innerText);
+		let layout;
+		const layoutPre = plotDiv.querySelector(".layout");
+		if (layoutPre) layout = JSON.parse(layoutPre.innerText);
+		let options;
+		const optionsPre = plotDiv.querySelector(".options");
+		if (optionsPre) options = JSON.parse(optionsPre.innerText);
+		if (!options) {
+			options = {};
+		}
+		// Disable tips that polute the DOM
+		options.showTips = false;
+		// Create a transient element for the view
+		const plotlyView = document.createElement("transient");
+		plotDiv.appendChild(plotlyView);
+		// Plot it.
+		Plotly.newPlot(plotlyView, data, layout, options);
+	});
+
+	const vm = Codestrate.VirtualMachines.get("text/javascript");
+
+	vm.addToGlobalContext({
+		plot
+	});	
+});</pre></div><div class="paragraph body-paragraph" data-id="8tRYpCkh" name="Examples"><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><h2>
+	Examples:
+</h2></div></div><div class="paragraph code-paragraph" data-id="JG7HKGia" name="Line and scattor plot" last-execution-state="success"><pre data-type="content" type="text/javascript">var trace1 = {
+  x: [1, 2, 3, 4],
+  y: [10, 15, 13, 17],
+  mode: 'markers',
+  type: 'scatter'
+};
+
+var trace2 = {
+  x: [2, 3, 4, 5],
+  y: [16, 5, 11, 9],
+  mode: 'lines',
+  type: 'scatter'
+};
+
+var trace3 = {
+  x: [1, 2, 3, 4],
+  y: [12, 9, 15, 12],
+  mode: 'lines+markers',
+  type: 'scatter'
+};
+
+var data = [trace1, trace2, trace3];
+
+plot(data);</pre></div><div class="paragraph code-paragraph" data-id="v2MZDDUW" name="Pie chart with data in data paragraph and layout" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">var layout = {
+  height: 400,
+  width: 500
+};
+
+plot("#pie-chart-example-data", layout);</pre></div><div class="paragraph data-paragraph" data-id="45eVgT5j" name="Pie Chart example data"><pre data-type="content" type="application/json" id="pie-chart-example-data">[{
+  "values": [19, 26, 55],
+  "labels": ["Residential", "Non-Residential", "Utility"],
+  "type": "pie"
+}]</pre></div><div class="paragraph code-paragraph" data-id="ZQ9fbxzS" draggable="false" style="" name="Scroll and zoom" last-execution-state="success"><pre data-type="content" type="text/javascript">// mousewheel or two-finger scroll zooms the plot
+
+var trace1 = {
+    x:['2020-10-04', '2021-11-04', '2023-12-04'],
+    y: [90, 40, 60],
+    type: 'scatter'
+};
+
+var data = [trace1];
+
+var layout = {
+    title: 'Scroll and Zoom',
+    showlegend: false
+};
+
+// Plot with options
+plot(data, layout, {scrollZoom: true});</pre></div></div>
