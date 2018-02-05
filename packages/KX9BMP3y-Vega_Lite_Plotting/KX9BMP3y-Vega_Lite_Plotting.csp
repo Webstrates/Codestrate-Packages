@@ -1,0 +1,155 @@
+<div class="section section-visible" data-id="KX9BMP3y" name="Vega Lite Plotting" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="aWpnaLGb" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Vega Lite Plotting</h2><div>Adds a <code>vplot</code> and <code>vplotlive</code> function to the global scope that can be used to plot using <a href="https://vega.github.io/vega-lite/" target="_blank">Vega Lite</a>.</div><div><code>vplot</code> renders a static plot, while <code>vplotlive</code> takes a reference to a data paragraph, and updates when the spec in the data paragraph is changed.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="SeeshLAV" draggable="false" style=""><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "0.4.3",
+	"icon": "bubble_chart",
+	"description": "Vega and Vega Lite plotting package. Adds global vplot function.",
+	"tags": [
+		"function",
+		"code paragraphs"
+	],
+	"assets": [
+		"vega.js",
+		"vega-lite.js",
+		"vega-embed.js",
+		"seattle-weather.csv"
+	],
+	"dependencies": [
+		{
+			"id": "qRcedryV",
+			"name": "Output"
+		}
+	],
+	"changelog":
+	{
+		"0.4.3": "Fixed styling of documentation.",
+		"0.4.2": "Fixed bug that prevented the vega lite package from initialize correctly.",
+		"0.4.1": "'this' in vplot and vplotlive now correctly refers to the calling paragraph.",
+		"0.4": "Added vplotlive and support for outputting to an element with a given id",
+		"0.3": "Added support for output target with CSS selector",
+		"0.2": "Multi-user support",
+		"0.1": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/KX9BMP3y-Vega_Lite_Plotting"
+	}
+}</pre></div><div class="paragraph body-paragraph locked collapsed" data-id="qDDJtgei" name="Assets" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="writing"><a href="vega.js" target="_blank">vega.js</a><div><a href="vega-lite.js" target="_blank">vega-lite.js</a><br><a href="vega-embed.js" target="_blank" style="font-family: var(--font-secondary); font-size: 1rem; background-color: var(--color-primary-shade-2);">vega-embed.js</a><br><a href="seattle-weather.csv" target="_blank" style="font-family: var(--font-secondary); font-size: 1rem; background-color: var(--color-primary-shade-2);">seattle-weather.csv</a></div></div></div><div class="paragraph code-paragraph collapsed" data-id="wpqsPzzf" name="Vega code" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript">importLib(["vega.js", "vega-lite.js", "vega-embed.js"]).then(() =&gt; {
+	
+	// vplot renders a static vega plot where the spec is stored with the plot
+	function vplot(spec, selector) {
+		// Create the div that will contain the plot
+		const vegaDiv = document.createElement("div");
+		// If a selector is given, use that element as an output
+		if (selector) {
+			document.querySelector(selector).appendChild(vegaDiv);
+		} else {
+			// Else just use output
+			let outputBound = output.bind(this);
+			outputBound(vegaDiv);
+		}
+		vegaDiv.classList.add("vega");
+		// If the spec is a string require it
+		if (typeof spec === "string") {
+			spec = require(spec);
+		}
+		const specPre = document.createElement("pre");
+		// Store the spec in a pre element
+		specPre.classList.add("spec");
+		specPre.innerText = JSON.stringify(spec);
+		vegaDiv.appendChild(specPre);
+	}
+
+	// Listen for new vega plots and render them based on the stored spec
+	document.liveQuerySelectorAll(".vega").added((vegaDiv) =&gt; {
+		if (vegaDiv.querySelector("transient")) return;
+		const spec = JSON.parse(vegaDiv.querySelector(".spec").innerText);
+		const vegaView = document.createElement("transient");
+		vegaDiv.appendChild(vegaView);
+		vegaEmbed(vegaView, spec);
+	});
+
+	// vplotlive renders a live vega plot that updates when the source spec in a data paragraph updates
+	function vplotlive(spec, selector) {
+		// We only allow ID selectors as input for specs
+		if (typeof spec !== "string" || spec[0] !== "#") {
+			alert("The first parameter to vplotlive must be an id of a data paragraph");
+			return;
+		}
+		const vegaDiv = document.createElement("div");
+		// If a selector is given, use that element as an output
+		if (selector) {
+			document.querySelector(selector).appendChild(vegaDiv);
+		} else {
+			// Else just use output
+			let outputBound = output.bind(this);
+			outputBound(vegaDiv);	
+		}
+		vegaDiv.classList.add("vegalive");
+		const specId = spec;
+		spec = require(spec);
+		const specPre = document.createElement("pre");
+		// Store the id of the spec in a pre element
+		specPre.classList.add("spec");
+		specPre.innerText = specId;
+		vegaDiv.appendChild(specPre);
+	}
+
+	// Listen for new vega live plots and render them based on the stored spec
+	document.liveQuerySelectorAll(".vegalive").added((vegaDiv) =&gt; {
+		if (vegaDiv.querySelector("transient")) return;
+		const specId = vegaDiv.querySelector(".spec").innerText;
+		const spec = require(specId);
+		const vegaView = document.createElement("transient");
+		vegaDiv.appendChild(vegaView);
+		vegaEmbed(vegaView, spec);
+		const specNode = document.querySelector(specId).firstChild;
+		// Listen for updates to the spec and re-render the vega plot
+		specNode.webstrate.on("insertText*", function(position, value) {
+  		vegaEmbed(vegaView, require(specId));
+		});
+
+		specNode.webstrate.on("deleteText*", function(position, value) {
+  		vegaEmbed(vegaView, require(specId));
+		});
+	}); 
+
+	const vm = Codestrate.VirtualMachines.get("text/javascript");
+
+	vm.addToGlobalContext({
+		vplot,
+		vplotlive
+	});	
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="GRmzwAuY" draggable="false" style="" name="Vega style"><style data-type="content" type="text/css" codemirror="true">.vega canvas, .vegalive canvas {
+	background-color: white;
+}
+
+.vega a, .vegalive a {
+	margin-right: 4px;
+}
+
+.vega pre.spec, .vegalive pre.spec {
+	display: none;
+}</style></div><div class="paragraph body-paragraph" data-id="xxXQD4JB" style="" name="Examples"><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><h2>
+	Examples:
+</h2></div></div><div class="paragraph data-paragraph" data-id="RgERWEx4" name="Average monthly precipitation&nbsp;in Seattle Vega Lite Spec" style=""><pre data-type="content" type="application/json" id="seattle-precipitation">{
+  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+  "data": {
+    "url": "seattle-weather.csv",
+    "format": {
+      "type": "csv"
+    }
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "timeUnit": "months",
+      "field": "date",
+      "type": "ordinal"
+    },
+    "y": {
+      "aggregate": "mean",
+      "field": "precipitation",
+      "type": "quantitative"
+    }
+  }
+}</pre></div><div class="paragraph code-paragraph" data-id="aw35mqbM" draggable="false" style="" name="Average monthly precipitation&nbsp;in Seattle Code" last-execution-state="success"><pre data-type="content" type="text/javascript">vplot("#seattle-precipitation");</pre></div><div class="paragraph code-paragraph" data-id="q7i5VkDu" name="Example with target output element" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">vplot("#seattle-precipitation", "#vega-lite-target");</pre></div><div class="paragraph body-paragraph locked" data-id="mUrwwTbR" draggable="false" style="" name="Target for plotting"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" id="vega-lite-target"></div></div><div class="paragraph code-paragraph" data-id="7uWdXfp5" draggable="false" style="" last-execution-state="success" name="Live plot"><pre data-type="content" type="text/javascript">// Change the spec, and the plot will change
+vplotlive("#seattle-precipitation");</pre></div></div>
