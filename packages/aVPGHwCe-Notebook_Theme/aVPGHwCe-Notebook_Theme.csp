@@ -1,0 +1,4904 @@
+<div class="section section-visible" data-id="aVPGHwCe" name="Notebook Theme" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="uKHYE63W" name="Documentation" draggable="false" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>A simple and light theme for writing and reading of contents.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="MVLy6nYM" name="Properties" draggable="false" style=""><pre data-type="content" type="application/json" contenteditable="false" class="section-properties">{
+	"version": "1.2.4",
+	"icon": "palette",
+	"description": "A simple and light theme for writing and reading of contents.",
+	"tags": [
+		"themes"
+	],
+	"assets": [],
+	"dependencies": [
+		{
+			"id": "w2AXGDAm",
+			"name": "Theme Creator",
+			"optional": true,
+			"usage": "The Theme Creator is needed to update themes."
+		}
+	],
+	"changelog":
+	{
+		"1.2.4": "Updated output and code paragraph style.",
+		"1.2.3": "Updated to new non jumping headers.",
+		"1.2.2": "Updated dependency to be optional.",
+		"1.2.1": "Updated many more things and switched to Alegreya as body font.",
+		"1.2": "Changed name from 'Simplicity' to 'Notebook' and updated several things (still under construction).",
+		"1.1": "Various fixes for new packages and Codestrate updates.",
+		"1.0": "Initial Version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/aVPGHwCe-Notebook_Theme"
+	}
+}</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="xwMtEJSr" style="" name="Add Global Menu Entry" run-on-load="true" last-execution-state="success" draggable="false"><pre data-type="content" type="text/javascript" contenteditable="false" class="">const GlobalMenuUtils = require("#global-menu-utils");
+
+/******************************************************************************/
+
+const toggleThemeButton = GlobalMenuUtils.createButton("Toggle Notebook Theme", null, event =&gt; {
+	if (document.documentElement.hasAttribute("transient-theme") &amp;&amp;
+		  (document.documentElement.getAttribute("transient-theme") === "Notebook")) {
+		document.documentElement.removeAttribute("transient-theme");
+	} else {
+		document.documentElement.setAttribute("transient-theme", "Notebook");
+	}
+});
+
+/******************************************************************************/
+
+const subMenuName = "Themes";
+
+GlobalMenuUtils.addMenuItemToSubMenu(toggleThemeButton, subMenuName);</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="NNecppGD" style="" name="Update Theme" last-execution-state="success" draggable="false"><pre data-type="content" type="text/javascript" contenteditable="false" class="">try {
+	const ThemeCreatorCode = require("#theme-creator-code");
+} catch (e) {
+	alert(`You need to install the optional dependency "Theme Creator" (w2AXGDAm) to update themes!`, "Missing Theme Creator");
+	return;
+}
+
+/******************************************************************************/
+
+ThemeCreatorCode.updateTheme("aVPGHwCe", "Notebook");</pre></div><div class="paragraph code-paragraph collapsed" data-id="qhxbxufp" name="Add Class and ID to Snackbar" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const SnackbarUtils = require("#snackbar-utils");
+const SnackbarTools = require("#snackbar-tools");
+
+/******************************************************************************/
+
+const toolsName = "paragraph-header-tools";
+let lastParagraph = null;
+
+/******************************************************************************/
+
+const idInput = SnackbarUtils.createInput("Paragraph ID", "id-input " + toolsName, "", (inputElement) =&gt; {
+	if (Codestrate.focussedParagraph) {
+		const content = Codestrate.focussedParagraph.querySelector("[data-type='content']");
+		if (content) {
+			if (inputElement.innerText === "") {
+				content.removeAttribute("id");
+			} else {
+				content.id = inputElement.innerText;
+			}
+		}
+	}
+});
+SnackbarUtils.addSnackbarItem(idInput, -1);
+
+const classInput = SnackbarUtils.createInput("Paragraph Class", "class-input " + toolsName, "", (inputElement) =&gt; {
+	if (Codestrate.focussedParagraph) {
+		const content = Codestrate.focussedParagraph.querySelector("[data-type='content']");
+		if (content) {
+			if (inputElement.innerText === "") {
+				content.removeAttribute("class");
+			} else {
+				content.className = inputElement.innerText;
+			}
+		}
+	}
+});
+SnackbarUtils.addSnackbarItem(classInput, -1);
+
+/******************************************************************************/
+
+SnackbarTools.addTools((target) =&gt; {
+	const result = target.closest(".paragraph-header");
+
+	if (Codestrate.focussedParagraph &amp;&amp;
+		 (Codestrate.focussedParagraph != lastParagraph)) {
+		const content = Codestrate.focussedParagraph.querySelector("[data-type='content']");
+		if (content) {
+			idInput.innerText = content.id;
+			classInput.innerText = content.className;
+		}
+	}
+
+	lastParagraph = Codestrate.focussedParagraph;
+	return result;
+}, toolsName);</pre></div><div class="paragraph style-paragraph collapsed" data-id="QXf3eKp3" name="Alegreya Font"><style data-type="content" type="text/css" codemirror="true">/* cyrillic-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/2-0rAhdO4T5hMLVYWXPl6yEAvth_LlrfE80CYdSH47w.woff2) format('woff2');
+	unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/G_Uzz0l2AD37fwazYIVqRCEAvth_LlrfE80CYdSH47w.woff2) format('woff2');
+	unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/KqrXb9ZAKqVtzt7EgGbdIiEAvth_LlrfE80CYdSH47w.woff2) format('woff2');
+	unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/V907Vsm1WDtzQVBmHEUaayEAvth_LlrfE80CYdSH47w.woff2) format('woff2');
+	unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/5EszMMLpK7CAwF487xC-ciEAvth_LlrfE80CYdSH47w.woff2) format('woff2');
+	unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/6_pOq2_yZBqNy9oVYzitaiEAvth_LlrfE80CYdSH47w.woff2) format('woff2');
+	unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 400;
+	src: local('Alegreya Italic'), local('Alegreya-Italic'), url(https://fonts.gstatic.com/s/alegreya/v10/Q-XbT1m22Fi9BEKb7y59O_k_vArhqVIZ0nv9q090hN8.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* cyrillic-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWude9INZm0R8ZMJUtfOsxrw.woff2) format('woff2');
+	unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWrpHcMS0zZe4mIYvDKG2oeM.woff2) format('woff2');
+	unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWhquHyap-BLkxbFhcQRhghg.woff2) format('woff2');
+	unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWjyJJ3dJfU6-XWVNf-DPRbs.woff2) format('woff2');
+	unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWjh33M2A-6X0bdu871ruAGs.woff2) format('woff2');
+	unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWhHJTnCUrjaAm2S9z52xC3Y.woff2) format('woff2');
+	unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: italic;
+	font-weight: 700;
+	src: local('Alegreya Bold Italic'), local('Alegreya-BoldItalic'), url(https://fonts.gstatic.com/s/alegreya/v10/IWi8e5bpnqhMRsZKTcTUWoWiMMZ7xLd792ULpGE4W_Y.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* cyrillic-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/CyUchkLLwC_Sk3Ot8VbrmBTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+	unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/ajjr5syd8npzA2oMO3e2tBTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+	unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/lC0rmMY7jeEwAi0q4NEiaxTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+	unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/hTEGF50xIZGXmUgSEbt1cBTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+	unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/Agq2djrNRZK5qadVTHOtlRTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+	unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/9u9YGRxvkN-Oe2bJiJD80RTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+	unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Alegreya Regular'), local('Alegreya-Regular'), url(https://fonts.gstatic.com/s/alegreya/v10/4vRXIs1BEbKX6mQ7lGu1I_esZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+/* cyrillic-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3TTOQ_MqJVwkKsUn0wKzc2I.woff2) format('woff2');
+	unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3TUj_cnvWIuuBMVgbX098Mw.woff2) format('woff2');
+	unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3UbcKLIaa1LC45dFaAfauRA.woff2) format('woff2');
+	unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3Wo_sUJ8uO4YLWRInS22T3Y.woff2) format('woff2');
+	unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3b6up8jxqWt8HVA3mDhkV_0.woff2) format('woff2');
+	unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3SYE0-AqJ3nfInTTiDXDjU4.woff2) format('woff2');
+	unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+	font-family: 'Alegreya';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Alegreya Bold'), local('Alegreya-Bold'), url(https://fonts.gstatic.com/s/alegreya/v10/F5BSMOSf_T8GT2wiqqpj3Y4P5ICox8Kq3LLUNMylGO4.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="5JAmcw7K" name="Class and ID Input Style"><style data-type="content" type="text/css" codemirror="true">html[transient-theme="Notebook"] #snackbar:not([paragraph-header-tools="true"]) .paragraph-header-tools {
+	display: none;
+}
+
+html:not([transient-theme="Notebook"]) #snackbar .id-input,
+html:not([transient-theme="Notebook"]) #snackbar .class-input {
+	display: none !important;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-input.id-input:before{
+	content: "#";
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-input.id-input:empty:before {
+	content: "#id";
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-input.class-input:before {
+	content: ".";
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-input.class-input:empty:before {
+	content: ".class";
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="wg7VK8PS" draggable="false" style="" name="Hide Header Stuff"><style data-type="content" type="text/css" codemirror="true" contenteditable="true">html[transient-theme="Notebook"] .paragraph-header .action,
+html[transient-theme="Notebook"] .paragraph-header:before,
+html[transient-theme="Notebook"] .section-header .action,
+html[transient-theme="Notebook"] .section-header:before,
+html[transient-theme="Notebook"] .paragraph-header .id-input,
+html[transient-theme="Notebook"] .section-header .id-input,
+html[transient-theme="Notebook"] .paragraph-header .class-input,
+html[transient-theme="Notebook"] .paragraph-header .type-input,
+html[transient-theme="Notebook"] .section .section-header .data-id-label,
+html[transient-theme="Notebook"] .section .section-header .export-package {
+	display: none !important;
+}
+
+
+html[transient-theme="Notebook"] .paragraph:hover .paragraph-header:before,
+html[transient-theme="Notebook"] .paragraph[transient-focussed] .paragraph-header:before,
+html[transient-theme="Notebook"] .section:hover .section-header:before,
+html[transient-theme="Notebook"] .section[transient-focussed] .section-header:before,
+html[transient-theme="Notebook"] .paragraph:hover .paragraph-header .action,
+html[transient-theme="Notebook"] .paragraph[transient-focussed] .paragraph-header .action,
+html[transient-theme="Notebook"] .section-header:hover .action:not(.export-package) {
+	opacity: 1 !important;
+	display: initial !important;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" name="Add File Style" draggable="false" data-id="PkGviRKY" orig-data-id="2SkdQVQA" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">/* Hide native upload file UI element */
+html[transient-theme="Notebook"] .add-file input[type="file"] {
+	display: none;
+}
+
+/* Icon Upload File */
+html[transient-theme="Notebook"] .add-file label.material-icons:after {
+	content: "file_upload";
+}
+
+/* Tooltip Upload File */
+html[transient-theme="Notebook"] .add-file:after {
+	content: "Upload File";
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" name="Text Tools Style" draggable="false" data-id="pD77NWRd" orig-data-id="ETX4s9QH"><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="" media="none">html[transient-theme="Notebook"] .text-tools {
+	/* position: relative; */
+	display: block;
+	width: 100%;
+	background-color: rgba(0, 0, 0, .3);
+	padding: 5px;
+	padding-top: 10px;
+	margin-top: 1px;
+	border-radius: 2px;
+
+	/* border-top: 1px solid rgba(255, 255, 255, .1);*/
+
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+	-moz-user-select: none;     /* Firefox all */
+	-ms-user-select: none;      /* IE 10+ */
+	user-select: none;          /* Likely future */   
+}
+
+html[transient-theme="Notebook"] .paragraph.collapsed .text-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .text-tools .action {
+	position: relative;
+	cursor: pointer;
+	display: inline-block;
+	margin-left: 5px;
+}
+
+html[transient-theme="Notebook"] .text-tools .action:hover {
+	color: orange;
+}
+
+/* Icon Bold */
+html[transient-theme="Notebook"] .text-tools .text-bold i:after {
+	content: "format_bold";
+}
+
+/* Tooltip Bold */
+html[transient-theme="Notebook"] .text-tools .text-bold:after {
+	content: "Bold";
+}
+
+/* Icon Italic */
+html[transient-theme="Notebook"] .text-tools .text-italic i:after {
+	content: "format_italic";
+}
+
+/* Tooltip Italic */
+html[transient-theme="Notebook"] .text-tools .text-italic:after {
+	content: "Italic";
+}
+
+/* Icon Underline */
+html[transient-theme="Notebook"] .text-tools .text-underline i:after {
+	content: "format_underline";
+}
+
+/* Tooltip Underline */
+html[transient-theme="Notebook"] .text-tools .text-underline:after {
+	content: "Underline";
+}
+
+/* Icon Strikethrough */
+html[transient-theme="Notebook"] .text-tools .text-strikethrough i:after {
+	content: "format_strikethrough";
+}
+
+/* Tooltip Strikethrough */
+html[transient-theme="Notebook"] .text-tools .text-strikethrough:after {
+	content: "Strikethrough";
+}
+
+/* Icon Bullets */
+html[transient-theme="Notebook"] .text-tools .text-list-bulleted i:after {
+	content: "format_list_bulleted";
+}
+
+/* Tooltip Bullets */
+html[transient-theme="Notebook"] .text-tools .text-list-bulleted:after {
+	content: "Bullets";
+}
+
+/* Icon Numbering */
+html[transient-theme="Notebook"] .text-tools .text-list-numbered i:after {
+	content: "format_list_numbered";
+}
+
+/* Tooltip Numbering */
+html[transient-theme="Notebook"] .text-tools .text-list-numbered:after {
+	content: "Numbering";
+}
+
+/* Icon Increase Indent */
+html[transient-theme="Notebook"] .text-tools .text-list-indent i:after {
+	content: "format_indent_increase";
+}
+
+/* Tooltip Increase Indent */
+html[transient-theme="Notebook"] .text-tools .text-list-indent:after {
+	content: "Increase Indent";
+}
+
+/* Icon Decrease Indent */
+html[transient-theme="Notebook"] .text-tools .text-list-outdent i:after {
+	content: "format_indent_decrease";
+}
+
+/* Tooltip Decrease Indent */
+html[transient-theme="Notebook"] .text-tools .text-list-outdent:after {
+	content: "Decrease Indent";
+}
+
+/* Icon Clear Formatting */
+html[transient-theme="Notebook"] .text-tools .clear-format i:after {
+	content: "format_clear";
+}
+
+/* Tooltip Clear Formatting */
+html[transient-theme="Notebook"] .text-tools .clear-format:after {
+	content: "Clear Formatting";
+}
+
+html[transient-theme="Notebook"] .text-tools .text-h1,
+html[transient-theme="Notebook"] .text-tools .text-h2,
+html[transient-theme="Notebook"] .text-tools .text-h3,
+html[transient-theme="Notebook"] .text-tools .text-set-variable,
+html[transient-theme="Notebook"] .text-tools .text-hide-variable-names, 
+html[transient-theme="Notebook"] .text-tools .text-convert-to-html {
+	margin-left: 10px;
+	margin-top: 2px;
+	vertical-align: top;
+}
+
+/* Tooltip Section */
+html[transient-theme="Notebook"] .text-tools .text-h1:after {
+	content: "Format Heading 1"
+}
+
+/* Tooltip Subsection */
+html[transient-theme="Notebook"] .text-tools .text-h2:after {
+	content: "Format Heading 2"
+}
+
+/* Tooltip Subsection */
+html[transient-theme="Notebook"] .text-tools .text-h3:after {
+	content: "Format Heading 3"
+}
+
+/* Tooltip Add Variable */
+html[transient-theme="Notebook"] .text-tools .text-set-variable:after {
+	content: "Add Variable"
+}
+
+/* Tooltip Hide Variable Names */
+html[transient-theme="Notebook"] .text-tools .text-hide-variable-names:after {
+	content: "Hide Variable Names"
+}
+
+/* Tooltip Convert HTML */
+html[transient-theme="Notebook"] .text-tools .text-convert-to-html:after {
+	content: "Convert HTML"
+}
+
+/* Hide native upload file UI element */
+html[transient-theme="Notebook"] .text-tools .add-file input[type="file"] {
+	display: none;
+}
+
+/* Icon Upload File */
+html[transient-theme="Notebook"] .text-tools .add-file label.material-icons:after {
+	content: "file_upload";
+}
+
+/* Tooltip Upload File */
+html[transient-theme="Notebook"] .text-tools .add-file:after {
+	content: "Upload File";
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Console Style" draggable="false" data-id="HN4Q2bPQ" orig-data-id="Xi64tc6E"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .console {
+	margin-top: 8px;
+	width: 100%;
+	height: 0;
+	opacity: 0;
+	pointer-events: none;
+	z-index: 9;
+	border-radius: 2px;
+	display: none;
+	background: var(--color-primary-shade-1);
+	padding: 8px;
+	/* -webkit-transition: height 500ms ease-in-out 0s, opacity 500ms ease-in-out 0s;
+	-moz-transition: height 500ms ease-in-out 0s, opacity 500ms ease-in-out 0s;
+	transition: height 500ms ease-in-out 0s, opacity 500ms ease-in-out 0s; */
+}
+
+html[transient-theme="Notebook"] .console.open {
+	display: flex;
+	/* flex: 1; */
+	/* flex-direction: column; */
+	flex-flow: column;
+	min-height: 192px;
+	opacity: 1.0;
+	pointer-events: all;
+	overflow: hidden;
+	overflow-y: hidden;
+	resize: vertical;
+}
+
+html[transient-theme="Notebook"] .console.close {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+html[transient-theme="Notebook"] .console .header {
+	padding: 4px;
+	border-bottom: 1px solid var(--color-tertiary-text);
+}
+
+html[transient-theme="Notebook"] .console .header:before {
+	content: "Console";
+}
+
+html[transient-theme="Notebook"] .console .close-console {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	z-index: 1;
+	cursor: pointer;
+	/* font-size: .6em; */
+}
+
+/******************************************************************************/
+
+/* html .console .close-console i:after {
+content: "close";
+position: absolute;
+top: 50%;
+right: 0;
+font-size: .8em;
+transform: translate3d(0, -50%, 0);
+} */
+
+html[transient-theme="Notebook"] .console .output,
+html[transient-theme="Notebook"] .console .input {
+	font-family: var(--font-monospace);
+	font-size: 0.8125rem;
+}
+
+html[transient-theme="Notebook"] .console .output {
+	flex: 1;
+	/* background-color: orange; */
+	overflow: hidden;
+	overflow-y: auto;
+	/* padding: 5px; */
+	/* border-top: 1px solid rgba(255, 255, 255, .05);
+	border-bottom: 1px solid rgba(255, 255, 255, .05); */
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output {
+	display: flex;
+	flex-direction: row;
+	/* word-break: break-all; */
+	/* word-wrap: break-word; */
+	/* float: right; */
+	/* white-space: pre-wrap; */
+	padding: 0 4px;
+	border-top: 1px solid rgba(255, 255, 255, .05);
+	border-bottom: 1px solid rgba(255, 255, 255, .05);
+	/* margin-bottom: -1px; */
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output > * {
+	/* display: inline; */
+	padding: 3px;
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output > .message {
+	flex: 1;
+}
+
+/* html .console > .output > div:not(:last-child) {
+padding: 3px 0 3px 0;
+border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+html[transient-theme="Notebook"] .console > .output > div:last-child {
+padding: 3px 0 0 0;
+}
+
+html[transient-theme="Notebook"] .console > .output > div > .time {
+color: rgb(135, 135, 129);
+} */
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .console > .output > .log-output.error {
+	color: var(--material-color-red);
+	background-color: rgba(var(--material-color-red-rgb), 0.1);
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output .time,
+html[transient-theme="Notebook"] .console > .output > .log-output .location {
+	color: var(--color-tertiary-text);
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output .location {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output.warn {
+	color: var(--material-color-yellow);
+	background-color: rgba(var(--material-color-yellow-rgb), 0.1);
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output.info {
+	color: var(--material-color-light-blue);
+	background-color: rgba(var(--material-color-light-blue-rgb), 0.1);
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output.debug {
+	color: var(--color-tertiary-text);
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output > .message .number,
+html[transient-theme="Notebook"] .console > .output > .log-output > .message .boolean {
+	color: #9179ff;
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output > .message .object {
+
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output > .message .null,
+html[transient-theme="Notebook"] .console > .output > .log-output > .message .undefined {
+	color: rgb(135, 135, 129);
+}
+
+html[transient-theme="Notebook"] .console > .output > .log-output > .message.info:before {
+	content: "INFO: ";
+	display: inline-block;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .console .input {
+	padding: 4px;
+	border-top: 1px solid var(--color-tertiary-text);
+}
+
+html[transient-theme="Notebook"] .console .input:before {
+	content: ">";
+	margin-right: 5px;
+	font-weight: bold;
+	width: 10px;
+	display: inline-block;
+}
+
+html[transient-theme="Notebook"] .console .input input[type="text"] {
+	font-family: inherit;
+	border: 0;
+	outline: 0;
+	color: var(--color-primary-text);
+	width: calc(100% - 15px);
+	background-color: transparent;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .console [error-id] {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] .CodeMirror .line-error {
+	background-color: var(--material-color-red);
+	animation-name: highlight;
+	animation-duration: 1250ms;
+	opacity: .15;
+	margin-right: 5px;
+}
+
+/* html .CodeMirror .line-error-text {
+text-decoration: underline;
+text-decoration-color: red;
+text-decoration-style: wavy;
+} */
+
+/* html .CodeMirror .line-error-gutter {
+text-decoration: underline;
+text-decoration-color: red;
+text-decoration-style: wavy;
+} */
+
+/* html .CodeMirror .line-error-wrap {
+text-decoration: underline;
+text-decoration-color: red;
+text-decoration-style: wavy;
+} */
+
+/******************************************************************************/
+
+@keyframes highlight {
+	from {
+		opacity: .5;
+	}
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="56xLprWL" draggable="false" style="" name="Dialog Style" orig-data-id="L4rzUGdH"><style data-type="content" type="text/css" class="" codemirror="true">@keyframes dialogAnimation {
+	from {
+		transform: translate(-50%, -50%) translate(0, 96px) scale(0.75);
+		opacity: 0;
+	}
+}
+
+@keyframes modalAnimation {
+	from {
+		opacity: 0;
+	}
+}
+
+html[transient-theme="Notebook"] .dialog {
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	min-width: 384px;
+	max-width: calc(100vw - 32px);
+	z-index: 400;
+	box-shadow: var(--material-shadow-z24);
+	border-radius: 2px;
+	background: var(--color-primary-shade-3);
+	animation: dialogAnimation var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] .modal {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--color-primary-text);
+	opacity: 0.25;
+	pointer-events: none;
+	z-index: 399;
+	animation: modalAnimation var(--navigation-transition);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .dialog .title {
+	color: var(--color-primary-text);
+	display: flex;
+	align-items: center;
+	font-size: 1.425rem;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	line-height: 2rem;
+	flex: 1;
+	margin: 0;
+	padding: 24px 24px 0;
+}
+
+html[transient-theme="Notebook"] .dialog .body {
+	color: var(--color-secondary-text);
+	font-size: 1rem;
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	line-height: 1.25rem;
+	margin-top: 20px;
+	padding: 0 24px 24px;
+	max-height: 80vh;
+	overflow-y: auto;
+	max-width: 512px;
+}
+
+html[transient-theme="Notebook"] .dialog .actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 8px;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .dialog .button {
+	color: var(--color-primary-text);
+	background: none;
+	font-size: 1rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	line-height: 2.25rem;
+	text-decoration: none;
+	text-transform: uppercase;
+	display: inline-block;
+	box-sizing: border-box;
+	min-width: 64px;
+	height: 36px;
+	padding: 0 16px;
+	border: none;
+	outline: none;
+	text-align: center;
+	overflow: hidden;
+	vertical-align: middle;
+	border-radius: 2px;
+	cursor: pointer;
+	margin-right: 8px;
+	user-select: none;
+}
+
+html[transient-theme="Notebook"] .dialog .button:last-child {
+	margin-right: 0;
+}
+
+html[transient-theme="Notebook"] .dialog .button:hover {
+	background-color: var(--color-primary-shade-2);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .dialog .body input {
+	font-size: 1rem;
+	width: 100%;
+	padding: 4px;
+	outline: 0;
+	color: var(--color-primary-text);
+	background-color: transparent;
+	border: 0;
+	border-bottom: 1px solid var(--color-tertiary-text);
+	margin-top: 8px;
+	margin-bottom: 16px;
+}
+
+html[transient-theme="Notebook"] .dialog .body input:focus {
+	border-bottom-color: var(--color-secondary-text);
+}
+
+html[transient-theme="Notebook"] .dialog .body input:invalid {
+	border-bottom-color: var(--material-color-red);
+}
+
+html[transient-theme="Notebook"] .dialog .body input::-webkit-calendar-picker-indicator {
+	opacity: 1.0;
+}
+
+html[transient-theme="Notebook"] .dialog .body input::-webkit-calendar-picker-indicator:hover {
+	background: var(--color-primary-shade-2);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .dialog .body select {
+	background: var(--material-color-grey-100);
+	color: var(--material-color-grey-900);
+	font-size: 1rem;
+	font-family: var(--font-primary);
+	border: none;
+	border-radius: 2px;
+	outline: none;
+	padding: 4px;
+	margin-top: 8px;
+	margin-bottom: 16px;
+	width: 100%;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" name="Show Tags Dialog Style" data-id="dFtHdKJw" style="" orig-data-id="2yNTLyMH"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .dialog ul.tags {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+html[transient-theme="Notebook"] .dialog ul li.tag {
+	padding: 6px 8px;
+	cursor: pointer;
+	border-radius: 2px;
+}
+
+html[transient-theme="Notebook"] .dialog ul li.tag:hover {
+	background-color: var(--color-primary-shade-2);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="PDiGnYdE" name="Toast Style" orig-data-id="es3FhyeZ"><style data-type="content" type="text/css" codemirror="true" class="" media="none">@keyframes toastAnimation {
+	from {
+		opacity: 0;
+		transform: translate(0, 72px);
+	}
+}
+
+html[transient-theme="Notebook"] .toast {
+	position: fixed;
+	right: 24px;
+	bottom: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 48px;
+	max-width: calc(100% - 48px);
+	background: var(--color-primary-shade-1);
+	box-shadow: var(--material-shadow-z6);
+	border-radius: 2px;
+	padding: 16px;
+	z-index: 500;
+	font-size: 0.875rem;
+	word-wrap: break-word;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	animation: toastAnimation var(--navigation-transition);
+	transition: opacity var(--navigation-transition),
+							transform var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] .toast.hidden {
+	opacity: 0;
+	transform: translate(0, 72px);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .toast .action {
+	display: flex;
+}
+
+html[transient-theme="Notebook"] .toast .button {
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] .toast .button.custom-action {
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--color-accent);
+	margin-left: 48px;
+}
+
+html[transient-theme="Notebook"] .toast .button.close {
+	margin-left: 16px;
+	user-select: none;
+}
+
+html[transient-theme="Notebook"] .toast .button.close i:after {
+	content: "close";
+	font-size: 1rem;
+}
+
+/******************************************************************************/
+
+@media only screen and (max-device-width: 480px) {
+	html .toast {
+		right: 0;
+		bottom: 0;
+		width: 100%;
+		max-width: 100%;
+		border-radius: 0;
+	}
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="yxHzQjis" draggable="false" style="" name="Global Toolbar Style" orig-data-id="y7Q3AHEx"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #global-toolbar {
+	background: var(--color-primary);
+	color: var(--color-primary-text);
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 64px;
+	overflow-x: scroll;
+	overflow: visible;
+	z-index: 200;
+	box-shadow: var(--material-shadow-z4);
+	transition: transform var(--navigation-transition),
+							box-shadow var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] #global-toolbar::-webkit-scrollbar {
+	display: none;
+}
+
+html[transient-theme="Notebook"] body[transient-toolbar-hidden="true"] #global-toolbar {
+	box-shadow: none;
+	transform: translate(0, -100%);
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-row {
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	padding: 8px;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-container {
+	display: flex;
+	box-sizing: border-box;
+	height: 48px;
+	vertical-align: middle;
+	z-index: 1;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-left {
+	flex: 1 0 auto;
+	justify-content: flex-start;
+	order: -1;
+	padding-right: 32px;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-center {
+	flex: 1 1 100%;
+	justify-content: center;
+	order: 0;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-right {
+	flex: 0 0 auto;
+	justify-content: flex-end;
+	order: 1;
+	padding-left: 32px;
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button {
+	display: flex;
+	padding: 4px;
+	width: 48px;
+	height: 48px;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-title {
+	font-size: 1.25rem;
+	font-weight: 500;
+	letter-spacing: 0.02rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	align-self: center;
+	padding: 0 16px;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-title+.toolbar-title {
+	padding-left: 0;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-input {
+	cursor: text;
+	outline: none;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-input:empty:before {
+	content: "Empty";
+	opacity: 0.5;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search {
+	background: var(--color-primary-shade-1);
+	border-radius: 4px;
+	display: flex;
+	flex: 0 1 512px;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-input {
+	flex: 0 1 100%;
+	outline: none;
+	background: none;
+	border: none;
+	color: var(--color-primary-text);
+	text-overflow: ellipsis;
+	font-size: 1em;
+	letter-spacing: 0.02rem;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-input::placeholder {
+	color: var(--color-tertiary-text);
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-button-search,
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-button-clear {
+	width: 40px;
+	height: 40px;
+	margin: 4px;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-button-search i:after {
+	content: "search";
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-input:placeholder-shown ~ .toolbar-search-button-clear {
+	visibility: hidden;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-search-button-clear i:after {
+	content: "clear";
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-input-title:empty:before {
+	content: "No Title";
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button-menu {
+	padding-right: 24px;
+	padding-left: 24px;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button-menu i:after {
+	content: "menu";
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #global-toolbar hr {
+	border: none;
+	border-left: 1px solid var(--color-primary-text);
+	margin: 8px 4px;
+	opacity: 0.8;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="hhZWaSU7" name="Global Menu Style" style="" draggable="false" orig-data-id="wckGBv9N"><style data-type="content" type="text/css" class="" codemirror="true">html[transient-theme="Notebook"] #global-menu {
+	background-color: var(--color-primary-shade-1);
+	color: var(--color-primary-text);
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 288px;
+	height: 100vh;
+	z-index: 100;
+	padding-top: 80px;
+	padding-bottom: 8px;
+	box-shadow: var(--material-shadow-z6);
+	transition: transform var(--navigation-transition),
+							box-shadow var(--navigation-transition),
+							padding-top var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] body[transient-toolbar-hidden="true"] #global-menu {
+	padding-top: 16px;
+}
+
+html[transient-theme="Notebook"] body:not([transient-menu-pinned="true"]) #global-menu {
+	transform: translate(-100%, 0);
+	box-shadow: none;
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] body:not([transient-menu-pinned="true"])  #global-menu:hover {
+	transform: none;
+	box-shadow: var(--material-shadow-z6);
+}
+
+html[transient-theme="Notebook"] #global-menu .handle {
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translate(100%, -50%);
+	transition: opacity var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] #global-menu .handle:after {
+	content: "keyboard_arrow_right";
+	background: var(--color-primary);
+	border-top-right-radius: 50%;
+	border-bottom-right-radius: 50%;
+}
+
+html[transient-theme="Notebook"] #global-menu:hover .handle,
+html[transient-theme="Notebook"] body[transient-menu-pinned="true"] #global-menu .handle {
+	opacity: 0;
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #global-menu .menu-container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	overflow-y: auto;
+	flex-wrap: nowrap;
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #global-menu .menu-container hr {
+	border: 0;
+	border-bottom: 1px solid var(--color-primary);
+	width: 100%;
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .menu-button,
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu > .label {
+	height: 40px;
+	font-weight: 500;
+	cursor: pointer;
+	font-size: 0.9rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	border: none;
+	background: none;
+	padding-left: 16px;
+	padding-right: 16px;
+	flex-shrink: 0;
+}
+
+
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	flex-shrink: 0;
+	border: 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--color-primary);
+	margin-bottom: 8px;
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu > .label .expander {
+	margin-right: 8px;
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .menu-button:hover,
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu > .label:hover,
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu:not(.hidden) > .label {
+	background: var(--color-primary);
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu > .label i {
+	font-size: 1.4rem;
+	display: flex
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu > .label i:after {
+	content: "keyboard_arrow_down";
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu.hidden > .label i:after {
+	content: "keyboard_arrow_right";
+}
+
+html[transient-theme="Notebook"] #global-menu .menu-container .sub-menu.hidden > *:not(.label) {
+	display: none;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="96HKgbmg" name="Snackbar Style" style="" orig-data-id="D7BPWi9D" draggable="false"><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="" media="none">html[transient-theme="Notebook"] #snackbar .snackbar {
+	background: var(--color-primary);
+	color: var(--color-primary-text);
+	display: block;
+	position: fixed;
+	bottom: 0;
+	left: 50%;
+	width: 64rem;
+	max-width: 100vw;
+	margin-right: 16px;
+	z-index: 50;
+	box-shadow: none;
+	opacity: 0;
+	transform: translate(-50%, 100%);
+	overflow-x: scroll;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	transition: transform var(--navigation-transition),
+							box-shadow var(--navigation-transition),
+							width var(--navigation-transition),
+							opacity var(--navigation-transition),
+							left var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar::-webkit-scrollbar {
+	display: none;
+}
+
+@keyframes fadeAnimation {
+	from {
+		opacity: 0;
+	}
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-fade {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--color-primary-text);
+	opacity: 0.25;
+	pointer-events: none;
+	z-index: 249;
+	animation: fadeAnimation var(--navigation-transition);
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar.content-expanded-open .snackbar-fade {
+	display: block;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar.row-open .snackbar {
+	box-shadow: var(--material-shadow-z6);
+	transform: translate(-50%, 0);
+	opacity: 1;
+}
+
+html[transient-theme="Notebook"] #snackbar.content-open .snackbar-content {
+	height: 25vh;
+}
+
+html[transient-theme="Notebook"] #snackbar.content-expanded-open .snackbar-content {
+	height: calc(100vh - 48px);
+}
+
+html[transient-theme="Notebook"] #snackbar.content-expanded-open .snackbar {
+	z-index: 250;
+}
+
+html[transient-theme="Notebook"] body[transient-menu-pinned="true"] #snackbar .snackbar {
+	left: calc(50% + 144px);
+	max-width: calc(100vw - 288px);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .snackbar-row {
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	align-items: center;
+	width: 100%;
+	height: 48px;
+	padding: 8px;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-container {
+	display: flex;
+	box-sizing: border-box;
+	height: 32px;
+	vertical-align: middle;
+	z-index: 1;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-left {
+	flex: 1 0 auto;
+	justify-content: flex-start;
+	order: -1;
+	padding-right: 24px;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-center {
+	flex: 1 1 100%;
+	justify-content: center;
+	order: 0;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-right {
+	flex: 0 0 auto;
+	justify-content: flex-end;
+	order: 1;
+	padding-left: 24px;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .snackbar-content {
+	display: block;
+	position: relative;
+	background: var(--color-primary-shade-1);
+	color: var(--color-primary-text);
+	height: 0;
+	overflow-y: auto;
+	width: 100%;
+	padding: 0 24px;
+	transition: height var(--navigation-transition),
+							padding var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] #snackbar.content-open .snackbar-content {
+	padding: 16px;
+}
+
+html[transient-theme="Notebook"] #snackbar .content-title {
+	order: -999;
+}
+
+html[transient-theme="Notebook"] #snackbar .content-expand {
+	order: 998;
+}
+
+html[transient-theme="Notebook"] #snackbar .content-close {
+	order: 999;
+}
+
+html[transient-theme="Notebook"] #snackbar .content-expand i:after {
+	content: "fullscreen";
+}
+
+html[transient-theme="Notebook"] #snackbar.content-expanded-open .content-expand i:after {
+	content: "fullscreen_exit";
+}
+
+html[transient-theme="Notebook"] #snackbar .content-close i:after {
+	content: "close";
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .snackbar-button {
+	display: flex;
+	padding: 4px;
+	width: 32px;
+	height: 32px;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	border-radius: 50%;
+	margin: 0 4px;
+	user-select: none;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-title {
+	font-size: 1.25rem;
+	font-weight: 500;
+	letter-spacing: 0.02rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	align-self: center;
+	padding: 0 8px;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-title+.snackbar-title {
+	padding-left: 0;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-input {
+	cursor: text;
+	outline: none;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-input:empty:before {
+	content: "Empty";
+	opacity: 0.5;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar hr {
+	border: none;
+	border-left: 1px solid var(--color-primary-text);
+	margin: 4px;
+	opacity: 0.8;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="y43JekjL" name="Snackbar Tools Style" draggable="false" style="" orig-data-id="Nj3GC2by"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #snackbar:not([section-tools="true"]) .section-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar:not([paragraph-tools="true"]) .paragraph-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar:not([body-tools="true"]) .body-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar:not([style-tools="true"]) .style-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar:not([code-tools="true"]) .code-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar:not([data-tools="true"]) .data-tools {
+	display: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar:not([content-tools="true"]) .content-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-title.content-tools+.snackbar-title {
+	padding-left: 8px;
+}
+
+html[transient-theme="Notebook"] #snackbar[content-tools="true"] .snackbar-button:not(.content-tools),
+html[transient-theme="Notebook"] #snackbar[content-tools="true"] .snackbar-title:not(.content-tools),
+html[transient-theme="Notebook"] #snackbar[content-tools="true"] hr:not(.content-tools) {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .paragraph-header {
+	transition: border-left var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] .paragraph[transient-content-paragraph] .paragraph-header {
+	border-left: 4px solid var(--color-accent);
+	border-radius: 4px 2px 2px 4px;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="2PtX36Qp" name="Snackbar Tools HTML Editor Style" orig-data-id="CYYui4Xj" draggable="false" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #snackbar:not([html-editor-tools="true"]) .html-editor-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar[html-editor-tools="true"][content-tools="true"] .html-editor-tools {
+	display: flex;
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-content .html-editor .CodeMirror,
+html[transient-theme="Notebook"] #snackbar .snackbar-content .html-editor .CodeMirror-gutters  {
+	background: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .html-editor-button i:after {
+	content: var(--xml);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #snackbar .html-save-button i:after {
+	content: "save";
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="umYM968T" name="Snackbar Tools Code Execution Style" orig-data-id="SfU3DezA" style="" draggable="false"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #snackbar .snackbar-content .console {
+	height: 100%;
+	margin: 0;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="738udRGE" draggable="false" style="" name="Theme Variables" orig-data-id="Z2h2eCWM"><style data-type="content" type="text/css" codemirror="true">html[transient-theme="Notebook"]:root {
+
+	/* Fonts */
+	--font-primary: "Roboto", "Avenir", sans-serif;
+	--font-secondary: "Alegreya", serif;
+	--font-monospace: "Roboto Mono", "Menlo", monospace;
+
+	/* Colors Neutral Grey */
+	--color-primary: var(--material-color-grey-300);
+	--color-primary-shade-1: var(--material-color-grey-100);
+	--color-primary-shade-2: var(--material-color-grey-50);
+	--color-primary-shade-3: var(--material-color-white);
+
+	--color-primary-text: var(--material-color-grey-900);
+	--color-secondary-text: var(--material-color-grey-800);
+	--color-tertiary-text: var(--material-color-grey-500);
+
+	--color-accent: var(--material-color-deep-orange);
+	--color-accent-text: var(--material-color-white);
+
+	/* Colors RGB */
+	--color-primary-rgb: var(--material-color-grey-300-rgb);
+	--color-primary-shade-1-rgb: var(--material-color-grey-100-rgb);
+	--color-primary-shade-2-rgb: var(--material-color-grey-50-rgb);
+	--color-primary-shade-3-rgb: var(--material-color-white-rgb);
+
+	--color-primary-text-rgb: var(--material-color-grey-900-rgb);
+	--color-secondary-text-rgb: var(--material-color-grey-800-rgb);
+	--color-tertiary-text-rgb: var(--material-color-grey-500-rgb);
+
+	--color-accent-rgb: var(--material-color-deep-orange-rgb);
+	--color-accent-text-rgb: var(--material-color-white-rgb);
+
+	/* Warm Gray */
+	--color-primary: #f1ede4;
+	--color-primary-shade-1: #f8f6f2;
+	--color-primary-shade-2: #fbfaf8;
+	--color-primary-shade-3: var(--material-color-white);
+
+	/*--color-primary-text: #1f1b14;
+	--color-secondary-text: #3d3729;
+	--color-tertiary-text: #a39c8f;*/
+
+	--color-accent: #8f743d;
+	--color-accent-text: #f7f4ed;
+
+	/* Warm Gray RGB */
+	--color-primary-rgb: 241, 237, 228;
+	--color-primary-shade-1-rgb: 248, 246, 242;
+	--color-primary-shade-2-rgb: 251, 250, 248;
+	--color-primary-shade-3-rgb: var(--material-color-white-rgb);
+
+	/*--color-primary-text-rgb: 31, 27, 2;
+	--color-secondary-text-rgb: 92, 82, 61;
+	--color-tertiary-text-rgb: 163, 156, 143;*/
+
+	--color-accent-rgb: 143, 116, 61;
+	--color-accent-text-rgb: 247, 244, 237;
+
+	/* Transitions */
+	--navigation-transition: 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="F6FURmuL" name="Material Ripple" draggable="false" style="" orig-data-id="s3RFq8qg"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .dialog .actions .button,
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button,
+html[transient-theme="Notebook"] #snackbar .snackbar-button,
+html[transient-theme="Notebook"] #snackbar .action,
+html[transient-theme="Notebook"] #global-menu .menu-button,
+html[transient-theme="Notebook"] #global-menu .sub-menu > .label {
+	position: relative;
+	overflow: hidden;
+	transform: translate3d(0, 0, 0);
+}
+
+html[transient-theme="Notebook"] .dialog .actions .button:after,
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button:after,
+html[transient-theme="Notebook"] #snackbar .snackbar-button:after,
+html[transient-theme="Notebook"] #snackbar .action:after,
+html[transient-theme="Notebook"] #global-menu .menu-button:after,
+html[transient-theme="Notebook"] #global-menu .sub-menu > .label:after {
+	content: "";
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	background-repeat: no-repeat;
+	background-position: 50%;
+	transform: scale(10, 10);
+	opacity: 0;
+	transition: transform 0.5s, opacity 1s;
+}
+
+html[transient-theme="Notebook"] .dialog .actions .button:after,
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button:after,
+html[transient-theme="Notebook"] #global-menu .menu-button:after,
+html[transient-theme="Notebook"] #global-menu .sub-menu > .label:after {
+	background-image: radial-gradient(circle, var(--color-primary-text) 10%, transparent 10.01%);
+}
+
+html[transient-theme="Notebook"] #snackbar .snackbar-button:after,
+html[transient-theme="Notebook"] #snackbar .action:after {
+	background-image: radial-gradient(circle, var(--color-accent-text) 10%, transparent 10.01%);
+}
+
+html[transient-theme="Notebook"] .dialog .actions .button:active:after,
+html[transient-theme="Notebook"] #global-toolbar .toolbar-button:active:after,
+html[transient-theme="Notebook"] #snackbar .snackbar-button:active:after,
+html[transient-theme="Notebook"] #snackbar .action:active:after,
+html[transient-theme="Notebook"] #global-menu .menu-button:active:after,
+html[transient-theme="Notebook"] #global-menu .sub-menu > .label:active:after {
+	transform: scale(0, 0);
+	opacity: 0.2;
+	transition: 0s;
+}</style></div><div class="paragraph style-paragraph collapsed" name="Main" draggable="false" style="" data-id="NNhQVFUR" orig-data-id="5uBKHKzL"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"],
+html[transient-theme="Notebook"] * {
+	box-sizing: border-box;
+}
+
+html[transient-theme="Notebook"],
+html[transient-theme="Notebook"] input,
+html[transient-theme="Notebook"] button {
+	font-family: var(--font-primary);
+}
+
+html[transient-theme="Notebook"] {
+	width: 100%;
+	min-height: 100%;
+	margin: 0;
+	background-color: var(--color-primary-shade-2);
+	color: var(--color-primary-text);
+}
+
+html[transient-theme="Notebook"] body {
+	min-height: 100%;
+	margin: 0;
+	margin-top: 64px;
+	margin-bottom: calc(64px + 25vh);
+	overflow: hidden;
+	overflow-y: auto;
+	transition: margin-left var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] body #sections {
+	margin: 0 auto;
+	width: 48em;
+	max-width: 100%;
+	padding: 16px;
+}
+
+html[transient-theme="Notebook"] body[transient-menu-pinned="true"] {
+	margin-left: 288px;
+}
+
+/* iPhone media query */
+@media only screen 
+	and (min-device-width : 375px) 
+	and (max-device-width : 667px) {
+		html[transient-theme="Notebook"] body #sections {
+			width: 100vw;
+		}
+}
+
+/* Fix Chrome setting h1 font-size to 1.17em in paragraphs within sections */
+html[transient-theme="Notebook"] h1 {
+	font-size: 2em;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" draggable="false" name="Loading / Disconnected" style="" data-id="cDnM8XdK" orig-data-id="c8dz5get"><style data-type="content" type="text/css" codemirror="true" class="" media="none">@-webkit-keyframes rotateplane {
+	0% {
+		-webkit-transform: perspective(120px);
+	}
+	50% {
+		-webkit-transform: perspective(120px) rotateY(180deg);
+	}
+	100% {
+		-webkit-transform: perspective(120px) rotateY(180deg) rotateX(180deg);
+	}
+}
+
+@-moz-keyframes rotateplane {
+	0% {
+		-moz-transform: perspective(120px);
+	}
+	50% {
+		-moz-transform: perspective(120px) rotateY(180deg);
+	}
+	100% {
+		-moz-transform: perspective(120px) rotateY(180deg) rotateX(180deg);
+	}
+}
+
+@-o-keyframes rotateplane {
+	0% {
+		-o-transform: perspective(120px);
+	}
+	50% {
+		-o-transform: perspective(120px) rotateY(180deg);
+	}
+	100% {
+		-o-transform: perspective(120px) rotateY(180deg) rotateX(180deg);
+	}
+}
+
+@keyframes rotateplane {
+	0% {
+		-webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+		-moz-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+		-o-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+		transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+	}
+	50% {
+		-webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+		-moz-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+		-o-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+		transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+	}
+	100% {
+		-webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+		-moz-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+		-o-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+		transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+	}
+}
+
+html[transient-theme="Notebook"] .overlay {
+	position: fixed;
+	display: block;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background-color: var(--color-primary-shade-2);
+	width: 100vw;
+	height: 100vh;
+	z-index: 395;
+}
+
+html[transient-theme="Notebook"] .overlay > div {
+	position: relative;
+	display: inline-block;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+html[transient-theme="Notebook"] .overlay > div:after {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	width: 200px;
+	transform: translate(-50%, 0);
+	text-align: center;
+}
+
+html[transient-theme="Notebook"] .overlay > div > div {
+	position: relative;
+	display: inline-block;
+	top: 0;
+	left: 0;
+	width: 50px;
+	height: 50px;
+	border-radius: 2px;
+	background: rgba(255, 255, 255, .5);
+	-webkit-animation: rotateplane 1.2s infinite ease-in-out;
+	-moz-animation: rotateplane 1.2s infinite ease-in-out;
+	-o-animation: rotateplane 1.2s infinite ease-in-out;
+	animation: rotateplane 1.2s infinite ease-in-out;
+}
+
+html[transient-theme="Notebook"] .overlay.loading > div:after {
+	margin-top: 8px;
+	content: "Loading";
+}
+
+html[transient-theme="Notebook"] .overlay.disconnected > div:after {
+	content: "Disconnected";
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" draggable="false" name="Scrollbars" data-id="puDPS2nW" style="" orig-data-id="aReAMqZa"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] *::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+	background: transparent;
+}
+
+html[transient-theme="Notebook"] *::-webkit-scrollbar-track {
+	background-color: var(--color-primary-shade-1);
+}
+
+html[transient-theme="Notebook"] *::-webkit-scrollbar-thumb {
+	border-radius: 2px;
+	background-color: var(--color-secondary-text);
+}
+
+html[transient-theme="Notebook"] *::-webkit-scrollbar-thumb:hover {
+	background-color: var(--color-primary-text);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Tooltip" draggable="false" data-id="9d2zbUkQ" style="" orig-data-id="ekcWCgH9"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .section-visible *[tooltip]:after {
+	font-size: 1rem;
+	font-family: var(--font-primary);
+	position: absolute;
+	bottom: 0px;
+	left: 50%;
+	z-index: 98;
+	padding: 5px 15px;
+	color: white;
+	background-color: rgba(0, 0, 0, 0.8);
+	border-radius: 2px;
+	display: inline;
+	width: 200px;
+	text-align: center;
+	transform: translate3d(-50%, -36px, 0);
+	opacity: 0;
+	pointer-events: none;
+	-webkit-font-smoothing: antialiased; /* webkit text rendering fix */
+}
+
+/* Match all tooltip headers and move them down 60px */
+html[transient-theme="Notebook"] .section-visible .section-header *[tooltip]:after {
+	bottom: -63px;
+}
+/* Match all tooltips except the first and move them back up, effectively making
+the selector only match the first tooltip header. */
+html[transient-theme="Notebook"] .section-visible ~ .section-visible *[tooltip]:after {
+	bottom: 0;
+}
+
+html[transient-theme="Notebook"] *[tooltip]:before {
+	content: "";
+	border: solid;
+	bottom: 0;
+	border-color: rgba(0, 0, 0, 0.8) transparent;
+	border-width: 6px 6px 0px 6px;
+	left: 50%;
+	transform: translate3d(-50%, -30px, 0);
+	position: absolute;
+	z-index: 99;
+	opacity: 0;
+	pointer-events: none;
+	-webkit-font-smoothing: antialiased; /* Webkit text rendering fix */
+}
+
+/* Same principle as above, except this is for the tooltip triangle which needs
+to be reversed. */
+html[transient-theme="Notebook"] .section-visible .section-header *[tooltip]:before {
+	transform: translate3d(-50%, 0px, 0);
+	border-width: 0px 6px 6px 6px;
+}
+html[transient-theme="Notebook"] .section-visible ~ .section-visible *[tooltip]:before {
+	transform: translate3d(-50%, -30px, 0);
+	border-width: 6px 6px 0px 6px;
+}
+
+html[transient-theme="Notebook"] *[tooltip]:hover:after,
+html[transient-theme="Notebook"] *[tooltip]:hover:before {
+	opacity: 1.0;
+	transition: opacity 200ms ease-in-out 300ms;
+}</style></div><div class="paragraph style-paragraph collapsed" name="Section Style" draggable="false" data-id="4vbV2Tzn" orig-data-id="Biib7BSP" style=""><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"] .section {
+	margin-bottom: 32px;
+	position: relative;
+}
+
+html[transient-theme="Notebook"] .section.section-hidden,
+html[transient-theme="Notebook"] .section.section-hidden * {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .section[transient-focussed]:before {
+	content: "";
+	position: absolute;
+	height: 100%;
+	width: 0;
+	left: -10px;
+	border-left: 4px solid rgba(var(--color-accent-rgb), 0.3);
+	border-radius: 4px;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .section .section-header {
+	display: block;
+	height: 40px;
+	padding-top: 8px;
+	padding-left: 8px;
+	background: var(--color-primary);
+	font-size: 1.2em;
+	margin-bottom: 10px;
+	border-radius: 2px;
+	position: relative;
+
+	height: auto;
+	padding-top: 0;
+	padding-left: 0;
+	font-size: 2rem;
+	height: 3rem;
+	font-weight: 500;
+	margin-bottom: 32px;
+	background: none;
+}
+
+html[transient-theme="Notebook"] .section .section-header:before {
+	font-family: "Material Icons";
+	font-weight: normal;
+	font-style: normal;
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+	text-rendering: optimizeLegibility;
+	font-feature-settings: "liga";
+
+	position: relative;
+	height: 48px;
+	line-height: 48px;
+	vertical-align: middle;
+	margin-right: 12px;
+	top: 0;
+	left: 0;
+}
+
+html[transient-theme="Notebook"] .section .section-header:before {
+	content: "label";
+}
+
+html[transient-theme="Notebook"] .section .section-header .action {
+	position: relative;
+	float: right;
+	margin-right: 10px;
+	cursor: pointer;
+	font-size: .6em;
+	opacity: 0.25;
+	pointer-events: none;
+	line-height: 48px;
+	height: 48px;
+	vertical-align: middle;
+}
+
+html[transient-theme="Notebook"] .section .section-header .action i {
+	line-height: 48px;
+	height: 48px;
+	vertical-align: middle;
+}
+
+html[transient-theme="Notebook"] .section .section-header:hover .action {
+	opacity: 1.0;
+	pointer-events: all;
+}
+
+html[transient-theme="Notebook"] .section .section-header .action:hover {
+	color: var(--color-accent);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .section .section-header .name-input {
+	position: relative;
+	cursor: text;
+	left: 0;
+	display: inline-block;
+	line-height: 48px;
+	height: 48px;
+}
+
+html[transient-theme="Notebook"] .section .section-header .name-input:focus {
+	outline: none;
+}
+
+html[transient-theme="Notebook"] .section .section-header .name-input:empty:focus {
+	outline: 1px solid var(--color-primary-text);
+	opacity: 1.0;
+	animation-name: blink-cursor;
+	animation-duration: 500ms;
+	animation-direction: alternate;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+html[transient-theme="Notebook"] .section .section-header .name-input:empty:before {
+	content: "No Name";
+	opacity: 0.5;
+}
+
+html[transient-theme="Notebook"] .section .section-header .name-input:empty:focus:before {
+	content: "";
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .section .section-header .data-id-label {
+	position: relative;
+	float: right;
+	user-select: all;
+	background-color: rgba(var(--material-color-light-green-rgb), 0.75);
+	font-size: 0.75em;
+	font-family: var(--font-monospace);
+	line-height: 20px;
+	color: var(--color-primary);
+	border-radius: 2px;
+	padding: 2px 4px;
+	font-weight: 700;
+	margin-right: 10px;
+	cursor: default;
+}
+
+html[transient-theme="Notebook"] .section.uninstalled .section-header .data-id-label {
+	background-color: rgba(var(--material-color-red-rgb), 0.75);
+}
+
+html[transient-theme="Notebook"] .section .section-header .data-id-label:after {
+	content: "Package ID";
+}
+
+html[transient-theme="Notebook"] .section:not([data-type="package"]) .section-header .data-id-label {
+	display: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .section .section-header .delete-section:hover {
+	color: var(--material-color-red);
+}
+
+/* Icon Delete */
+html[transient-theme="Notebook"] .section .section-header .delete-section i:after {
+	content: "delete";
+}
+
+/* Tooltip Delete */
+html[transient-theme="Notebook"] .section .section-header .delete-section:after {
+	content: "Delete";
+}
+
+/******************************************************************************/
+
+/* Hide Collapsed Sections */
+html[transient-theme="Notebook"] .section.hide-collapsed-paragraphs .paragraph.collapsed {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .section.hide-collapsed-paragraphs .hide-collapsed-paragraphs2 {
+	opacity: 1.0;
+}
+
+/* Icon Show Collapsed Paragraphs */
+html[transient-theme="Notebook"] .section.hide-collapsed-paragraphs .hide-collapsed-paragraphs2 i:after {
+	content: "visibility_off";
+}
+
+/* Tooltip Show Collapsed Paragraphs */
+html[transient-theme="Notebook"] .section.hide-collapsed-paragraphs .hide-collapsed-paragraphs2:after {
+	content: "Show Collapsed Paragraphs";
+}
+
+/* Icon Hide Collapsed Paragraphs */
+html[transient-theme="Notebook"] .section:not(.hide-collapsed-paragraphs) .hide-collapsed-paragraphs2 i:after {
+	content: "visibility";
+}
+
+/* Tooltip Hide Collapsed Paragraphs */
+html[transient-theme="Notebook"] .section:not(.hide-collapsed-paragraphs) .hide-collapsed-paragraphs2:after {
+	content: "Hide Collapsed Paragraphs";
+}
+
+/******************************************************************************/
+
+/* Icon Not System Section */
+html[transient-theme="Notebook"] .section .toggle-system-section i:after {
+	content: var(--settings);
+	font-family: "Material Design Icons";
+}
+
+/* Tooltip Not System Section */
+html[transient-theme="Notebook"] .section .toggle-system-section:after {
+	content: "Activate System Section";
+}
+
+/* System Section */
+html[transient-theme="Notebook"] .section[data-type="system"] .toggle-system-section {
+	color: var(--material-color-light-green);
+	opacity: 1.0 !important;
+}
+
+/* Tooltip Not System Section */
+html[transient-theme="Notebook"] .section[data-type="system"] .toggle-system-section:after {
+	content: "Deactivate System Section";
+}
+
+/******************************************************************************/
+
+/* Icon Not Package Section */
+html[transient-theme="Notebook"] .section .toggle-package-section i:after {
+	content: var(--cube-outline);
+	font-family: "Material Design Icons";
+}
+
+/* Tooltip Not Package Section */
+html[transient-theme="Notebook"] .section .toggle-package-section:after {
+	content: "Activate Package Section";
+}
+
+/* Package Section */
+html[transient-theme="Notebook"] .section[data-type="package"] .toggle-package-section {
+	color: var(--material-color-light-green);
+	opacity: 1.0 !important;
+}
+
+/* Tooltip Not Package Section */
+html[transient-theme="Notebook"] .section[data-type="package"] .toggle-package-section:after {
+	content: "Deactivate Package Section";
+}
+
+/******************************************************************************/
+
+/* Collapse Section */
+html[transient-theme="Notebook"] .section.collapsed .paragraph {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .section .toggle-collapse i:after {
+	content: "expand_less";
+}
+
+html[transient-theme="Notebook"] .section .toggle-collapse:after {
+	content: "Collapse";
+}
+
+html[transient-theme="Notebook"] .section.collapsed .toggle-collapse i:after {
+	content: "expand_more";
+}
+
+html[transient-theme="Notebook"] .section.collapsed .toggle-collapse:after {
+	content: "Expand";
+}
+
+/******************************************************************************/
+
+/* Hide Section */
+html[transient-theme="Notebook"] .section .toggle-visibility-section i:after {
+	content: "clear";
+}
+
+html[transient-theme="Notebook"] .section .toggle-visibility-section:after {
+	content: "Hide Section";
+}
+
+/******************************************************************************/
+
+/* Spacing */
+html[transient-theme="Notebook"] .section .hide-collapsed-paragraphs2,
+html[transient-theme="Notebook"] .section .toggle-package-section {
+	margin-left: 20px;
+}</style></div><div class="paragraph style-paragraph collapsed" draggable="false" data-id="8FyAs3Qa" name="Paragraph Style" style="" orig-data-id="ZVLeTEZN"><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="true">html[transient-theme="Notebook"] .paragraph {
+	clear: both;
+	position: relative;
+	margin-top: 0;
+	margin-bottom: 24px;
+}
+
+html[transient-theme="Notebook"] .paragraph div:focus {
+	outline: none;
+}
+
+html[transient-theme="Notebook"] .paragraph pre {
+	margin: 0px;
+	padding: 0px;
+}
+
+html[transient-theme="Notebook"] .paragraph pre[type]  {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .paragraph[transient-focussed]:before {
+	content: "";
+	position: absolute;
+	height: 100%;
+	width: 0;
+	left: -18px;
+	border-left: 4px solid rgba(var(--color-accent-rgb), 0.45);
+	border-radius: 4px;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header {
+	display: block;
+	position: relative;
+	display: block;
+	background: var(--color-primary-shade-1);
+	width: 100%;
+	height: 30px;
+	border-radius: 2px;
+
+	background: none;
+	height: 2.5rem;
+	font-size: 1.5rem;
+	font-weight: 500;
+	margin-top: 0;
+	margin-bottom: 24px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph [data-type="content"] {
+	overflow: hidden;
+}
+
+/* Reset box-sizing of content paragraphs to their initial value */
+html[transient-theme="Notebook"] .paragraph.body-paragraph [data-type="content"] * {
+	box-sizing: initial;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .action {
+	position: relative;
+	float: right;
+	height: 100%;
+	cursor: pointer;
+	margin-right: 10px;
+	opacity: 0.25;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .action:hover {
+	color: var(--color-accent);
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header:hover .action {
+	pointer-events: initial;
+	opacity: 1.0;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .action .material-icons {
+	position: relative;
+	top: 50%;
+	transform: translate3d(0, -50%, 0);
+}
+</style></div><div class="paragraph style-paragraph collapsed" data-id="FqPSRsXV" name="Paragraph Writing Style  " orig-data-id="zRGMQcXU"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"],
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] {
+	position: inherit;
+	font-family: var(--font-secondary);
+	color: var(--color-secondary-text);
+	font-size: 1.3rem;
+	line-height: 1.6;
+	box-sizing: border-box;
+	margin: 0;
+	z-index: 0;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] > *:first-child,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] > *:first-child {
+	margin-top: 0 !important;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] > *:last-child,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] > *:last-child {
+	margin-bottom: 0 !important;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h1,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h2,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h3,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h4,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h5,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h6,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] div:not([class]),
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] blockquote,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] ul,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] ol,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h1,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h2,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h3,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h4,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h5,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h6,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] div:not([class]),
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] blockquote,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] ul,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] ol {
+	margin-top: 0;
+	margin-bottom: 8px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] li,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] li {
+	margin-bottom: 4px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] a,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] a {
+	color: var(--color-accent);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h1,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h2,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h3,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h4,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h5,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h6,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h1,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h2,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h3,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h4,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h5,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h6 {
+	font-family: var(--font-primary);
+	color: var(--color-primary-text);
+	font-weight: 500;
+	letter-spacing: 0.02rem;
+	line-height: 1;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h1,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h1 {
+	font-size: 2rem;
+	border-bottom: none;
+	margin-top: 32px;
+	line-height: 48px;
+	margin-bottom: 32px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h2,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h2 {
+	font-size: 1.5rem;
+	border-bottom: none;
+	margin-top: 24px;
+	line-height: 40px;
+	margin-bottom: 24px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h3,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h3 {
+	font-size: 1.25rem;
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h4,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h4 {
+	font-size: 1.125rem;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h5,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h5 {
+	font-size: 1rem;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] h6,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] h6 {
+	font-size: 0.875rem;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] hr,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] hr {
+	height: 1px;
+	padding: 0;
+	margin: 16px 0;
+	background-color: var(--color-tertiary-text);
+	border: 0;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] kbd,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] kbd {
+	margin: 0 2px;
+	color: #eee;
+	border-radius: 3px;
+	padding: 3px 7px;
+	min-width: 1em;
+	box-shadow: inset 0 0 2px #5a5a5a, 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+	cursor: default;
+	background: #000;
+	text-align: center;
+	text-shadow: none;
+	background-color: #101010;
+	background-repeat: repeat-x;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+/******************************************************************************/
+
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] blockquote,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] blockquote {
+	padding: 0 1em;
+	border-left: 0.25em solid var(--color-secondary-text);
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] blockquote>:first-child,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] blockquote>:first-child {
+	margin-top: 0;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] blockquote>:last-child,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] blockquote>:last-child {
+	margin-bottom: 0;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table {
+	display: block;
+	width: 100%;
+	overflow: auto;
+	border-collapse: collapse;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table th,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table th {
+	font-weight: 700;
+	background: var(--color-primary-shade-3);
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table th,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table td,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table th,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table td {
+	padding: 8px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table tr,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table tr{
+	background: var(--color-primary-shade-2);
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table tr:nth-child(2n),
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table tr:nth-child(2n) {
+	background: var(--color-primary-shade-3);
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] table img,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] table img {
+	background-color: transparent;
+}
+
+/******************************************************************************/
+
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] code,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] tt,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] code,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] tt {
+	color: var(--color-primary-text);
+	padding: 1px 4px;
+	margin: 0;
+	font-size: 0.9em;
+	background-color: var(--color-primary-shade-3);
+	border-radius: 3px;
+	font-family: var(--font-monospace);
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] code br,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] tt br,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] code br,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] tt br {
+	display: none
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] del code,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] del code {
+	text-decoration: inherit
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] pre {
+	word-wrap: normal
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] pre > code,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] pre > code {
+	padding: 0;
+	margin: 0;
+	font-size: 100%;
+	word-break: normal;
+	white-space: pre;
+	background: transparent;
+	border: 0
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] .highlight,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] .highlight {
+	margin-bottom: 16px
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] .highlight pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] .highlight pre {
+	margin-bottom: 0;
+	word-break: normal
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] .highlight pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] .highlight pre,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] pre {
+	padding: 16px;
+	overflow: auto;
+	font-size: 85%;
+	line-height: 1.45;
+	background-color: var(--color-primary-shade-3);
+	border-radius: 3px;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] pre code,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .writing[data-type="content"] pre tt,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] pre code,
+html[transient-theme="Notebook"] .paragraph.body-paragraph .section-documentation[data-type="content"] pre tt {
+	display: inline;
+	max-width: auto;
+	padding: 0;
+	margin: 0;
+	overflow: visible;
+	line-height: inherit;
+	word-wrap: normal;
+	background-color: transparent;
+	border: 0;
+}</style></div><div class="paragraph style-paragraph collapsed" name="Paragraph Title Style" draggable="false" data-id="wZvGMgYX" orig-data-id="n64A599U" style=""><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="true">html[transient-theme="Notebook"] .paragraph .paragraph-header:before {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+	text-rendering: optimizeLegibility;
+	font-feature-settings: 'liga';
+
+	position: relative;
+	height: 40px;
+	line-height: 40px;
+	vertical-align: middle;
+	margin-right: 8px;
+	top: 0;
+	left: 0;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph .paragraph-header:before {
+	content: "text_fields";
+}
+
+html[transient-theme="Notebook"] .paragraph.code-paragraph .paragraph-header:before {
+	content: "code";
+}
+
+html[transient-theme="Notebook"] .paragraph.style-paragraph .paragraph-header:before {
+	content: "brush";
+}
+
+html[transient-theme="Notebook"] .paragraph.data-paragraph .paragraph-header:before {
+	content: "storage";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input {
+	position: relative;
+	font-size: 1em;
+	z-index: 1;
+	display: inline-block;
+	height: 40px;
+	line-height: 40px;
+	vertical-align: middle;
+	top: 0;
+	left: 0;
+}
+
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input:focus {
+	outline: none;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input:empty:focus {
+	outline: 1px solid var(--color-primary-text);
+	opacity: 1.0;
+	animation-name: blink-cursor;
+	animation-duration: 500ms;
+	animation-direction: alternate;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input:empty:before {
+	opacity: .5;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input:empty:focus:before {
+	content: "";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input {
+	left: 0;
+	margin-right: 15px;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input:before {
+	color: var(--color-accent);
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .name-input:empty:before {
+	content: "name";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .id-input:not(:empty):before {
+	content: "#";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .id-input:empty:before {
+	content: "#id";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .class-input:before {
+	content: "class: ";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .input:empty:before {
+	opacity: 0;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header:hover .input:empty:before {
+	opacity: 1.0;
+	pointer-events: all;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" name="Paragraph Collapse Style" draggable="false" data-id="F3TCwRxM" orig-data-id="gKnfCRJB" style=""><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="true" media="none">/* Icon expanded */
+html[transient-theme="Notebook"] .collapse-expand i:after {
+	content: "expand_less";
+}
+
+/* Tooltip expanded */
+html[transient-theme="Notebook"] .collapse-expand:after {
+	content: "Collapse";
+}
+
+/* Icon collapsed */
+html[transient-theme="Notebook"] .paragraph.collapsed .collapse-expand i:after {
+	content: "expand_more";
+}
+
+/* Tooltip collapsed */
+html[transient-theme="Notebook"] .paragraph.collapsed .collapse-expand:after {
+	content: "Expand";
+}
+
+/* Hide all content of a paragraph except the paragraph header */
+html[transient-theme="Notebook"] .paragraph.collapsed > *:not(.paragraph-header) {
+	display: none;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Lock Paragraph Style" draggable="false" data-id="qhfTw9vV" style="" orig-data-id="LM22iaJk"><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="" media="none">html[transient-theme="Notebook"] .paragraph:not(:hover):not(.locked) .paragraph-header .lock-content {
+	opacity: 0.25;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.locked .paragraph-header .lock-content {
+	opacity: 1.0;
+}
+
+html[transient-theme="Notebook"] .paragraph.locked .text-tools {
+	display: none;
+}
+
+/* Icon Lock */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .lock-content i:after {
+	content: "lock_open";
+}
+
+/* Tooltip Lock */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .lock-content:after {
+	content: "Lock";
+}
+
+/* Icon Unlock */
+html[transient-theme="Notebook"] .paragraph.locked .paragraph-header .lock-content i:after {
+	content: "lock_outline";
+}
+
+/* Tooltip Unlock */
+html[transient-theme="Notebook"] .paragraph.locked .paragraph-header .lock-content:after {
+	content: "Unlock";
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Paragraph Delete Action Style" draggable="false" data-id="eQYQCS3M" orig-data-id="8vZywFM8" style=""><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="" media="none">html[transient-theme="Notebook"] .paragraph .delete-paragraph {
+	margin-right: 10px;
+}
+
+/* Icon Delete */
+html[transient-theme="Notebook"] .paragraph .delete-paragraph i:after {
+	content: "delete";
+}
+
+/* Tooltip Delete */
+html[transient-theme="Notebook"] .paragraph .delete-paragraph:after {
+	content: "Delete";
+}
+
+html[transient-theme="Notebook"] .paragraph .delete-paragraph:hover i:after {
+	color: var(--material-color-red);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Paragraph Sortable Style" draggable="false" data-id="mNdkGKwR" style="" orig-data-id="C6eX72vd"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .paragraph .drag-handle {
+	cursor: -webkit-grabbing;
+	cursor: move;
+	opacity: 0;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.dragging > * {
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.dragging {
+	opacity: 0.5;
+}
+
+/* Icon Drag Handle */
+html[transient-theme="Notebook"] .paragraph .drag-handle i:after {
+	content: "drag_handle";
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" name="Variable Style" draggable="false" data-id="2bRPX2Ly" style="" orig-data-id="LWYEJJ2X"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .variable {
+	position: relative;
+	display: inline;
+	color: var(--material-color-light-blue);
+}
+
+html[transient-theme="Notebook"] .variable:empty:before {
+	content: attr(data-name) " (unset)";
+}
+
+html[transient-theme="Notebook"] .variable:before {
+	content: attr(data-name) " = ";
+	color: var(--color-accent);
+	opacity: .5;
+}
+
+html[transient-theme="Notebook"] .hide-variable-names .variable:not(:empty):before {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .hide-variable-names .variable:not(:empty):hover:before {
+	content: attr(data-name);
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform: translate3d(0, -100%, 0);
+	display: inline-block;
+	border-radius: 2px;
+	font-size: .8em;
+	padding: 2px;
+	color: white;
+	background: rgb(135, 135, 129);
+	opacity: 1.0;
+	/* border: 5px solid transparent; */
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="RuRxRueu" name="Persistent Log Style" orig-data-id="eGQSiWkH"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .paragraph .persistent-log[data-type="content"] {
+	font-family: var(--font-monospace);
+	font-size: 0.875rem;
+}
+
+html[transient-theme="Notebook"] .paragraph .persistent-log[data-type="content"] p {
+	color: var(--color-primary-text);
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+html[transient-theme="Notebook"] .paragraph .persistent-log[data-type="content"] p.debug {
+	color: var(--color-tertiary-text);
+}
+
+html[transient-theme="Notebook"] .paragraph .persistent-log[data-type="content"] p.info {
+	color: var(--material-color-light-blue);
+}
+
+html[transient-theme="Notebook"] .paragraph .persistent-log[data-type="content"] p.warn {
+	color: var(--material-color-orange);
+}
+
+html[transient-theme="Notebook"] .paragraph .persistent-log[data-type="content"] p.error {
+	color: var(--material-color-red);
+}</style></div><div class="paragraph style-paragraph collapsed" name="Pull System Sections Dialog Style" data-id="nJbF49Pj" orig-data-id="GNFbi7e6" style=""><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"] .update-system-sections .body {
+	max-width: 90vw;
+}
+
+html[transient-theme="Notebook"] table.update-system-sections {
+	width: 85vw;
+	border-collapse: collapse;
+	margin-top: 16px;
+}
+
+html[transient-theme="Notebook"] table.update-system-sections td,
+html[transient-theme="Notebook"] table.update-system-sections th {
+	padding: 8px;
+}
+
+html[transient-theme="Notebook"] input[name="systemSections"] {
+	width: auto !important;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .update-system-sections .pullData {
+	display: flex;
+	margin-bottom: 32px;
+	margin-top: 16px;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	height: 48px;
+	background: var(--color-primary-shade-2);
+	padding: 8px;
+	width: 100%;
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData > * {
+	flex: 0 1 auto;
+	height: 32px;
+	margin: 0 !important;
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData > * + * {
+	margin-left: 32px !important;
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData .update-section-list {
+	flex: 0 0 auto;
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData .update-section-list:hover {
+	background: var(--color-primary-shade-3);
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData .update-section-list.update-needed {
+	background: rgba(var(--material-color-green-rgb), 0.75);
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData .update-section-list.update-needed:hover {
+	background: var(--material-color-green);
+}
+
+html[transient-theme="Notebook"] .update-system-sections .pullData .update-section-list.invalid {
+	background: var(--material-color-grey) !important;
+	cursor: default;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] table.update-system-sections tr:nth-child(even) {
+	background: var(--color-primary-shade-2);
+}
+
+html[transient-theme="Notebook"] table.update-system-sections tr[local="true"][version-changed="true"] {
+	background: var(--material-color-orange);
+	color: var(--material-color-grey-100);
+}
+
+html[transient-theme="Notebook"] table.update-system-sections tr[local="true"][version-changed="false"] {
+	background: var(--material-color-green);
+	color: var(--material-color-grey-100);
+}
+
+html[transient-theme="Notebook"] table.update-system-sections tr[local="true"][version-changed="undefined"] {
+	background: var(--material-color-teal);
+	color: var(--material-color-grey-100);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="kVAgkphs" name="Package Export UI Style" style="" orig-data-id="RsTYGeWK"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .section:not([data-type="package"]) .export-package,
+html[transient-theme="Notebook"] .section.uninstalled .export-package {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .section .export-package i:after {
+	content: var(--arrow-down-bold-hexagon-outline);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] .section .export-package:after {
+	content: "Export Package";
+}</style></div><div class="paragraph style-paragraph collapsed" name="Package Management Dialogs Style" data-id="X4eFHnxK" style="" orig-data-id="aaSLkDgy"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"] .install-and-update-packages .body,
+html[transient-theme="Notebook"] .select-packages .body {
+	max-width: 90vw;
+}
+
+html[transient-theme="Notebook"] table.packages {
+	border-collapse: collapse;
+	margin-top: 16px;
+}
+
+html[transient-theme="Notebook"] table.install-and-update-packages {
+	width: 85vw;
+}
+
+html[transient-theme="Notebook"] table.select-packages,
+html[transient-theme="Notebook"] table.package-repositories {
+	width: 100%;
+	max-height: 90vh;
+}
+
+html[transient-theme="Notebook"] table.packages td,
+html[transient-theme="Notebook"] table.packages th {
+	padding: 8px;
+}
+
+html[transient-theme="Notebook"] input[name="packages"] {
+	width: auto !important;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .packages .pullData {
+	display: flex;
+	margin-bottom: 32px;
+	margin-top: 16px;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	height: 48px;
+	background: var(--color-primary-shade-2);
+	padding: 8px;
+	width: 100%;
+}
+
+html[transient-theme="Notebook"] .packages .pullData > * {
+	flex: 0 1 auto;
+	height: 32px;
+	margin: 0 !important;
+}
+
+html[transient-theme="Notebook"] .packages .pullData > * + * {
+	margin-left: 32px !important;
+}
+
+html[transient-theme="Notebook"] .packages .pullData .repositories {
+	width: auto;
+	margin: 0;
+}
+
+html[transient-theme="Notebook"] .packages .pullData .update-package-list {
+	flex: 0 0 auto;
+}
+
+html[transient-theme="Notebook"] .packages .pullData .update-package-list:hover {
+	background: var(--color-primary-shade-3);
+}
+
+html[transient-theme="Notebook"] .packages .pullData .update-package-list.update-needed {
+	background: rgba(var(--material-color-green-rgb), 0.75);
+}
+
+html[transient-theme="Notebook"] .packages .pullData .update-package-list.update-needed:hover {
+	background: var(--material-color-green);
+}
+
+html[transient-theme="Notebook"] .packages .pullData .update-package-list.invalid {
+	background: var(--material-color-grey) !important;
+	cursor: default;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] table.packages tr:nth-child(even),
+html[transient-theme="Notebook"] table.packages thead {
+	background: var(--color-primary-shade-2);
+}
+
+html[transient-theme="Notebook"] table.packages tr[local="true"][version-changed="true"] {
+	background: var(--material-color-orange);
+	color: var(--material-color-grey-100);
+}
+
+html[transient-theme="Notebook"] table.packages tr[local="true"][version-changed="false"] {
+	background: var(--material-color-green);
+	color: var(--material-color-grey-100);
+}
+
+html[transient-theme="Notebook"] table.packages tr[local="true"][version-changed="undefined"] {
+	background: var(--material-color-teal);
+	color: var(--material-color-grey-100);
+}
+
+html[transient-theme="Notebook"] table.packages tr[uninstalled="true"] {
+	background: var(--material-color-red) !important;
+	color: var(--material-color-grey-100);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] table.package-repositories .package-repository-name,
+html[transient-theme="Notebook"] table.package-repositories .package-repository-tag {
+	cursor: text;
+	outline: none;
+}
+
+html[transient-theme="Notebook"] table.package-repositories .package-repository-name:empty:before {
+	content: "name";
+	opacity: 0.5;
+}
+
+html[transient-theme="Notebook"] table.package-repositories .package-repository-tag:empty:before {
+	content: "tag";
+	opacity: 0.5;
+}
+
+html[transient-theme="Notebook"] table.package-repositories .remove-package-repository {
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] table.package-repositories .remove-package-repository:hover {
+	color: var(--material-color-red);
+}
+
+html[transient-theme="Notebook"] table.package-repositories .remove-package-repository i:after {
+	content: "delete";
+}</style></div><div class="paragraph style-paragraph collapsed" name="Fullscreen Style" draggable="false" data-id="CYFyvRBQ" orig-data-id="AXwP6QBU" style=""><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="">html[transient-theme="Notebook"] body.fullscreen:not([transient-fullscreen="false"]),
+html[transient-theme="Notebook"] body[transient-fullscreen="true"] {
+	overflow: hidden;
+}
+
+html[transient-theme="Notebook"] body.fullscreen:not([transient-fullscreen="false"]) #snackbar,
+html[transient-theme="Notebook"] body[transient-fullscreen="true"] #snackbar {
+	z-index: 375;
+}
+
+html[transient-theme="Notebook"] body.fullscreen:not([transient-fullscreen="false"]) .section,
+html[transient-theme="Notebook"] body[transient-fullscreen="true"] .section {
+	width: 0;
+	height: 0;
+	padding: 0;
+	margin: 0;
+}
+
+/* Hides section toolbar */
+html[transient-theme="Notebook"] body.fullscreen:not([transient-fullscreen="false"]) .section .section-header,
+html[transient-theme="Notebook"] body[transient-fullscreen="true"] .section .section-header {
+	opacity: 0;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]),
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] {
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 300;
+	margin: 0;
+	background: var(--color-primary-shade-3);
+	-webkit-overflow-scrolling: touch; /* enable elastic scroll on touch devices */
+}
+
+/* Mve transient-fullscreen above fullscreen */
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] {
+	z-index: 350;
+}
+
+/* Prevent input on paragraphs not in fullscreen view */
+html[transient-theme="Notebook"] body.fullscreen:not([transient-fullscreen="false"]) .paragraph:not(.fullscreen):not([transient-fullscreen="true"]),
+html[transient-theme="Notebook"] body[transient-fullscreen="true"] .paragraph:not([transient-fullscreen="true"]) {
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .paragraph-header,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .paragraph-header {
+	position: fixed;
+	z-index: 1;
+}
+
+/* "Hide" paragraph utils when in locked fullscreen view */
+html[transient-theme="Notebook"] .paragraph.locked.fullscreen:not([transient-fullscreen="false"]) .paragraph-header,
+html[transient-theme="Notebook"] .paragraph.locked[transient-fullscreen="true"] .paragraph-header {
+	height: 0;
+}
+
+/* Position toggle fullscreen button in locked fullscreen view */
+html[transient-theme="Notebook"] .paragraph.locked.fullscreen:not([transient-fullscreen="false"]) .paragraph-header > .toggle-fullscreen,
+html[transient-theme="Notebook"] .paragraph.locked[transient-fullscreen="true"] .paragraph-header > .toggle-fullscreen {
+	position: absolute;
+	top: 15px;
+	right: 34px;
+}
+
+/* Position toggle fullscreen button in locked fullscreen view */
+html[transient-theme="Notebook"] .paragraph.locked.fullscreen:not([transient-fullscreen="false"]) .paragraph-header > .lock-content,
+html[transient-theme="Notebook"] .paragraph.locked[transient-fullscreen="true"] .paragraph-header > .lock-content {
+	position: absolute;
+	top: 15px;
+	right: 0;
+}
+
+/* !!! Bug: make actions interactive */
+html[transient-theme="Notebook"] .paragraph.locked.fullscreen:not([transient-fullscreen="false"]) .paragraph-header .action,
+html[transient-theme="Notebook"] .paragraph.locked[transient-fullscreen="true"] .paragraph-header .action {
+	pointer-events: initial;
+}
+
+/* Hide paragraph icon */
+html[transient-theme="Notebook"] .paragraph.locked.fullscreen:not([transient-fullscreen="false"]) .paragraph-header:before,
+html[transient-theme="Notebook"] .paragraph.locked[transient-fullscreen="true"] .paragraph-header:before {
+	display: none !important;
+}
+
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .paragraph-header .delete-paragraph,
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .paragraph-header .drag-handle,
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .paragraph-header .collapse-expand,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .paragraph-header .delete-paragraph,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .paragraph-header .drag-handle,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .paragraph-header .collapse-expand {
+	display: none !important;
+}
+
+/* Hide all paragraph actions excluding lock and toggle fullscreen */
+html[transient-theme="Notebook"] .paragraph.locked.fullscreen:not([transient-fullscreen="false"]) .paragraph-header > *:not(.lock-content):not(.toggle-fullscreen),
+html[transient-theme="Notebook"] .paragraph.locked[transient-fullscreen="true"] .paragraph-header > *:not(.lock-content):not(.toggle-fullscreen) {
+	display: none !important;
+}
+
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .CodeMirror,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .CodeMirror {
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden !important;
+	overflow-y: auto;
+}
+
+
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]):not(.locked) .CodeMirror,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"]:not(.locked) .CodeMirror {
+	height: calc(100vh - 72px);
+	overflow: auto;
+}
+
+/* This is a HACK as text paragraph cannot be scrolled in fullscreen otherwise */
+html[transient-theme="Notebook"] .paragraph.body-paragraph.fullscreen:not([transient-fullscreen="false"]) [data-type="content"],
+html[transient-theme="Notebook"] .paragraph.body-paragraph[transient-fullscreen="true"] [data-type="content"] {
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	height: 100vh;
+	overflow: auto;
+}
+
+/* Move CodeMirror down to make space for fixed paragraph utils */
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]):not(.locked) .CodeMirror,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"]:not(.locked) .CodeMirror,
+html[transient-theme="Notebook"] .paragraph.body-paragraph.fullscreen:not([transient-fullscreen="false"]):not(.locked) [data-type="content"],
+html[transient-theme="Notebook"] .paragraph.body-paragraph[transient-fullscreen="true"]:not(.locked) [data-type="content"] {
+	margin-top: 40px;
+}
+
+/******************************************************************************/
+
+/* Icon Fullscreen */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .toggle-fullscreen i:after {
+	content: "fullscreen";
+}
+
+/* Tooltip Fullscreen */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .toggle-fullscreen:after {
+	content: "Fullscreen";
+}
+
+/* Icon Exit Fullscreen */
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .paragraph-header .toggle-fullscreen i:after,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .paragraph-header .toggle-fullscreen i:after {
+	content: "fullscreen_exit";
+}
+
+/* Tooltip Exit Fullscreen */
+html[transient-theme="Notebook"] .paragraph.fullscreen:not([transient-fullscreen="false"]) .paragraph-header .toggle-fullscreen:after,
+html[transient-theme="Notebook"] .paragraph[transient-fullscreen="true"] .paragraph-header .toggle-fullscreen:after {
+	content: "Exit Fullscreen";
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Paragraph Code Execution" draggable="false" data-id="vbQLv8xC" orig-data-id="HHcUjYwH" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .paragraph .execute-paragraph,
+html[transient-theme="Notebook"] .paragraph .run-on-load-paragraph,
+html[transient-theme="Notebook"] .paragraph .toggle-console-paragraph {
+	margin-left: 5px;
+}
+
+html[transient-theme="Notebook"] .paragraph .run-on-load-paragraph {
+	margin-right: 10px;
+}
+
+html[transient-theme="Notebook"] .paragraph[run-on-load] .run-on-load-paragraph.action {
+	opacity: 1.0;
+	pointer-events: all;
+}
+
+/* Icon Execute Code */
+html[transient-theme="Notebook"] .paragraph .execute-paragraph i:after {
+	content: "play_circle_outline";
+}
+
+/* Tooltip Execute Code */
+html[transient-theme="Notebook"] .paragraph .execute-paragraph:after {
+	content: "Execute Code";
+}
+
+/* Icon Execute Code on Load */
+html[transient-theme="Notebook"] .paragraph .run-on-load-paragraph i:after {
+	content: "directions_run";
+}
+
+/* Tooltip Enable Execute Code on Load */
+html[transient-theme="Notebook"] .paragraph .run-on-load-paragraph:after {
+	content: "Enable Execute Code on Load";
+}
+
+/* Icon Console */
+html[transient-theme="Notebook"] .paragraph .toggle-console-paragraph i:after {
+	content: "message";
+}
+
+/* Tooltip Console */
+html[transient-theme="Notebook"] .paragraph .toggle-console-paragraph:after {
+	content: "Toggle Console";
+}
+
+html[transient-theme="Notebook"] .paragraph[run-on-load] .run-on-load-paragraph i:after {
+	color: var(--material-color-light-green);
+}
+
+/* Tooltip Disable Execute Code on Load */
+html[transient-theme="Notebook"] .paragraph[run-on-load] .run-on-load-paragraph:after {
+	content: "Disable Execute Code on Load";
+}
+
+html[transient-theme="Notebook"] .paragraph[last-execution-state="error"] .toggle-console-paragraph {
+	opacity: 1.0;
+}
+
+html[transient-theme="Notebook"] .paragraph[last-execution-state="error"] .toggle-console-paragraph i:after {
+	color: var(--material-color-red);
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .type-input {
+	opacity: 0;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header:hover .type-input {
+	opacity: 1;
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .type-input:before {
+	content: "type: ";
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="CodeMirror Integration CSS" draggable="false" data-id="qPN9CZNf" orig-data-id="xjJqeVWB" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .CodeMirror {
+	isolation: isolate;
+	height: auto;
+	font-family: var(--font-monospace);
+	font-size: 0.875rem;
+	line-height: 1.25;
+	height: auto;
+	-webkit-font-smoothing: antialiased;
+	clear: both;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph > transient.hidden {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.body-paragraph transient.html-editor:before {
+	content: "HTML of the above body paragraph";
+	display: block;
+	margin-top: 20px;
+	background-color: var(--color-primary-shade-1);
+	padding: 4px;
+	border-radius: 2px;
+	pointer-events: none;
+	clear: both;
+}
+
+/******************************************************************************/
+
+/* Icon Save HTML */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .save-html i:after {
+	content: "save";
+}
+
+/* Tooltip Save HTML */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .save-html:after {
+	content: "Save HTML";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .toggle-html i:after {
+	content: "visibility";
+}
+
+html[transient-theme="Notebook"] .paragraph .paragraph-header .toggle-html:after {
+	content: "Toggle HTML Editor";
+}</style></div><div class="paragraph style-paragraph collapsed" name="CodeMirror Monokai Theme" draggable="false" data-id="939CPj2a" orig-data-id="63U8sryX" style=""><style data-type="content" type="text/css" codemirror="true" class="">/* Based on Sublime Text's Monokai theme */
+
+html[transient-theme="Notebook"] .cm-s-monokai.CodeMirror {
+	background: none;
+	color: var(--color-text-primary) !important;
+}
+html[transient-theme="Notebook"] .cm-s-monokai .CodeMirror-gutters {
+	background: none;
+	border-right: 0px;
+}
+html[transient-theme="Notebook"] .cm-s-monokai div.CodeMirror-selected {
+	background: var(--color-primary);
+}
+html[transient-theme="Notebook"] .cm-s-monokai .CodeMirror-cursor {
+	border-left: 1px solid var(--color-primary-text);
+}
+
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-number, html[transient-theme="Notebook"] .cm-s-monokai span.cm-string, html[transient-theme="Notebook"] .cm-s-monokai span.cm-atom { color: #762; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-comment { color: #262; font-style: italic; line-height: 1em; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-meta { color: #555; font-style: italic; line-height: 1em; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-variable { color: black; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-variable-2 { color: #b11; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-qualifier { color: #555; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-keyword { color: #730; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-builtin { color: #30a; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-link { color: #762; }
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-error { background-color: #ffb8b8; }
+
+html[transient-theme="Notebook"] .cm-s-monokai .CodeMirror-activeline-background { background: rgba(var(--color-accent-rgb), 0.1); }
+html[transient-theme="Notebook"] .cm-s-monokai .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
+
+
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-matchhighlight {
+	background: #353;
+}
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-tag {
+	color: rgb(234, 53, 134);
+}
+
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-property,
+html[transient-theme="Notebook"] .cm-s-monokai span.cm-attribute {
+	color: #12AF16;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="KUq4ZUr5" name="Tabs, Linebreaks and Rulers" orig-data-id="Mf3uBNUQ"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .CodeMirror-rulers {
+	color: var(--color-primary-text);
+	opacity: 0.1;
+	z-index: 2;
+	max-height: calc(100% - 8px) !important;
+	min-height: calc(100% - 8px) !important;
+	top: 0;
+	margin: 4px 0;
+}
+
+html[transient-theme="Notebook"] .cm-tab {
+	background: linear-gradient(to right, rgba(0, 0, 0, 0) 5%, var(--color-primary-text) 6%, var(--color-primary-text) 95%, rgba(0, 0, 0, 0) 96%);
+	height: 0.05em;
+	vertical-align: middle;
+	opacity: 0.2;
+}
+
+/*html .CodeMirror-code > div > pre > span::after, .CodeMirror-line > span::after {
+	content: "¬";
+	color: var(--color-primary-text);
+	opacity: 0.2;
+}*/</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Drop Assets Style" draggable="false" data-id="etJ8SJvC" orig-data-id="smjHTJUJ" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .paragraph [data-type="content"] .upload-in-progress {
+	opacity: 0.25;
+}
+
+html[transient-theme="Notebook"] .paragraph [data-type="content"] video,
+html[transient-theme="Notebook"] .paragraph [data-type="content"] img {
+	max-width: 100%;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="SYEWAKaC" style="" name="Help Dialog Style" orig-data-id="M5jKghq9"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .dialog.help {
+	z-index: 450;
+}
+
+html[transient-theme="Notebook"] .dialog.help .body {
+	width: 70rem;
+	max-width: calc(100vw - 32px);
+	max-height: calc(100vh - 180px);
+}
+
+html[transient-theme="Notebook"] .dialog.help #explanation {
+	margin-bottom: 24px;
+}
+
+html[transient-theme="Notebook"] .dialog.help #shortcuts {
+	width: 33%;
+	float: left;
+}
+
+html[transient-theme="Notebook"] .dialog.help #intro {
+	margin-left: 35%;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .dialog.help a {
+	color: var(--color-secondary-text);
+}
+
+html[transient-theme="Notebook"] .dialog.help .help-title {
+	font-size: 24px;
+	margin-bottom: 12px;
+}
+
+html[transient-theme="Notebook"] .dialog.help #intro .video {
+	width: 100%;
+	text-align: center;
+}
+
+html[transient-theme="Notebook"] .dialog.help #shortcuts li {
+	margin-bottom: 16px;
+}
+
+html[transient-theme="Notebook"] .dialog.help #shortcuts .key {
+	margin: 0 5px 0 0;
+	color: #eee;
+	border-radius: 3px;
+	padding: 3px 7px;
+	min-width: 1em;
+	box-shadow: inset 0 0 2px #5a5a5a, 0 0.1em 0.11em rgba(0, 0, 0, 0.9);
+	cursor: default;
+	background: #000;
+	text-align: center;
+	text-shadow: none;
+	background-color: #101010;
+	background-repeat: repeat-x;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+html[transient-theme="Notebook"] .dialog.help #shortcuts .action {
+	line-height: 150%;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #global-menu .help-button {
+	order: 990;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" name="Section Browser Style" draggable="false" data-id="u5Sw3G7Q" orig-data-id="6tj93nGL" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #section-tree {
+	margin: 0px;
+	padding-left: 8px;
+	padding-right: 16px;
+	user-select: none;
+	overflow: auto;
+	list-style: none;
+	order: 980;
+	display: flex;
+	flex-direction: column;
+}
+
+html[transient-theme="Notebook"] hr.section-tree {
+	order: 980;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #section-tree li {
+	color: var(--color-text-primary);
+	vertical-align: middle;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+html[transient-theme="Notebook"] #section-tree > li {
+	flex-wrap: wrap;
+}
+
+html[transient-theme="Notebook"] #section-tree .closed ul {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #section-tree li.hidden {
+	opacity: 0.5;
+}
+
+html[transient-theme="Notebook"] #section-tree li .title {
+	margin-left: 0.5em;
+	vertical-align: middle;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+html[transient-theme="Notebook"] #section-tree > li > .title {
+	max-width: 174px;
+}
+
+/* Fix for disappearing icons bug */
+html[transient-theme="Notebook"] #section-tree li i {
+	display: flex;
+}
+
+html[transient-theme="Notebook"] #section-tree li .type {
+	margin-left: 5px;
+}
+
+html[transient-theme="Notebook"] #section-tree li ul {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #section-tree li .type i:after,
+html[transient-theme="Notebook"] #section-tree .section-tree-controls .toggle-user-sections i:after {
+	content: "person";
+}
+
+html[transient-theme="Notebook"] #section-tree li[data-type="system"] .type i:after,
+html[transient-theme="Notebook"] #section-tree .section-tree-controls .toggle-system-sections i:after {
+	content: var(--settings);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #section-tree li[data-type="package"] .type i:after,
+html[transient-theme="Notebook"] #section-tree .section-tree-controls .toggle-package-sections i:after {
+	content: var(--cube-outline);
+	font-family: "Material Design Icons";
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #section-tree .section-tree-controls {
+	display: flex;
+	justify-content: space-evenly;
+	margin: 4px;
+	flex-shrink: 0;
+}
+
+html[transient-theme="Notebook"] #section-tree .section-tree-controls span {
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] #section-tree.hide-user-sections .toggle-user-sections,
+html[transient-theme="Notebook"] #section-tree.hide-system-sections .toggle-system-sections,
+html[transient-theme="Notebook"] #section-tree.hide-package-sections .toggle-package-sections {
+	opacity: 0.5;
+}
+
+html[transient-theme="Notebook"] #section-tree.hide-user-sections li.hidden:not([data-type]),
+html[transient-theme="Notebook"] #section-tree.hide-system-sections li.hidden[data-type="system"],
+html[transient-theme="Notebook"] #section-tree.hide-package-sections li.hidden[data-type="package"] {
+	display: none;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="jnGMUWCr" name="Package Icons Main" style="" orig-data-id="4BGSHqL7"><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="null" media="none">html[transient-theme="Notebook"] #package-icons {
+	position: fixed;
+	right: 0;
+	top: 0;
+	height: 100vh;
+	width: 240px;
+	transition: transform 250ms ease-in-out 0s;
+	z-index: 100;
+	transform: translate(200px, 0);
+	overflow: auto;
+}
+
+html[transient-theme="Notebook"] #package-icons::-webkit-scrollbar,
+html[transient-theme="Notebook"] #package-icons #package-icons-packages::-webkit-scrollbar,
+html[transient-theme="Notebook"] #package-icons #package-icons-repositories::-webkit-scrollbar {
+  display: none;
+}
+
+html[transient-theme="Notebook"] #package-icons:hover {
+	transform: translate(0, 0);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons #package-icons-packages,
+html[transient-theme="Notebook"] #package-icons #package-icons-repositories {
+	position: fixed;
+	top: 0;
+	right: 0;
+	overflow: auto;
+	height: 100%;
+	width: 100%;
+	transition: transform 250ms ease-in-out 0s,
+							opacity 250ms ease-in-out 0s,
+							padding-top var(--navigation-transition);
+	padding-top: 64px;
+}
+
+html[transient-theme="Notebook"] body[transient-toolbar-hidden="true"] #package-icons #package-icons-packages,
+html[transient-theme="Notebook"] body[transient-toolbar-hidden="true"] #package-icons #package-icons-repositories {
+	padding-top: 0;
+}
+
+html[transient-theme="Notebook"] #package-icons #package-icons-packages.hidden,
+html[transient-theme="Notebook"] #package-icons #package-icons-repositories.hidden {
+	transform: translate(240px, 0);
+	opacity: 0;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon,
+html[transient-theme="Notebook"] #package-icons .package-button {
+	border-radius: 50%;
+	height: 64px;
+	width: 64px;
+	text-align: center;
+	line-height: 64px;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon {
+	position: relative;
+	margin: 16px 8px 16px 160px;
+	overflow: visible;
+	background: var(--material-color-grey-200);
+	color: var(--material-color-grey-900);
+	animation: show 150ms ease-in-out;
+	animation-fill-mode: forwards;
+	box-shadow: var(--material-shadow-z2);
+}
+@keyframes show {
+	0% {
+		transform: translate(128px, 0);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-button-refresh-packages i {
+	animation: spin 1000ms linear infinite;
+	animation-play-state: paused;
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-refresh-packages.refreshing i {
+	animation-play-state: running;
+}
+@keyframes spin {
+	100% {
+		transform: rotate(-360deg);
+	}
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-label {
+	position: absolute;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: none;
+	height: 28px;
+	line-height: 24px;
+	padding: 2px 6px;
+	font-size: 14px;
+	background: #000000;
+	color: #FFFFFF;
+	max-width: 192px;
+	transform: translate(-45%, -60px) rotate(4deg);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon:hover .package-label {
+	display: inline-block;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button {
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: var(--material-color-white);
+	cursor: pointer;
+	opacity: 0;
+	transform: translate(0, 0);
+	box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0),
+		var(--material-shadow-z2);
+	transition: opacity 150ms ease-in-out 250ms,
+		transform 150ms ease-in-out 250ms,
+		box-shadow var(--navigation-transition);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon:hover .package-button {
+	opacity: 1;
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button:hover {
+	box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.25),
+		var(--material-shadow-z8);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon:hover .package-button-second {
+	transform: translate(-72px, 0);
+}
+	
+html[transient-theme="Notebook"] #package-icons .package-icon:hover .package-button-third {
+	transform: translate(-144px, 0);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .material-icons {
+	font-size: 32px;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="DMkThcYM" name="Package Icons State Colors" orig-data-id="2Chhy49u" style=""><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="true" media="none">html[transient-theme="Notebook"] #package-icons .package-icon-package[local="true"][version-changed="false"] {
+	background: var(--material-color-green);
+	color: var(--material-color-white);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon-package[local="true"][version-changed="true"] {
+	background: var(--material-color-orange);
+	color: var(--material-color-white);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon-package[local="true"][version-changed="undefined"] {
+	background: var(--material-color-teal);
+	color: var(--material-color-white);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon-package[local="true"][uninstalled="true"] {
+	background: var(--material-color-grey-800) !important;
+	color: var(--material-color-white);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon-package[local="true"][prototype="false"] {
+	background: var(--material-color-light-blue);
+	color: var(--material-color-white);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon-repository[active="true"] {
+	background: var(--material-color-green);
+	color: var(--material-color-white);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="ckyATpY9" name="Package Icons Button Colors" style="" orig-data-id="4YhsGV4U"><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="null" media="none">html[transient-theme="Notebook"] #package-icons .package-icon-menu,
+html[transient-theme="Notebook"] #package-icons .package-icon-all {
+	background: var(--material-color-indigo);
+	color: var(--material-color-white);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-refresh-packages {
+	background: var(--material-color-indigo);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-add-repository {
+	background: var(--material-color-indigo);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-swap {
+	background: var(--material-color-indigo);
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button.disabled {
+	background: var(--material-color-grey-800) !important;
+	cursor: default;
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button.disabled:hover {
+	box-shadow: var(--material-shadow-z2);
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon .install-package-button,
+html[transient-theme="Notebook"] #package-icons .package-icon[local="true"][uninstalled="true"] .install-package-button,
+html[transient-theme="Notebook"] #package-icons .package-icon .select-repository-button,
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button-install-all {
+	background: var(--material-color-green);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon[local="true"][uninstalled="false"][version-changed="true"] .install-package-button {
+	background: var(--material-color-orange);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon[local="true"][uninstalled="false"][version-changed="undefined"] .install-package-button {
+	background: var(--material-color-teal);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .remove-package-button,
+html[transient-theme="Notebook"] #package-icons .package-icon .remove-repository-button,
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button-remove-all {
+	background: var(--material-color-red);
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .push-package-button {
+	background: var(--material-color-light-blue);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="2Y5MLyYD" name="Package Icons Material Icons" draggable="false" style="" orig-data-id="eW5ajidK"><style data-type="content" type="text/css" codemirror="true" class="" contenteditable="null" media="none">html[transient-theme="Notebook"] #package-icons .package-icon-menu i:after {
+	content: "menu";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon-all > i:after {
+	content: var(--database);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-refresh-packages i:after {
+	content: "cached";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-add-repository i:after {
+	content: "add";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-button-swap i:after {
+	content: "swap_horiz";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button-install-all i:after  {
+	content: "done_all";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .package-button-remove-all i:after {
+	content: "clear_all";
+}
+
+/**************************************************************************************************/
+
+html[transient-theme="Notebook"] #package-icons .package-icon.package-icon-package > i:empty:after {
+	content: var(--cube-outline);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon.package-icon-repository > i:after {
+	content: var(--database);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .install-package-button i:after,
+html[transient-theme="Notebook"] #package-icons .package-icon[local="true"][uninstalled="true"] .install-package-button i:after{
+	content: "file_download";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .select-repository-button i:after {
+	content: "check";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon[local="true"] .install-package-button i:after {
+	content: "update";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .remove-package-button i:after,
+html[transient-theme="Notebook"] #package-icons .package-icon .remove-repository-button i:after {
+	content: "delete";
+}
+
+html[transient-theme="Notebook"] #package-icons .package-icon .push-package-button i:after {
+	content: "file_upload";
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="LnYxQjNC" name="Permissions Dialog Style" style="" orig-data-id="n86qmxNM"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .permissions-dialog .dialog table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+html[transient-theme="Notebook"] .permissions-dialog .dialog td,
+html[transient-theme="Notebook"] .permissions-dialog .dialog th {
+	padding: 8px;
+	text-align: left;
+	outline: none;
+}
+
+html[transient-theme="Notebook"] .permissions-dialog .dialog tr:nth-child(even) {
+	background: var(--color-primary-shade-2);
+}
+
+html[transient-theme="Notebook"] .permissions-dialog .dialog tr:hover {
+	background-color: var(--color-primary-shade-3);
+}
+
+html[transient-theme="Notebook"] .permissions-dialog .delete {
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] .permissions-dialog .delete:hover i {
+	color: var(--material-color-red);
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="AHcgU5q9" name="Text Tools Style" draggable="false" style="" orig-data-id="UArqpeRC"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #snackbar:not([body-content-tools="true"]) .body-content-tools {
+	display: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .format-p-button i:after {
+	content: var(--format-paragraph);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #snackbar .format-h1-button i:after {
+	content: var(--format-header-1);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #snackbar .format-h2-button i:after {
+	content: var(--format-header-2);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #snackbar .format-h3-button i:after {
+	content: var(--format-header-3);
+	font-family: "Material Design Icons";
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .add-variable-button i:after {
+	content: var(--tag-plus);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #snackbar .hide-variables-button i:after {
+	content: var(--tag-outline);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #snackbar .convert-html-button i:after {
+	content: var(--language-html5);
+	font-family: "Material Design Icons";
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] #snackbar .add-file-button label {
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] #snackbar .add-file-button input {
+	display: none;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Avatars Style" data-id="mxbDMy32" orig-data-id="ZDQNSSqu"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .avatars {
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
+}
+
+/* Make the .avatars-test only occupy minimal space */
+html[transient-theme="Notebook"] .avatars-test {
+	float: left;
+	position: relative;
+	bottom: 10px;
+	left: 10px;
+}
+
+html[transient-theme="Notebook"] .avatars .avatar,
+html[transient-theme="Notebook"] .avatars-test .avatar {
+	box-sizing: content-box;
+	position: relative;
+	width: 45px;
+	height: 45px;
+	margin-top: 10px;
+	background-size: contain;
+	border-radius: 50%;
+	border: 2px solid white;
+	box-shadow: 0px 0px 5px #000;
+}
+
+html[transient-theme="Notebook"] .avatars .avatar:not(.self) {
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] .avatars:hover .avatar:after,
+html[transient-theme="Notebook"] .avatars-test:hover .avatar:after {
+	content: attr(username);
+	display: inline-block;
+	background: #000;
+	padding: 2px 6px;
+	font-size: .8em;
+	transform: translate3d(-100%, 10px, 0) translate3d(-10px, 0, 0) rotate(-4deg);
+}
+
+html[transient-theme="Notebook"] .avatars .avatar > div.star {
+	color: rgba(255,255,255,.3);
+	position: absolute;
+	margin-left: 47px;
+	margin-top: 47px;
+}
+
+html[transient-theme="Notebook"] .avatars .avatar > div.snooze {
+	color: #fff;
+	font-size: 65%;
+	font-weight: bold;
+	text-shadow: 1px 1px #000;
+	position: absolute;
+	margin-left: 53px;
+	margin-top: -3px;
+}
+
+html[transient-theme="Notebook"] .avatars .avatar.snoozed {
+	opacity: .25;
+}
+
+@media only screen and (max-width: 950px) {
+	html .avatars {
+		display: none;
+	}
+	/* 	.avatars {
+	top: 5px;
+	left: 5px;
+}
+	.avatars .avatar {
+	width: 30px;
+	height: 30px;
+	margin-bottom: 5px;
+	border-width: 1px;
+}
+	.avatars:hover .avatar:after {
+	font-size: 60%;
+}
+	.avatar > div.star {
+	font-size: 40%;
+	margin-left: 23px;
+	margin-top: 23px;
+}
+	.avatar > div.snooze {
+	display: none;
+} */
+}
+@media only screen and (max-width: 875px) {
+	html .avatars {
+		display: none;
+	}
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Shared Pointers Style" data-id="hLP3y2xb" orig-data-id="GfyCc8Cd"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .remote-cursor {
+	position: absolute;
+
+	/* Set the cursor offscreen initially. If top is not set then cursor
+	will be appended like regular position: initial */
+	top: -100px;
+
+	z-index: 999;
+	width: 12px;
+	height: 12px;
+	background-color: transparent;
+	border-left: 4px solid;
+	border-top: 4px solid;
+	box-sizing: border-box;
+	pointer-events: none;
+	/* transition: top 1ms, left 1ms; */
+	/* transform: translate3d(20px, -0px, 0); */
+	transition: all 0.05s ease 0s;
+	opacity: 1;
+	transition: opacity 150ms ease-in;
+}
+
+html[transient-theme="Notebook"] .remote-cursor:after {
+	content: attr(username);
+	position: absolute;
+	transform: translate3d(5px, 0px, 0);
+	font-size: .6em;
+}
+
+html[transient-theme="Notebook"] .remote-cursor.hidden {
+	opacity: 0;	
+}
+
+html[transient-theme="Notebook"] .remote-click {
+	position: absolute;
+	z-index: 998;
+	width: 50px;
+	height: 50px;
+	/* background-color: orange; */
+	transform: translate3d(-25px, -25px, 0) scale(0);
+	transition: transform 150ms ease-in-out, opacity 150ms ease-in;
+	border-radius: 50%;
+	border: 4px solid orange;
+	pointer-events: none;
+	filter: blur(2px);
+	opacity: 1.0;
+}
+
+html[transient-theme="Notebook"] .remote-click.animate {
+	/* width: 50px;
+	height: 50px; */
+	transform: translate3d(-25px, -25px, 0) scale(1.0);
+	opacity: 0;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" draggable="false" name="Remote Cursors" data-id="rkJsYYY3" orig-data-id="q78PZsdu"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .client {
+	width: 100px;
+	height: 1em;
+	margin: 1px;
+	padding: 1px;
+	display: inline-block;
+}
+
+html[transient-theme="Notebook"] .cursor {
+	position: absolute;
+	user-select: none;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .cursor .rect {
+	/* lighten when white color font */
+	mix-blend-mode: lighten;
+}
+
+html[transient-theme="Notebook"] .cursor .end {
+	opacity: 1.0;
+	width: 2px;
+}
+
+html[transient-theme="Notebook"] .cursor .end .displayName {
+	position: absolute;
+	padding: 2px;
+	white-space: pre;
+	top: -100%;
+	font-size: 9pt;
+	animation: hide 4s ease 1 normal;
+	opacity: 0;
+	font-weight: bold;
+}
+
+@-webkit-keyframes hide {
+	0% { opacity: 1; }
+	80% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+html[transient-theme="Notebook"] .cursor .rect {
+	border-left: none;
+}
+
+html[transient-theme="Notebook"] .cursor .rect ~ .rect {
+	border: none;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" draggable="false" name="Carousel" data-id="zYUvDesd" orig-data-id="5RyWnSLX"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #paragraph-carousel {
+	position: fixed;
+	right: 0;
+	top: 0;
+	max-height: 100vh;
+	z-index: 100;
+	opacity: 0;
+	
+	overflow: hidden;
+	overflow-y: auto;
+	
+	transform: translate3d(calc(100% - 20px), 0, 0);
+	transition: transform 250ms ease-in-out, opacity 250ms ease-in-out;
+}
+
+/* Hide scrollbar */
+html[transient-theme="Notebook"] #paragraph-carousel::-webkit-scrollbar {
+	width: 0px;  /* remove scrollbar space */
+	background: transparent;  /* optional: just make scrollbar invisible */
+}
+
+html[transient-theme="Notebook"] #paragraph-carousel:hover {
+	transform: translate3d(-5px, 0, 0);
+	opacity: 1.0;
+}
+
+html[transient-theme="Notebook"] .paragraph-prototype {
+	width: 180px;
+	height: 65px;
+	border-radius: 2px;
+	color: black;
+	background-color: white;
+	padding: 10px;
+	margin: 5px 0;
+	transform: translate3d(20px, 0, 0);
+	transition: transform 250ms ease-in-out;
+	cursor: pointer;
+	
+	box-shadow: 0px 0px 5px black;
+	
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+
+html[transient-theme="Notebook"] .paragraph-prototype:hover {
+	transform: translate3d(10px, 0, 0);
+}
+
+html[transient-theme="Notebook"] .paragraph-prototype i {
+	font-size: 1.2em;
+}
+
+html[transient-theme="Notebook"] .paragraph-prototype .template {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .drop-indicator {
+	display: block;
+/* 	position: absolute; */
+	width: calc(100% + 10px);
+	margin-left: -5px;
+	
+	height: 5px;
+	background-color: rgba(255, 255, 255, .9);
+}
+
+/* html[transient-dragging="true"],
+html[transient-theme="Notebook"][transient-dragging="true"] body {
+	background-color: orange;
+} */
+
+html[transient-theme="Notebook"][transient-dragging="true"] .paragraph > *:not(#carousel-definitions) {
+	pointer-events: none;
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" name="Paragraph Style Disable Style" data-id="RKuLhTUQ" orig-data-id="AqZAbtDa" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .paragraph:not(:hover):not(.style-disabled) .paragraph-header .disable-style-content {
+	opacity: 0.25;
+	pointer-events: none;
+}
+
+html[transient-theme="Notebook"] .paragraph.style-disabled .paragraph-header .disable-style-content {
+	opacity: 1.0;
+}
+
+/******************************************************************************/
+
+/* Icon Disable */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .disable-style-content i:after {
+	content: "check_box";
+}
+
+/* Tooltip Disable */
+html[transient-theme="Notebook"] .paragraph .paragraph-header .disable-style-content:after {
+	content: "Disable";
+}
+
+/* Icon Enable */
+html[transient-theme="Notebook"] .paragraph.style-disabled .paragraph-header .disable-style-content i:after {
+	content: "check_box_outline_blank";
+}
+
+/* Tooltip Enable */
+html[transient-theme="Notebook"] .paragraph.style-disabled .paragraph-header .disable-style-content:after {
+	content: "Enable";
+}</style></div><div class="paragraph style-paragraph collapsed style-disabled" data-id="L5LugzCS" name="Drawing Toolbar/Snackbar Style" orig-data-id="sBa3Chfb" style=""><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #snackbar[canvas-tools="true"] .body-content-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar[canvas-tools="true"]:not([content-tools]) .drawing {
+	display: flex;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .drawing i:after,
+html[transient-theme="Notebook"] #snackbar .drawing i:after {
+	content: "filter_frames";
+}
+
+/*html #snackbar[canvas-tools="true"] .drawing {
+	background: radial-gradient(rgba(var(--color-accent-text-rgb), 0.8) 0%, rgba(var(--color-accent-text-rgb), 1) 52%, rgba(0, 0, 0, 0) 55%);
+}
+
+html[transient-theme="Notebook"] #snackbar[canvas-tools="true"] .drawing {
+	color: var(--color-accent);
+}*/</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="EZkYtwzh" name="Search Paragraph Style" draggable="false" style="" orig-data-id="bcCnFNzQ"><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="" media="none">html[transient-theme="Notebook"] .awesomplete [hidden] {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .awesomplete .visually-hidden {
+	position: absolute;
+	clip: rect(0, 0, 0, 0);
+}
+
+html[transient-theme="Notebook"] .awesomplete {
+	display: inline-block;
+	position: relative;
+	display: flex;
+	flex: 0 1 100%;
+}
+
+html[transient-theme="Notebook"] .awesomplete > input {
+	display: block;
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul {
+	position: absolute;
+	left: 0;
+	top: 44px;
+	color: var(--material-color-black);
+	z-index: 1;
+	min-width: 100%;
+	box-sizing: border-box;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	background: var(--material-color-white);
+	max-height: 33vh;
+	overflow-y: auto;
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul:empty {
+	display: none;
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul {
+	border-radius: 2px;
+	background: var(--material-color-white);
+	box-shadow: var(--material-shadow-z4);
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul {
+	transition: 0.3s cubic-bezier(0.4, 0.2, 0.5, 1.4);
+	transform-origin: 1.43em -.43em;
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul[hidden],
+html[transient-theme="Notebook"] .awesomplete > ul:empty {
+	opacity: 0;
+	transform: scale(0);
+	display: block;
+	transition-timing-function: ease;
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul > li {
+	position: relative;
+	padding: 8px;
+	cursor: pointer;
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul > li:hover {
+	background: rgba(var(--color-accent-rgb), 0.25);
+}
+
+html[transient-theme="Notebook"] .awesomplete mark {
+	background: rgba(var(--color-accent-rgb), 0.5);
+}
+
+html[transient-theme="Notebook"] .awesomplete > ul > li[aria-selected="true"] {
+	background: rgba(var(--color-accent-rgb), 0.5);
+}
+
+html[transient-theme="Notebook"] .awesomplete li[aria-selected="true"] mark {
+	background: rgba(var(--color-accent-rgb), 1);
+	color: var(--color-accent-text);
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="4qZ6QQwC" name="Presentation Style" style="" orig-data-id="khjUmJzS"><style data-type="content" type="text/css" codemirror="true">html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]),
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) {
+	overflow: hidden;
+}
+
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] {
+	display: block;
+	position: fixed;
+	padding: 0;
+	margin: 0;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 250;
+	user-select: none;
+	cursor: url(presentation_pointer.png), default;
+	background: var(--material-color-black);
+}
+
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"],
+html[transient-theme="Notebook"] body.presentation[transient-presentation="true"] {
+	border: 0.5rem solid var(--material-color-orange);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation .html-editor,
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation .paragraph-header,
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation .text-tools,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .html-editor,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .paragraph-header,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .text-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation .CodeMirror,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .CodeMirror {
+	overflow: auto;
+	height: 100vh;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph .slide[data-type="content"],
+html[transient-theme="Notebook"] .paragraph .slide .slide-content{
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	font-family: "Roboto", "Avenir", sans-serif;
+	font-weight: 400;
+}
+
+html[transient-theme="Notebook"] .paragraph .slide.slide-hidden {
+	outline: 0.25rem solid var(--material-color-orange);
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .slide .slide-content {
+	background: var(--material-color-white);
+	color: var(--material-color-black);
+	font-size: 48px;
+	display: flex;
+}
+
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide .slide-content,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide .slide-content {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+}
+
+html[transient-theme="Notebook"] body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide .slide-content[slide-number]:after,
+html[transient-theme="Notebook"] body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide .slide-content[slide-number]:after{
+    content: attr(slide-number);
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 8px 16px;
+    background-color: rgba(var(--material-color-white-rgb), 0.5);
+    border-radius: 2px;
+    font-size: 24px;
+    z-index: 299;
+    pointer-events: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .slide .slide-content {
+	width: 1920px;
+	height: 1080px;
+}
+
+html[transient-theme="Notebook"] .slide.aspect-4-3 .slide-content {
+	width: 1920px;
+	height: 1440px;
+}
+
+html[transient-theme="Notebook"] .slide.aspect-16-10 .slide-content {
+	width: 1920px;
+	height: 1200px;
+}
+
+html[transient-theme="Notebook"] .slide.aspect-1-1 .slide-content {
+	width: 1920px;
+	height: 1920px;
+}
+
+/******************************************************************************/
+
+/* Fallback scaling if only persistent parts are left */
+
+html[transient-theme="Notebook"] .slide-container {
+	width: 736px;
+	height: 414px;
+}
+
+html[transient-theme="Notebook"] .slide.aspect-4-3 .slide-container {
+	width: 736px;
+	height: 552px;
+}
+
+html[transient-theme="Notebook"] .slide.aspect-16-10 .slide-container {
+	width: 736px;
+	height: 460px;
+}
+
+html[transient-theme="Notebook"] .slide.aspect-1-1 .slide-container {
+	width: 736px;
+	height: 736px;
+}
+
+html[transient-theme="Notebook"] .slide-content {
+	transform: scale(0.5);
+	transform-origin: 0 0 0;
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="3SqnwtXJ" name="Presentation Toolbar and Snackbar Entries Style" style="" orig-data-id="4zrNYvYJ"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] #snackbar:not([slide-tools="true"]) .slide-tools {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #global-toolbar .slide-button i:after,
+html[transient-theme="Notebook"] #snackbar .slide-button i:after {
+	content: var(--file-presentation-box);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #global-toolbar .slide-script-button i:after,
+html[transient-theme="Notebook"] #snackbar .slide-script-button i:after {
+	content: "code";
+}
+
+html[transient-theme="Notebook"] #global-toolbar .slide-style-button i:after,
+html[transient-theme="Notebook"] #snackbar .slide-style-button i:after {
+	content: "brush";
+}
+
+html[transient-theme="Notebook"] #snackbar[slide-tools="true"][content-tools="true"] .add-heavy-content-button {
+	display: block;
+}
+
+html[transient-theme="Notebook"] #snackbar:not([content-tools]) .add-heavy-content-button {
+	display: none;
+}
+
+html[transient-theme="Notebook"] #snackbar .add-heavy-content-button i:after {
+	content: var(--flash);
+	font-family: "Material Design Icons";
+}
+
+html[transient-theme="Notebook"] #global-toolbar .presentation-button i:after,
+html[transient-theme="Notebook"] #snackbar .presentation-button i:after {
+	content: var(--presentation-play);
+	font-family: "Material Design Icons";
+}</style></div><div class="paragraph style-paragraph style-disabled collapsed" data-id="kkSBdBbB" name="Basic Slide Style" style="" orig-data-id="zXb5uycG"><style data-type="content" type="text/css" codemirror="true" class="" media="none">html[transient-theme="Notebook"] .slide-content .title {
+	position: absolute;
+	top: 32px;
+	left: 32px;
+}
+
+html[transient-theme="Notebook"] .slide-content a {
+	color: orange !important;
+}
+
+html[transient-theme="Notebook"] .slide-content .keyword {
+	position: absolute;
+	left: 10%;
+	top: 40%;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+html[transient-theme="Notebook"] .slide-content .slogan {
+	position: absolute;
+	top: 40%;
+	left: 10%;
+	width: 80%;
+	margin-top: 120px;
+	margin-left: 20px;
+	font-size: .8em;
+}
+
+html[transient-theme="Notebook"] .slide-content ul.items {
+	list-style: none;
+	font-size: .7em;
+	width: 90% !important;
+}
+
+html[transient-theme="Notebook"] .slide-content ul.items li {
+	padding-bottom: 55px;
+}
+
+html[transient-theme="Notebook"] .slide-content .highlight {
+	font-weight: bold;
+}
+
+html[transient-theme="Notebook"] .slide-content .image-footer {
+  display: block;
+  text-align: center;
+  font-size: .4em;
+  width: 100%;
+}
+
+html[transient-theme="Notebook"] .slide-content .fill {
+  width: 100%;
+  height: 100%;
+}
+
+html[transient-theme="Notebook"] .slide-content .fill-horizontal {
+  width: 100%;
+  height: auto;
+}
+
+html[transient-theme="Notebook"] .slide-content .fill-vertical {
+  width: auto;
+  height: 100%;
+}
+
+html[transient-theme="Notebook"] .slide-content .center-with-title {
+	position: absolute;
+  top: 60%;
+	left: 50%;
+	transform: translate3d(-50%, -50%, 0);
+  width: auto;
+  height: 70%;
+}
+
+html[transient-theme="Notebook"] .slide-content .center {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate3d(-50%, -50%, 0);
+}
+
+html[transient-theme="Notebook"] .slide-content .slide-title {
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, .75);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+html[transient-theme="Notebook"] .slide-content .slide-title.right {
+  display: inline-block;
+  left: 82%;
+/*  transform: translate3d(-100%, 0, 0);*/
+}
+
+html[transient-theme="Notebook"] .slide-content .slide-title-focus {
+  font-size: .6em;
+}
+
+html[transient-theme="Notebook"] .slide-content .full-publication {
+  position: absolute;
+  font-size: .6em;
+  top: 60%;
+  left: 50%;
+  width: 80%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+html[transient-theme="Notebook"] .slide-content .left-box,
+html[transient-theme="Notebook"] .slide-content .right-box {
+  width: 45%;
+  float: left;
+  position: absolute;
+  top: 50%;
+}
+
+html[transient-theme="Notebook"] .slide-content .left-box {
+  left: 25%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+html[transient-theme="Notebook"] .slide-content .right-box {
+  left: 75%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+html[transient-theme="Notebook"] .slide-content .topleft-box,
+html[transient-theme="Notebook"] .slide-content .topright-box,
+html[transient-theme="Notebook"] .slide-content .bottomleft-box,
+html[transient-theme="Notebook"] .slide-content .bottomright-box {
+  position: absolute;
+  width: 45%;
+}
+
+html[transient-theme="Notebook"] .slide-content .topleft-box .copyright,
+html[transient-theme="Notebook"] .slide-content .topright-box .copyright,
+html[transient-theme="Notebook"] .slide-content .bottomleft-box .copyright,
+html[transient-theme="Notebook"] .slide-content .bottomright-box .copyright {
+  margin-bottom: 25px;
+  max-width: 90%;
+}
+
+html[transient-theme="Notebook"] .slide-content .topleft-box {
+  top: 20px;
+  left: 60px;
+}
+
+html[transient-theme="Notebook"] .slide-content .topright-box {
+  top: 20px;
+  right: 60px;
+}
+
+html[transient-theme="Notebook"] .slide-content .bottomleft-box {
+  bottom: 5px;
+  left: 60px;
+}
+
+html[transient-theme="Notebook"] .slide-content .bottomright-box {
+  bottom: 5px;
+  right: 60px;
+}
+
+html[transient-theme="Notebook"] .slide-content .publication {
+	display: flex;
+	align-items: flex-end;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, .75);
+  border-radius: 2px;
+  font-size: .4em;
+  max-width: 50%;
+  z-index: 2;
+}
+
+html[transient-theme="Notebook"] .slide-content .publication .cover {
+	min-height: 100px;
+	min-width: 100px;
+	max-height: 150px;
+	background-size: contain;
+	margin-right: 10px;
+}
+
+html[transient-theme="Notebook"] .slide-content .copyright {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, .75);
+  border-radius: 2px;
+  font-size: .4em;
+  max-width: 50%;
+  z-index: 2;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="HevdeFh6" name="Output Style" orig-data-id="ftrWXYaM"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) {
+	background: var(--color-primary-shade-3);
+	border-radius: 2px;
+	border: 4px solid;
+	border-color: var(--color-primary);
+	box-shadow: none;
+	margin-bottom: 24px;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .paragraph-header {
+	z-index: 2;
+	position: absolute;
+	top: -46px;
+	box-shadow: var(--material-shadow-z4);
+	background: var(--color-primary-shade-1);
+}
+
+html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):not([transient-focussed]):not(:hover) .paragraph-header {
+	display: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):before,
+html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-left: 120px solid transparent;
+	border-right: 120px solid transparent;
+}
+
+html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):before {
+	transform: translate3d(-50%, -28px, 0);
+	border-top: 30px solid var(--color-accent);
+	z-index: 2;
+}
+
+html[transient-theme="Notebook"] .paragraph.output:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):after {
+    transform: translate3d(-50%, 0, 0);
+    border-top: 30px solid var(--color-primary);
+    z-index: 1;
+}
+
+/******************************************************************************/
+
+
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror,
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) [data-type="content"] {
+	padding: 24px;
+	border: none !important;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror {
+	background: none !important;
+}
+
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-activeline-background,
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-rulers,
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutters,
+html[transient-theme="Notebook"] .paragraph.output:not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutter-wrapper {
+	display: none;
+}</style></div><div class="paragraph style-paragraph collapsed" name="Hide Headers Style" data-id="FLbpQXqh" orig-data-id="hhQ5bTAE"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Notebook"] .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .paragraph-header,
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed) .paragraph-header {
+	z-index: 3;
+	position: absolute;
+	top: -40px;
+	box-shadow: var(--material-shadow-z4);
+	background: var(--color-primary-shade-1);
+}
+
+html[transient-theme="Notebook"] .paragraph.hide-header:not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):not([transient-focussed]):not(:hover) .paragraph-header,
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]):not([transient-focussed]):not(:hover) .paragraph-header {
+	display: none;
+}
+
+/******************************************************************************/
+
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed) :not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror {
+	padding: 15px;
+	margin: 0;
+	background: var(--color-primary-shade-3);
+	border: 4px solid var(--color-accent);
+	border-radius: 2px;
+}
+
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-activeline-background,
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-rulers,
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutters,
+html[transient-theme="Notebook"] .paragraph:not(.body-paragraph):not(.collapsed):not(.fullscreen):not([transient-fullscreen="true"]) .CodeMirror-gutter-wrapper {
+	display: none;
+}</style></div></div>
