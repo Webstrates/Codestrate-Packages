@@ -1,0 +1,75 @@
+<div class="section section-visible" data-id="WN87HJGR" name="Publish" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="VHrysbyw"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Publish contents of multiple paragraphs in one.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="NUTZuegE"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.1",
+	"icon": "call_merge",
+	"description": "Publish contents of multiple paragraphs in one.",
+	"tags": [
+		"utility",
+		"body paragraphs"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"1.1": "Updated icon.",
+		"1.0": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/WN87HJGR-Publish"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="Vqy8sRNV" name="Publish Code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const GlobalToolbarUtils = require("#global-toolbar-utils");
+const ParagraphUtils = require("#paragraph-utils");
+
+/******************************************************************************/
+
+GlobalToolbarUtils.addDivider();
+GlobalToolbarUtils.addButton("Publish", "", "publish-button", 1, () =&gt; {
+	const section = document.createElement("div");
+	section.classList.add("section", "section-visible");
+	section.setAttribute("name", "Publish Section");
+
+	const paragraph = ParagraphUtils.createBodyParagraph();
+	paragraph.setAttribute("name", "Publish Paragraph");
+
+	const content = paragraph.querySelector("[data-type='content']");
+	content.classList.add("publish", "writing");
+	content.setAttribute("contenteditable", "false");
+
+	const contents = Array.from(document.querySelectorAll(".section.section-visible:not(.collapsed) &gt; .body-paragraph:not(.collapsed) &gt; [data-type='content']:not(.publish)"));
+
+	if (!contents || contents.length === 0) {
+		alert("No visible body-paragraphs available!", "Publish");
+		return false;
+	}
+
+	for (let i = 0; i &lt; contents.length; i++) {
+		const currentContent = contents[i];
+		const currentParagraph = currentContent.parentNode;
+
+		const div = document.createElement("div");
+		div.setAttribute("publish-name", currentParagraph.getAttribute("name"));
+		div.setAttribute("publish-data-id", currentParagraph.getAttribute("data-id"));
+
+		if (currentContent.getAttribute("class")) div.setAttribute("class", currentContent.getAttribute("class"));
+		div.innerHTML = currentContent.innerHTML;
+
+		content.appendChild(div);
+	}
+
+	const sections = document.querySelector("#sections");
+	section.appendChild(paragraph);
+	sections.appendChild(section);
+
+	toast("Published paragraphs", 5000, () =&gt; {
+		section.remove();
+	}, "Undo");
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="xbGqyCRE" name="Publish Style"><style data-type="content" type="text/css" codemirror="true">html #global-toolbar .publish-button i:after {
+	content: var(--call-merge);
+	font-family: "Material Design Icons";
+}
+
+html .fullscreen:not([transient-fullscreen="true"]) .publish[data-type="content"] > div,
+html [transient-fullscreen="true"]:not(.fullscreen) .publish[data-type="content"] > div {
+	max-width: 960px;
+	margin: 0 auto;
+}</style></div></div>
