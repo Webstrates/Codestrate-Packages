@@ -1,0 +1,176 @@
+<div class="section section-visible" data-id="VK5AV5Yb" name="p5.js" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="AEkVuBRj"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>p5.js integration</h2><div>Adds integration of <a href="https://p5js.org/">p5.js</a>. A <code>p5sketch</code> function is added to the global scope.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="weSvyA4H"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "0.1.5",
+	"icon": "",
+	"description": "Adds integration of p5.js. A p5sketch function is added to the global scope.",
+	"tags": [
+		"function",
+		"code paragraph"
+	],
+	"assets": [
+		"p5.js"
+	],
+	"dependencies": [
+		{
+			"id": "qRcedryV",
+			"name": "Output"
+		}
+	],
+	"changelog":
+	{
+		"0.1.5": "Repeatedly outputting to a target no longer produces multiple sketch renders.",
+		"0.1.4": "Functions in the p5 sketch are dynamically extracted and added to the p5 object.",
+		"0.1.3": "The setup and draw functions of a sketch work without a p prefix.",
+		"0.1.2": "More minor bug fixes.",
+		"0.1.1": "Minor bug fixes.",
+		"0.1": "Initial version."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/VK5AV5Yb-p5.js"
+	}
+}</pre></div><div class="paragraph body-paragraph collapsed" data-id="92fwwRD8" name="Assets"><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><a href="p5.js" target="_blank" style="color: white;">p5.js</a></div></div><div class="paragraph code-paragraph collapsed" data-id="RzcrqF9w" name="p5.js integration code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">importLib(["p5.js"]).then(() =&gt; {
+
+  const re = /function\s*([a-zA-Z][a-zA-Z\d]*)\s*\(.*\)\s*\{/g;
+
+	// extract function names to add them to the p object
+  const extractFunctionNames = (code) =&gt; {
+    let names = [];
+
+    let matches;
+    while ((matches = re.exec(code)) !== null) {
+      names.push(matches[1]);
+    }
+    return names;
+  };
+
+  function renderSketch(codeId, view) {
+    let code = document.querySelector(codeId).innerText;
+
+		// the appendix is necessary for p5 to work with setup, draw, and other p5 functions
+    let funcNames = extractFunctionNames(code);
+    let appendix = funcNames.map((name) =&gt; {
+      return `if (typeof ${name} === 'function') {
+	p.${name} = ${name};
+}`;
+    }).join('\n\n');
+
+    code = `
+with (p) {
+  ${code}
+}
+
+${appendix}
+`;
+		
+    let p5function;
+    try {
+      p5function = new Function('p', code);
+    } catch (error) {
+      console.log("Got p5.js error", error);
+      return;
+    }
+    if (view._p5instance) {
+      view._p5instance.remove();
+			view._p5instance = null;
+    }
+    view.innerHTML = "";
+    view._p5instance = new p5(p5function, view);
+  }
+
+  function p5sketch(code, selector) {
+    if (typeof code !== "string" || code[0] !== "#") {
+      alert("The first parameter to p5 must be an id of a code paragraph");
+      return;
+    }
+    const p5Div = document.createElement("div");
+    // If a selector is given, use that element as an output
+    if (selector) {
+			const container = document.querySelector(selector);
+			const p5view = container.querySelector("transient");
+			if (p5view) {
+				p5view._p5instance.remove();
+				p5view._p5instance = null;
+			}
+			container.innerHTML = "";
+      container.appendChild(p5Div);
+    } else {
+      // Else just use output
+      let outputBound = output.bind(this);
+      outputBound(p5Div);
+    }
+    p5Div.classList.add("p5");
+    const codeId = code;
+    const codePre = document.createElement("pre");
+    // Store the id of the spec in a pre element
+    codePre.classList.add("p5code");
+    codePre.innerText = codeId;
+    p5Div.appendChild(codePre);
+  }
+
+  document.liveQuerySelectorAll(".p5").added((p5Div) =&gt; {
+    if (p5Div.querySelector("transient")) return;
+    const codeId = p5Div.querySelector(".p5code").innerText;
+    //const spec = require(specId);
+
+    const p5View = document.createElement("transient");
+    p5Div.appendChild(p5View);
+
+    renderSketch(codeId, p5View);
+
+    const codeNode = document.querySelector(codeId).firstChild;
+    // Listen for updates to the spec and re-render the vega plot
+    codeNode.webstrate.on("insertText*", function (position, value) {
+      renderSketch(codeId, p5View);
+    });
+
+    codeNode.webstrate.on("deleteText*", function (position, value) {
+      renderSketch(codeId, p5View);
+    });
+  });
+
+  const vm = Codestrate.VirtualMachines.get("text/javascript");
+
+  vm.addToGlobalContext({
+    p5sketch
+  });
+
+});</pre></div><div class="paragraph style-paragraph collapsed" data-id="EKCYk9KA" name="p5 style"><style data-type="content" type="text/css" codemirror="true">.p5 .p5code {
+	display: none;
+}
+
+.p5 canvas {
+	border: 2px solid black;
+}</style></div><div class="paragraph body-paragraph" data-id="yyva4rmU" name="Examples"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="writing"><h2>
+	Examples:
+</h2></div></div><div class="paragraph code-paragraph" data-id="gdWeaz44" name="My p5 sketch" last-execution-state=""><pre data-type="content" type="text/javascript" id="p5-example">function setup() {
+  createCanvas(640, 480);
+}
+
+function draw() {
+  if (mouseIsPressed) {
+    fill(0);
+  } else {
+    fill(255, 0, 0);
+  }
+  ellipse(mouseX, mouseY, 80, 80);
+}</pre></div><div class="paragraph code-paragraph" data-id="Rp8MNGFS" name="Render the sketch as output" last-execution-state="success"><pre data-type="content" type="text/javascript">p5sketch("#p5-example");</pre></div><div class="paragraph body-paragraph" data-id="PQNYNeHC" name="Render target"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" id="p5-example-target"></div></div><div class="paragraph code-paragraph" data-id="bRfHGDjz" name="Another p5 sketch" last-execution-state="success"><pre data-type="content" type="text/javascript" id="another-p5-example">var y = 100;
+
+// The statements in the setup() function 
+// execute once when the program begins
+function setup() {
+  createCanvas(720, 400);  // Size must be the first statement
+  stroke(255, 0, 0);     // Set line drawing color to white
+  frameRate(30);
+}
+// The statements in draw() are executed until the 
+// program is stopped. Each statement is executed in 
+// sequence and after the last line is read, the first 
+// line is executed again.
+function draw() { 
+  background(0);   // Set the background to black
+  y = y - 1; 
+  if (y &lt; 0) { 
+    y = height; 
+  } 
+  line(0, y, width, y);  
+}</pre></div><div class="paragraph code-paragraph" data-id="D2Y6CBzk" name="Render sketch to specific element" last-execution-state="success"><pre data-type="content" type="text/javascript">p5sketch("#another-p5-example", "#p5-example-target");</pre></div></div>
