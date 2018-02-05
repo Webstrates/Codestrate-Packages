@@ -1,0 +1,315 @@
+<div name="Shared Pointers" class="section section-visible" data-type="package" data-group="basic" data-id="mhzRF233" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="XUF62tu7"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to see mouse pointers of other people on a codestrate.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="xVmNyYKM"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.1",
+	"icon": "mouse",
+	"description": "Adds the functionality to see mouse pointers of other people on a codestrate.",
+	"tags": [
+		"collaboration"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"1.1": "Calculation with new margins fixed.",
+		"1.0": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/mhzRF233-Shared_Pointers"
+	}
+}</pre></div>
+
+<div class="paragraph code-paragraph collapsed" name="Shared Pointers Code" run-on-load="true" last-execution-state="success" data-id="KaMxKCbr"><pre data-type="content" type="text/javascript">const ClientManager = require('#client-manager');
+
+var clients = {};
+
+/**
+ * Returns an object with the position relative to the body and relative to a given
+ * paragraph. If the cursor is not on top of a paragraph the paraId will be null.
+ */
+const adjustCoords = (x, y) =&gt; {
+	const rect = document.body.getBoundingClientRect();
+	const elemAtPoint = document.elementFromPoint(window.innerWidth / 2, y - document.documentElement.scrollTop);
+	const paragraphAtCursor = elemAtPoint ? elemAtPoint.closest(".paragraph") : null;
+
+	let paraX = 0;
+	let paraY = 0;
+	let paraId = null;
+
+	if (paragraphAtCursor !== null) {
+		paraId = paragraphAtCursor.webstrate.id;
+		let paraRect = paragraphAtCursor.getBoundingClientRect();
+		paraX = x - paraRect.left;
+		paraY = y - paraRect.top - document.documentElement.scrollTop;
+	}
+
+	return {
+		paraId: paraId,
+		paraX: paraX,
+		paraY: paraY,
+		x: x,
+		y: y
+	};
+};
+
+document.addEventListener("mousedown", function (e) {
+	const pos = adjustCoords(e.pageX, e.pageY);
+	throttledSignal({
+		cmd: "click",
+		data: pos
+	});
+});
+
+document.addEventListener("touchstart", function (e) {
+	if (e.touches.length &gt; 0) {
+		const touch = e.touches[0];
+		const pos = adjustCoords(touch.pageX, touch.pageY);
+		throttledSignal({
+			cmd: "click",
+			data: pos
+		});
+	}
+});
+
+document.addEventListener("mousemove", function (e) {
+	const pos = adjustCoords(e.pageX, e.pageY);
+	throttledSignal({
+		cmd: "pos",
+		data: pos
+	});
+});
+
+document.addEventListener("touchmove", function (e) {
+	if (e.touches.length &gt; 0) {
+		const touch = e.touches[0];
+		const pos = adjustCoords(touch.pageX, touch.pageY);
+		throttledSignal({
+			cmd: "pos",
+			data: pos
+		});
+	}
+});
+
+document.body.webstrate.on("signal", function (msg, clientId) {
+	if (clientId == window.webstrate.clientId) return;
+	if (msg.cmd === undefined) return;
+	else if (msg.cmd === "pos") {
+
+		if (clients[clientId] === undefined) return;
+		clients[clientId].classList.remove("hidden");
+
+		const remoteCursorPostion = getRemoteCursorPostion(msg);
+
+		clients[clientId].style.left = remoteCursorPostion.x + "px";
+		clients[clientId].style.top = remoteCursorPostion.y + "px";
+
+		// Hide cursor after five seconds of inactivity
+		if (clients[clientId].__timeout) clearTimeout(clients[clientId].__timeout);
+		clients[clientId].__timeout = setTimeout(function () {
+			if (!clients[clientId]) return;
+			clients[clientId].classList.add("hidden");
+		}, 5000);
+
+	} else if (msg.cmd === "click") {
+		clicked(msg, clientId);
+	}
+});
+
+webstrate.on("signal", (message, senderId) =&gt; {
+	if (message.type === "IdleTimer") {
+
+		if (message.cmd === "awake") {
+			clientJoin(senderId);
+		} else if (message.cmd === "idle") {
+			clientPart(senderId);
+		}
+	}
+});
+
+webstrate.on("clientJoin", function (clientId) {
+	clientJoin(clientId);
+});
+
+webstrate.on("clientPart", function (clientId) {
+	clientPart(clientId);
+});
+
+function clientJoin(clientId) {
+	// Ignore own cursor
+	if (clientId === webstrate.clientId) return;
+
+	clients[clientId] = createCursor(clientId);
+}
+
+function clientPart(clientId) {
+	if (!clients.hasOwnProperty(clientId)) return;
+	clients[clientId].parentElement.removeChild(clients[clientId]);
+	delete clients[clientId];
+}
+
+function createCursor(clientId) {
+	let client = ClientManager.getClient(clientId);
+
+	var cursor = document.createElement("transient");
+	cursor.classList.add("remote-cursor");
+	cursor.setAttribute("client-id", clientId);
+	cursor.setAttribute("username", client.username);
+	cursor.style.borderColor = client.color;
+	document.body.appendChild(cursor);
+	// console.log(cursor);
+	return cursor;
+}
+
+Codestrate.on("clientUpdateProperty", ({ property, client }) =&gt; {
+	let cursor = document.querySelector(`.remote-cursor[client-id="${client.id}"]`);
+	if (cursor) {
+		cursor.setAttribute("username", client.username);
+		cursor.style.borderColor = client.color;
+	}
+});
+
+function clicked(msg, clientId) {
+
+	//const rect = document.body.getBoundingClientRect();
+	//const x = msg.data.x;// + rect.left;
+	//const y = msg.data.y; // + rect.top;
+
+	const remoteCursorPostion = getRemoteCursorPostion(msg);
+
+	const click = document.createElement("transient");
+	click.classList.add("remote-click");
+	click.style.left = remoteCursorPostion.x + "px";
+	click.style.top = remoteCursorPostion.y + "px";
+	click.style.borderColor = clients[clientId].style.borderColor;
+	click.addEventListener("transitionend", function (event) {
+		if (event.propertyName === "transform") {
+			click.remove();
+		}
+	});
+	document.body.appendChild(click);
+
+	// Add animation with timeout to make it actually animate
+	setTimeout(() =&gt; {
+		click.classList.add("animate");
+	}, 10);
+
+	setTimeout(() =&gt; {
+		click.remove();
+	}, 200);
+}
+
+function getRemoteCursorPostion(msg) {
+	let x = msg.data.x;
+	let y = msg.data.y;
+	if (msg.paraId !== null) {
+		let paragraphs = document.querySelectorAll(".paragraph");
+		let paragraph = null;
+		for (var i = 0; i &lt; paragraphs.length; i++) {
+			if (paragraphs[i].webstrate.id === msg.data.paraId) {
+				paragraph = paragraphs[i];
+				break;
+			}
+		}
+
+		if (paragraph !== null) {
+			let paraRect = paragraph.getBoundingClientRect();
+			let bodyRect = document.body.getBoundingClientRect();
+			x = msg.data.paraX + paraRect.left - bodyRect.left + 
+				parseInt(document.defaultView.getComputedStyle(document.body).marginLeft);
+			y = msg.data.paraY + paraRect.top - bodyRect.top +
+				parseInt(document.defaultView.getComputedStyle(document.body).marginTop);
+		}
+	}
+
+	return {
+		x: x,
+		y: y
+	};
+}
+
+var count = 0;
+
+function signal(msg, clientId) {
+	if (clientId) document.body.webstrate.signal(msg, clientId);
+	else document.body.webstrate.signal(msg);
+}
+
+const throttledSignal = throttleFn(signal, 100);
+
+function throttleFn(fn, limit) {
+	var timeout;
+	var lastCall = 0;
+	return function (...args) {
+		var now = Date.now();
+		var delay = lastCall + limit - now;
+		if (delay &lt;= 0) {
+			fn(...args);
+			lastCall = now;
+		} else {
+			clearTimeout(timeout);
+			timeout = setTimeout(function () {
+				fn(...args);
+				lastCall = now;
+			}, delay);
+		}
+	};
+}
+
+/*
+for (var i = 0; i&lt;webstrate.clients.length; i++) {
+  if (webstrate.clients[i] == webstrate.clientId) continue;
+  clientJoin(webstrate.clients[i]); 
+}*/
+webstrate.clients.forEach(clientJoin);</pre></div><div class="paragraph style-paragraph collapsed" name="Shared Pointers Style" data-id="GfyCc8Cd"><style data-type="content" type="text/css" codemirror="true" class="themable">html .remote-cursor {
+	position: absolute;
+
+	/* Set the cursor offscreen initially. If top is not set then cursor
+	will be appended like regular position: initial */
+	top: -100px;
+
+	z-index: 999;
+	width: 12px;
+	height: 12px;
+	background-color: transparent;
+	border-left: 4px solid;
+	border-top: 4px solid;
+	box-sizing: border-box;
+	pointer-events: none;
+	/* transition: top 1ms, left 1ms; */
+	/* transform: translate3d(20px, -0px, 0); */
+	transition: all 0.05s ease 0s;
+	opacity: 1;
+	transition: opacity 150ms ease-in;
+}
+
+html .remote-cursor:after {
+	content: attr(username);
+	position: absolute;
+	transform: translate3d(5px, 0px, 0);
+	font-size: .6em;
+}
+
+html .remote-cursor.hidden {
+	opacity: 0;	
+}
+
+html .remote-click {
+	position: absolute;
+	z-index: 998;
+	width: 50px;
+	height: 50px;
+	/* background-color: orange; */
+	transform: translate3d(-25px, -25px, 0) scale(0);
+	transition: transform 150ms ease-in-out, opacity 150ms ease-in;
+	border-radius: 50%;
+	border: 4px solid orange;
+	pointer-events: none;
+	filter: blur(2px);
+	opacity: 1.0;
+}
+
+html .remote-click.animate {
+	/* width: 50px;
+	height: 50px; */
+	transform: translate3d(-25px, -25px, 0) scale(1.0);
+	opacity: 0;
+}</style></div></div>
