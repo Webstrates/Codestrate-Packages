@@ -1,0 +1,138 @@
+<div class="section section-visible" name="Messages" data-type="package" data-group="basic" data-id="E9RsGgmZ" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" draggable="false" name="Documentation" data-id="yE2MbEaa"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to display Webstrates of a user in Codestrates.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="AZu6s64W"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "0.2",
+	"icon": "message",
+	"description": "Adds the functionality to display Webstrates of a user in Codestrates.",
+	"tags": [
+		"experimental",
+		"devtools"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"0.2": "Fixed entry in global menu.",
+		"0.1": "Initital Release"
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/E9RsGgmZ-Messages"
+	}
+}</pre></div>
+
+<div class="paragraph body-paragraph locked" draggable="false" style="" data-id="XF6byGcD" name="Messages Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="false"><template id="messages-template">
+	<transient class="messages">
+		<div class="close">
+			<i class="material-icons">clear</i>
+		</div>
+	</transient>
+</template></div></div><div class="paragraph body-paragraph locked" draggable="false" style="" name="Message Template" data-id="zd7rzAy5"><div data-type="content" type="text/html" codemirror="true" contenteditable="false"><template id="message-template">
+	<div class="message">
+		<pre class="content">Content</pre>
+		<div class="delete">
+			<i class="material-icons">delete</i>
+		</div>
+	</div>
+</template></div></div><div class="paragraph code-paragraph collapsed" draggable="false" style="" name="Message Viewer" run-on-load="true" last-execution-state="success" data-id="N4hU8h6A"><pre data-type="content" type="text/javascript">const GlobalMenuUtils = require('#global-menu-utils');
+
+GlobalMenuUtils.addButton("Show Messages", false, (event) =&gt; {
+
+	// Get messages template
+	let template = document.querySelector('#messages-template');
+	let fragment = document.importNode(template.content, true);
+	let messages = fragment.firstElementChild;
+
+	// Get message template
+	let messageTemplate = document.querySelector("#message-template");
+
+	// Add message to message view
+	const addMessage = (msg) =&gt; {
+
+		// Create a clone from message template, and set message subject and message body
+		let messageFragment = document.importNode(messageTemplate.content, true);
+		let message = messageFragment.querySelector('.message');
+
+		message.setAttribute("message-id", msg.messageId);
+		message.querySelector('.content').innerHTML = JSON.stringify(msg, null, 2);
+		message.querySelector('.delete').addEventListener("click", (event) =&gt; {
+			webstrate.deleteMessage(msg.messageId);
+			message.remove();
+		});
+
+		messages.appendChild(message);
+	};
+
+	// Delete message from messages view
+	const deleteMessage = (messageId) =&gt; {
+		let message = messages.querySelector(`[message-id="${messageId}"]`);
+		if (message) {
+			message.remove();
+		}
+	};
+
+	function onMessageReceived(message, senderId, messageId) {
+		addMessage(message);
+	}
+
+	function onMessageDeleted(messageId) {
+		deleteMessage(messageId);
+	}
+
+	// Add existing messages, and add listeners to new messages or when messages were
+	// deleted on another client
+	webstrate.messages.forEach(addMessage);
+	webstrate.on("messageReceived", onMessageReceived);
+	webstrate.on("messageDeleted", onMessageDeleted);
+
+	// Add listener when
+	document.addEventListener("click", function closeMessage(event) {
+
+		if (!event.target.closest('.messages')) {
+			document.removeEventListener("click", closeMessage, true);
+			webstrate.off("messageReceived", onMessageReceived);
+			webstrate.off("messageDeleted", onMessageDeleted);
+			messages.remove();
+		}
+	}, true);
+
+	document.body.appendChild(messages);
+});
+
+GlobalMenuUtils.addDivider();</pre></div><div class="paragraph style-paragraph collapsed" style="" name="Message Style" data-id="6iAb2HCQ"><style data-type="content" type="text/css" codemirror="true">.messages {
+	/* pointer-events: none; */
+	position: fixed;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: calc(100vw - 100px);
+	height: calc(100vh - 100px);
+	margin: 50px;
+	padding: 10px;
+	overflow: auto;
+	border-radius: 2px;
+
+	color: black;
+	background-color: whitesmoke;
+	z-index: 300;
+	box-shadow: var(--material-shadow-z24);
+}
+
+.messages:empty:after {
+	content: "No messages";
+}
+
+.messages .message {
+	position: relative;
+	padding: 10px;
+}
+
+.messages .message .delete {
+	user-select: none;
+	cursor: pointer;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	color: darkred;
+	display: inline-block;
+}</style></div></div>
