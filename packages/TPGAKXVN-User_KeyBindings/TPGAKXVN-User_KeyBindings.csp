@@ -1,0 +1,126 @@
+<div class="section section-visible" data-id="TPGAKXVN" name="User KeyBindings" data-type="package"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="ym3gJGjR"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div class="info"><b>Note</b>: This package requires users to be logged into the Webstrates server using for example GitHub.</div><div>This package allows to define user specific keybindings. It is possible to bind new keybindings and unbind existing bindings. The bindings are stored within the Webstrates Anywhere Cookies (<a href="https://webstrates.github.io/userguide/api/cookies.html" target="_blank">more information</a>). There it is <b>required </b>to be logged in using for example GitHub.</div><h3>Editing User Keybindings</h3><div>In order to modify user keybindings, one has to create a data paragraph and content in the structure as seen in the example. When finished the keybindings can be saved into the Webstrates cookie using the "Save from Paragraph" menu entry. The "Load into Paragraph" in return loads existing user keybindings from the Webstrates cookie into a data paragraph.</div><div>After saving keybindings the codestrate needs to be reloaded in order to apply them.</div><h3>Examples</h3><div>The following code shows an example of user keybindings in a data paragraph:</div><pre><code>{
+  "bind": [
+    {
+      "id": "codestrates.toggleMenu",
+      "key": "mod+m",
+      "preventDefault": true
+    }
+  ],
+  "unbind": [
+    {
+      "id": "codestrates.fullscreen",
+      "key": "ctrl+shift+f"
+    }
+  ]
+}</code></pre>
+<div>The above code performs the following changes:</div>
+<ul>
+	<li>It binds <kbd>mod</kbd>+<kbd>m</kbd> to toggle the menu.</li>
+	<li>It unbinds <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>f</kbd> to no longer toggle fullscreen.</li>
+</ul></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="XPSn79ye"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0.2",
+	"icon": "keyboard",
+	"description": "Utility to overwrite keybindings with user defined bindings.",
+	"tags": [
+		"devtools"
+	],
+	"assets": [],
+	"dependencies": [],
+	"changelog":
+	{
+		"1.0": "Initial version.",
+		"1.0.1": "Added check if codestrate has already loaded to trigger initialize user key bindings, which is important if the package is installed after the window.addEventListener(\"codestrateloaded\", () =&gt; {}) event was triggered.",
+		"1.0.2": "Using the new codestrate event loaded to initialize user key binding functionality."
+	},
+	"github": {
+		"url": "https://github.com/Webstrates/Codestrate-Packages",
+		"folder": "packages/TPGAKXVN-User_KeyBindings"
+	}
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="czB3DRtw" name="User KeyBindings Code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const GlobalMenuUtils = require("#global-menu-utils");
+
+/******************************************************************************/
+
+const userKeyBindingsKey = "user-keybindings";
+const dialogTitle = "User KeyBindings";
+
+/******************************************************************************/
+
+const getUserKeyBindings = () =&gt; {
+  if (!webstrate.user.cookies) {
+    alert("No user cookies available!", dialogTitle);
+    return false;
+  } else {
+    return webstrate.user.cookies.anywhere.get(userKeyBindingsKey);
+  }
+};
+
+const setUserKeyBindings = (userKeyBindings) =&gt; {
+  if (!webstrate.user.cookies) {
+    alert("No user cookies available!", dialogTitle);
+    return false;
+  } else {
+    return webstrate.user.cookies.anywhere.set(userKeyBindingsKey, userKeyBindings);
+  }
+};
+
+/******************************************************************************/
+
+const initializeUserKeyBindings = () =&gt; {
+  const userKeyBindings = getUserKeyBindings();
+  if (userKeyBindings) {
+    if (userKeyBindings.bind) {
+      userKeyBindings.bind.forEach(binding =&gt; {
+        Codestrate.addKeyBinding(binding.id, binding.key, binding.preventDefault);
+      });
+    }
+    if (userKeyBindings.unbind) {
+      userKeyBindings.unbind.forEach(binding =&gt; {
+        Codestrate.removeKeyBinding(binding.id, binding.key);
+      });
+    }
+  } else {
+    console.log("Couldn't load user keybindings.");
+  }
+};
+
+Codestrate.addEventListener("loaded", initializeUserKeyBindings);
+
+/******************************************************************************/
+
+Codestrate.addCommand("userKeyBindings.saveFromParagraph", "Save User KeyBindings from Paragraph", () =&gt; {
+  if (Codestrate.focussedParagraph &amp;&amp; Codestrate.focussedParagraph.classList.contains("data-paragraph")) {
+    const oldKeyBindings = getUserKeyBindings();
+
+    setUserKeyBindings(JSON.parse(Codestrate.focussedParagraph.querySelector("[data-type='content']").innerHTML));
+
+    toast("Saved User Keybindings", 5000, () =&gt; {
+      setUserKeyBindings(oldKeyBindings);
+    }, "Undo");
+  } else {
+    alert("Select a data paragraph to save user keybindings from.", dialogTitle);
+    return false;
+  }
+});
+
+Codestrate.addCommand("userKeyBindings.loadIntoParagraph", "Load User KeyBindings into Paragraph", () =&gt; {
+  if (Codestrate.focussedParagraph &amp;&amp; Codestrate.focussedParagraph.classList.contains("data-paragraph")) {
+    const content = Codestrate.focussedParagraph.querySelector("[data-type='content']");
+    const textNode = content.firstChild;
+    const oldContent = textNode.textContent;
+
+    textNode.textContent = JSON.stringify(getUserKeyBindings(), null, 2);
+    content.__editor.editor.refresh();
+
+    toast("Loaded User Keybindings", 5000, () =&gt; {
+      textNode.textContent = oldContent;
+    }, "Undo");
+  } else {
+    alert("Select a data paragraph to load user keybindings into.", dialogTitle);
+    return false;
+  }
+});
+
+/******************************************************************************/
+
+GlobalMenuUtils.addButtonToSubMenu("Save from Paragraph", false, () =&gt; Codestrate.executeCommand("userKeyBindings.saveFromParagraph"), dialogTitle);
+GlobalMenuUtils.addButtonToSubMenu("Load into Paragraph", false, () =&gt; Codestrate.executeCommand("userKeyBindings.loadIntoParagraph"), dialogTitle);</pre></div></div>
