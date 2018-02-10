@@ -1,16 +1,16 @@
-<div class="section section-visible" data-id="73QaAetS" name="Goto Paragraph" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="LVsc7BNx" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds a search to the toolbar, which enables to search and scroll to paragraphs by their ID or name.</div><h3>Search Options</h3><div>There are three search modes:</div><div><ul><li><b>Name</b>: Searches for a name of a paragraph.</li><li><b>ID</b>: Use the prefix <code>id:</code> to search for the ID of a paragraph.</li><li><b>Paragraph-ID</b>: Use the prefix <code>data-id:</code> to search for the <code>data-id</code> attribute of a paragraph.</li></ul></div><h3>Shortcut</h3><div>The shortcut to focus the search is <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd> on Windows and <kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd> on macOS.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="xtYuvXdc" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.0.3",
+<div class="section section-visible" data-id="73QaAetS" name="Goto Paragraph" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="LVsc7BNx" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds a paragraph palette to the codestrate, which enables to search and scroll to paragraphs by their ID or name.</div><h3>Search Options</h3><div>There are three search modes:</div><div><ul><li><b>Name</b>: Searches for a name of a paragraph.</li><li><b>ID</b>: Use the prefix <code>id:</code> to search for the ID of a paragraph.</li><li><b>Paragraph-ID</b>: Use the prefix <code>data-id:</code> to search for the <code>data-id</code> attribute of a paragraph.</li></ul></div><h3>Shortcut</h3><div>The shortcut to focus the search is <kbd>Ctrl</kbd>+<kbd>P</kbd> on Windows and <kbd>Cmd</kbd>+<kbd>P</kbd> on macOS.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="xtYuvXdc" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "2.0.1",
 	"icon": "search",
-	"description": "Adds a paragraph search to the toolbar.",
+	"description": "Adds a paragraph palette to the codestrate.",
 	"tags": [
 		"devtools"
 	],
 	"dependencies": [],
-	"assets": [
-		"awesomplete.js"
-	],
+	"assets": [],
 	"changelog":
 	{
+		"2.0.1": "Small fix for empty searches.",
+		"2.0": "Converted to palette and used Commands API.",
 		"1.0.3": "Updated to use cmd key on macOS.",
 		"1.0.2": "Tag added.",
 		"1.0.1": "Style only on toolbar active.",
@@ -20,29 +20,25 @@
 		"url": "https://github.com/Webstrates/Codestrate-Packages",
 		"folder": "packages/73QaAetS-Goto_Paragraph"
 	}
-}</pre></div><div class="paragraph code-paragraph collapsed" data-id="P2uGR6Mk" run-on-load="true" name="Goto Paragraph Code" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">const GlobalToolbarUtils = require("#global-toolbar-utils");
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="gRzxdfcE" name="Goto Paragraph Code" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript">const PaletteUtils = require("#palette-utils");
 
 /******************************************************************************/
 
-GlobalToolbarUtils.addSearch("", "paragraph-search", "Goto Paragraph", 0, (searchInput) =&gt; {
-	search(searchInput.value);
-});
+const getLabel = (sec, par) =&gt; `${sec} &gt; ${par}`;
 
-/******************************************************************************/
+const getListElement = (section, paragraph) =&gt; {
+	return {
+		label: getLabel(section.getAttribute("name"), paragraph.getAttribute("name")),
+		value: `data-id:${paragraph.getAttribute("data-id")}`
+	};
+};
 
-const searchInput = document.querySelector("input.toolbar-search-input");
-
-/******************************************************************************/
-
-const search = (text) =&gt; {
+const action = (text) =&gt; {
 	let paragraph;
 	let content;
 
-	if (!text) {
-		alert("Enter a paragraph name or ID.", "Empty Search");
-		searchInput.blur();
+	if (text === "") {
 		return;
-
 	} else if (text.startsWith("data-id:")) {
 		const dataId = text.substring(8);
 		paragraph = document.querySelector(`.paragraph[data-id="${dataId}"]`);
@@ -60,7 +56,6 @@ const search = (text) =&gt; {
 
 	if (!paragraph || !content) {
 		alert(`The paragraph "${text}" wasn't found.`, "Paragraph Not Found");
-		searchInput.blur();
 	} else {
 		const section = paragraph.closest(".section");
 
@@ -72,9 +67,6 @@ const search = (text) =&gt; {
 
 		paragraph.classList.remove("collapsed");
 
-		searchInput.value = "";
-		searchInput.blur();
-
 		Codestrate.simulateClick(paragraph);
 
 		setTimeout(false, 0);
@@ -85,142 +77,31 @@ const search = (text) =&gt; {
 
 /******************************************************************************/
 
-importLib([
-	"mousetrap.min.js",
-	"mousetrap-global-bind.min.js"
-]).then(() =&gt; {
-	Mousetrap.bindGlobal("mod+alt+p", (event) =&gt; {
-		if (searchInput) searchInput.select();
-		return false;
-	});
-});
+const gotoParagraphPalette = PaletteUtils.addPalette(
+	"goto-paragraph-palette", "label", "Paragraph",
+	action, [],
+	"gotoParagraph.togglePalette", "Goto Paragraph", "Opens the goto paragraph palette.",
+	"mod+p", true);
 
 /******************************************************************************/
 
-importLib([
-	"awesomplete.js"
-]).then(() =&gt; {
-	if (searchInput) {
-		const myAwesomeplete = new Awesomplete(searchInput, {
-			autoFirst: true,
-			maxItems: 100
-		});
+document.liveQuerySelectorAll(".paragraph").added((paragraph) =&gt; {
+	const section = paragraph.closest(".section");
 
-		searchInput.addEventListener("awesomplete-selectcomplete", (event) =&gt; {
-			search(event.text.value);
-		});
+	const listElement = getListElement(section, paragraph);
 
-		const list = [];
+	gotoParagraphPalette.__addListElement(listElement);
 
-		const getLabel = (sec, par) =&gt; `${sec} &gt; ${par}`;
+	section.liveAttribute("name").changed((value, oldValue) =&gt; {
+		listElement.label = getLabel(value, paragraph.getAttribute("name"));
+	});
 
-		document.liveQuerySelectorAll(".paragraph").added((paragraph) =&gt; {
-			const section = paragraph.closest(".section");
+	paragraph.liveAttribute("name").changed((value, oldValue) =&gt; {
+		listElement.label = getLabel(section.getAttribute("name"), value);
+	});
+});
 
-			const listElement = {
-				label: getLabel(section.getAttribute("name"), paragraph.getAttribute("name")),
-				value: `data-id:${paragraph.getAttribute("data-id")}`
-			};
-
-			list.push(listElement);
-			myAwesomeplete.list = list;
-
-			section.liveAttribute("name").changed((value, oldValue) =&gt; {
-				listElement.label = getLabel(value, paragraph.getAttribute("name"));
-			});
-
-			paragraph.liveAttribute("name").changed((value, oldValue) =&gt; {
-				listElement.label = getLabel(section.getAttribute("name"), value);
-			});
-		});
-
-		document.liveQuerySelectorAll(".paragraph").removed((paragraph) =&gt; {
-			const listElement = list.find(el =&gt; el.value === `data-id:${paragraph.getAttribute("data-id")}`);
-			if (listElement) {
-				const index = list.indexOf(listElement);
-				list.splice(index, 1);
-				myAwesomeplete.list = list;
-			} 
-		});
-	}
-});</pre></div><div class="paragraph style-paragraph collapsed" data-id="bcCnFNzQ" name="Goto Paragraph Style" draggable="false" style=""><style data-type="content" type="text/css" codemirror="true" contenteditable="true" class="themable">html #global-toolbar .awesomplete [hidden] {
-	display: none;
-}
-
-html #global-toolbar .awesomplete .visually-hidden {
-	position: absolute;
-	clip: rect(0, 0, 0, 0);
-}
-
-html #global-toolbar .awesomplete {
-	display: inline-block;
-	position: relative;
-	display: flex;
-	flex: 0 1 100%;
-}
-
-html #global-toolbar .awesomplete > input {
-	display: block;
-}
-
-html #global-toolbar .awesomplete > ul {
-	position: absolute;
-	left: 0;
-	top: 44px;
-	color: var(--material-color-black);
-	z-index: 1;
-	min-width: 100%;
-	box-sizing: border-box;
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	background: var(--material-color-white);
-	max-height: 33vh;
-	overflow-y: auto;
-}
-
-html #global-toolbar .awesomplete > ul:empty {
-	display: none;
-}
-
-html #global-toolbar .awesomplete > ul {
-	border-radius: 2px;
-	background: var(--material-color-white);
-	box-shadow: var(--material-shadow-z4);
-}
-
-html #global-toolbar .awesomplete > ul {
-	transition: 0.3s cubic-bezier(0.4, 0.2, 0.5, 1.4);
-	transform-origin: 1.43em -.43em;
-}
-
-html #global-toolbar .awesomplete > ul[hidden],
-html #global-toolbar .awesomplete > ul:empty {
-	opacity: 0;
-	transform: scale(0);
-	display: block;
-	transition-timing-function: ease;
-}
-
-html #global-toolbar .awesomplete > ul > li {
-	position: relative;
-	padding: 8px;
-	cursor: pointer;
-}
-
-html #global-toolbar .awesomplete > ul > li:hover {
-	background: rgba(var(--color-accent-rgb), 0.25);
-}
-
-html #global-toolbar .awesomplete mark {
-	background: rgba(var(--color-accent-rgb), 0.5);
-}
-
-html #global-toolbar .awesomplete > ul > li[aria-selected="true"] {
-	background: rgba(var(--color-accent-rgb), 0.5);
-}
-
-html #global-toolbar .awesomplete li[aria-selected="true"] mark {
-	background: rgba(var(--color-accent-rgb), 1);
-	color: var(--color-accent-text);
-}</style></div></div>
+document.liveQuerySelectorAll(".paragraph").removed((paragraph) =&gt; {
+	const listElement = gotoParagraphPalette.__getList().find(el =&gt; el.value === `data-id:${paragraph.getAttribute("data-id")}`);
+	gotoParagraphPalette.__removeListElement(listElement);
+});</pre></div></div>
