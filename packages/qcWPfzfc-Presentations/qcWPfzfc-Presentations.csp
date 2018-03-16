@@ -1,4 +1,4 @@
-<div class="section section-visible" data-id="qcWPfzfc" data-type="package" name="Presentations" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="M4fRaLu8" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>This package makes it possible to create slides and presentations in Codestrates.</div><h2>Slides</h2><h4>Adding Slides</h4><div>Slides can be added to the Codestrate by using the "Add Slide" button in the global toolbar.</div><h4>Converting to Slides</h4><div>Body paragraphs can be converted to a slide (and vice versa). This is done by selecting a body-paragraph and then using the "Toggle Slide" button in the snackbar.</div><h4>Aspect Ratio of Slides</h4><div>Slides by default have an aspect ratio of 16:9. The aspect ratio can be changed by adding a <code>aspect-x-y</code> class to a slide paragraph. The following aspect ratios are supported: <code>aspect-4-3</code>, <code>aspect-16-10</code> and <code>aspect-1-1</code>.</div><h2>Presentations</h2><h4>Start Presentation from Start</h4><div>A presentation can be started from the first slide on by using the "Start Presentation" button in the global toolbar. A presentation can also be started from the start by pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>F5</kbd> while no slide is selected.</div><h4>Start Presentation from a Specific Slide</h4><div>A presentation can also be started from a specific slide. This is done by selecting the slide and pressing the "Start Presentation" button in the snackbar. A presentation can also be started from a specific slide by pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>F5</kbd> while the slide is selected.</div><h4>Exit a Presentation</h4><div>To exit a presentation press <kbd>Esc</kbd> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>F5</kbd> during a presentation.</div><h3>Navigating Slides</h3><div>To go to the next or previous slides use the <kbd>&lt;-</kbd> and <kbd>-&gt;</kbd> arrow keys or <kbd>Page Up</kbd> and <kbd>Page Down</kbd>.</div><h3>Slide Notes</h3><div>To toggle slide notes during press <kbd>Ctrl</kbd>+<kbd>K</kbd> during a presentation.</div><h2>Heavy Content</h2><div>In the context of this package, heavy content means iframes or scripts or videos, which should be executed lazy, i.e. when the slide comes up or shortly before and be again removed afterwards. To facilitate these kind of loading this package provides slide scripts and <code>&lt;slide-content&gt;</code> elements to do so.</div><h3>Slide Scripts</h3><div>A slide script is a script, which has the same ID as a slide paragraph followed by <code>-script</code> and provides three functions for three slide states. A newly created script looks as follows:</div><pre><code>// Called on slide preload
+<div class="section section-visible" data-id="qcWPfzfc" data-type="package" name="Presentations"><div class="paragraph body-paragraph locked collapsed" data-id="M4fRaLu8" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>This package makes it possible to create slides and presentations in Codestrates.</div><h2>Slides</h2><h4>Adding Slides</h4><div>Slides can be added to the Codestrate by using the "Add Slide" button in the global toolbar.</div><h4>Converting to Slides</h4><div>Body paragraphs can be converted to a slide (and vice versa). This is done by selecting a body-paragraph and then using the "Toggle Slide" button in the snackbar.</div><h4>Aspect Ratio of Slides</h4><div>Slides by default have an aspect ratio of 16:9. The aspect ratio can be changed by adding a <code>aspect-x-y</code> class to a slide paragraph. The following aspect ratios are supported: <code>aspect-4-3</code>, <code>aspect-16-10</code> and <code>aspect-1-1</code>.</div><h2>Presentations</h2><h4>Start Presentation from Start</h4><div>A presentation can be started from the first slide on by using the "Start Presentation" button in the global toolbar. A presentation can also be started from the start by pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>F5</kbd> while no slide is selected.</div><h4>Start Presentation from a Specific Slide</h4><div>A presentation can also be started from a specific slide. This is done by selecting the slide and pressing the "Start Presentation" button in the snackbar. A presentation can also be started from a specific slide by pressing <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>F5</kbd> while the slide is selected.</div><h4>Exit a Presentation</h4><div>To exit a presentation press <kbd>Esc</kbd> or <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>F5</kbd> during a presentation.</div><h3>Navigating Slides</h3><div>To go to the next or previous slides use the <kbd>&lt;-</kbd> and <kbd>-&gt;</kbd> arrow keys or <kbd>Page Up</kbd> and <kbd>Page Down</kbd>.</div><h3>Slide Notes</h3><div>To toggle slide notes during press <kbd>Ctrl</kbd>+<kbd>K</kbd> during a presentation.</div><h2>Heavy Content</h2><div>In the context of this package, heavy content means iframes or scripts or videos, which should be executed lazy, i.e. when the slide comes up or shortly before and be again removed afterwards. To facilitate these kind of loading this package provides slide scripts and <code>&lt;slide-content&gt;</code> elements to do so.</div><h3>Slide Scripts</h3><div>A slide script is a script, which has the same ID as a slide paragraph followed by <code>-script</code> and provides three functions for three slide states. A newly created script looks as follows:</div><pre><code>// Called on slide preload
 exports.preload = (paragraph, slide) =&gt; {
   // Your code...
 };
@@ -17,79 +17,87 @@ exports.exit = (paragraph, slide) =&gt; {
   &lt;template event="enter"&gt;&lt;/template&gt;
   &lt;template event="exit"&gt;&lt;/template&gt;
   &lt;render-to&gt;&lt;/render-to&gt;
-&lt;/slide-content&gt;</code></pre><div>This element will render the contents of the <code>&lt;template&gt;</code> elements into the <code>&lt;render-to&gt;</code> element on the same slide states as described in slide scripts.</div><h2>Transient Presentation (experimental)</h2><div>When starting a presentation it is started persistent, i.e. on every client. When one wants to preview a presentation or leave a presentation just on the local client, one can add the <kbd>Alt</kbd> key to the shortcuts from above (e.g. <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd>) in order to do that. An orange border indicates, that the presentation is started (or left) just on the local client.</div><div><b>Warning</b>: This is an experimental function, so some things like presentation scripts or <code>&lt;slide-content&gt;</code> are not loading.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="zntLciQX"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.0.19",
-	"icon": "tv",
-	"description": "Makes it possible to create slides and presentations.",
-	"tags": [
-		"tools",
-		"body paragraphs"
-	],
-	"assets": [
-		"presentation_pointer.png"
-	],
-	"dependencies": [
-		{
-			"id": "jFx9fAE8",
-			"name": "Text Tools",
-			"optional": true,
-			"usage": "Text tools provides valuable text formatting capabilities for slides."
-		}
-	],
-	"changelog": {
-		"1.0.19": "Added text tools as optional dependency.",
-		"1.0.18": "Fixed issue with table header (thead) rendering multiple times within table body when printing presentation slides.",
-		"1.0.17": "New indicator for transient hidden presentation.",
-		"1.0.16": "Extended basic style.",
-		"1.0.15": "Pull classes from content into slide-content and convert slide back without notes.",
-		"1.0.14": "Fixed scaling in paragraphs, added 'basic' class for basic slide styles.",
-		"1.0.13": "Fixed printing CSS.",
-		"1.0.12": "Added documentation and new description.",
-		"1.0.11": "Fixed fullscreen scaling by using 'window.innerWidth'.",
-		"1.0.10": "Update slide numbers when creating slides.",
-		"1.0.9": "Fixed scaling bug when first slide is hidden.",
-		"1.0.8": "Always show slide number.",
-		"1.0.7": "Fixed slide flex direction.",
-		"1.0.6": "Added transient element as wrapper around heavy slide content. Fixed comment in slide script template.",
-		"1.0.5": "Added add heavy slide content button to snackbar content editor.",
-		"1.0.4": "Added persistent styles to package.",
-		"1.0.3": "Fixed slide notes text color in other themes.",
-		"1.0.2": "Added print slide style.",
-		"1.0.1": "Fixed slide scaling when first slide is added and debounced slide scaling on window resize.",
-		"1.0": "Initial version."
-	},
-	"github": {
-		"url": "https://github.com/Webstrates/Codestrate-Packages",
-		"folder": "packages/qcWPfzfc-Presentations"
-	}
-}</pre></div><div class="paragraph body-paragraph collapsed locked" data-id="Cqmg5byz" name="Slide Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" id="slide-template"><div class="slide-container" contenteditable="false">
-	<div class="slide-content" contenteditable="true">${slideContent}</div>
+&lt;/slide-content&gt;</code></pre><div>This element will render the contents of the <code>&lt;template&gt;</code> elements into the <code>&lt;render-to&gt;</code> element on the same slide states as described in slide scripts.</div><h2>Transient Presentation (experimental)</h2><div>When starting a presentation it is started persistent, i.e. on every client. When one wants to preview a presentation or leave a presentation just on the local client, one can add the <kbd>Alt</kbd> key to the shortcuts from above (e.g. <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd>) in order to do that. An orange border indicates, that the presentation is started (or left) just on the local client.</div><div><b>Warning</b>: This is an experimental function, so some things like presentation scripts or <code>&lt;slide-content&gt;</code> are not loading.</div></div></div><div class="paragraph data-paragraph collapsed locked" name="Properties" data-id="zntLciQX"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+  "version": "1.2.3",
+  "icon": "slideshow",
+  "description": "Makes it possible to create slides and presentations.",
+  "tags": [
+    "tools",
+    "body paragraphs"
+  ],
+  "assets": [
+    "presentation_pointer.png"
+  ],
+  "changelog": {
+    "1.0": "Initial version.",
+    "1.0.1": "Fixed slide scaling when first slide is added and debounced slide scaling on window resize.",
+    "1.0.2": "Added print slide style.",
+    "1.0.3": "Fixed slide notes text color in other themes.",
+    "1.0.4": "Added persistent styles to package.",
+    "1.0.5": "Added add heavy slide content button to snackbar content editor.",
+    "1.0.6": "Added transient element as wrapper around heavy slide content. Fixed comment in slide script template.",
+    "1.0.7": "Fixed slide flex direction.",
+    "1.0.8": "Always show slide number.",
+    "1.0.9": "Fixed scaling bug when first slide is hidden.",
+    "1.0.10": "Update slide numbers when creating slides.",
+    "1.0.11": "Fixed fullscreen scaling by using 'window.innerWidth'.",
+    "1.0.12": "Added documentation and new description.",
+    "1.0.13": "Fixed printing CSS.",
+    "1.0.14": "Fixed scaling in paragraphs, added 'basic' class for basic slide styles.",
+    "1.0.15": "Pull classes from content into slide-content and convert slide back without notes.",
+    "1.0.16": "Extended basic style.",
+    "1.0.17": "New indicator for transient hidden presentation.",
+    "1.0.18": "Fixed issue with table header (thead) rendering multiple times within table body when printing presentation slides.",
+    "1.0.19": "Added text tools as optional dependency.",
+    "1.0.20": "Fixed print style for new scroll style of #sections.",
+    "1.0.21": "Added MutationObserver that checks for videos that have the muted attribute set and mutes the video accordingly. This fixes a change in Chrome where muted attribute is ignored.",
+    "1.0.22": "Added gesture control to control slide show on a touch device",
+    "1.0.23": "Fixed a bug where the toolbar and the snackbar were still visible in presentation mode on Mobile Safari.",
+    "1.0.24": "Update scale on presentation exit to fixed wrong scaling bug.",
+    "1.1": "Fixed transforming from paragraph to slide and vice versa.",
+    "1.1.1": "Extracted basic slide template into custom package, and added it as optional dependency.",
+    "1.1.2": "Re-implemented undo toggle slide action.",
+    "1.2": "Added slide template select to the paragraph header when slide class is active.",
+    "1.2.1": "Removed optional dependencies",
+    "1.2.2": "Added aspect ratio select to paragraph header when slide class is active.",
+    "1.2.3": "Removed console.log"
+  },
+  "github": {
+    "url": "https://github.com/Webstrates/Codestrate-Packages",
+    "folder": "packages/qcWPfzfc-Presentations"
+  }
+}</pre></div><div class="paragraph body-paragraph locked collapsed" data-id="Cqmg5byz" name="Slide Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="false"><!-- DO NOT CHANGE FORMATTING OF HTML  -->
+<template id="slide-template"><div class="slide-container" contenteditable="false">
+  <div class="slide-content" contenteditable="true"></div>
 </div>
 <div class="slide-notes-container" contenteditable="false">
-	<div class="slide-notes" contenteditable="true">${slideNotes}</div>
-</div></div></div><div class="paragraph code-paragraph locked collapsed" data-id="mh8ua8Lh" name="Slide Script Template"><pre data-type="content" type="text/javascript" contenteditable="false" id="slide-script-template">// Called on slide preload
+  <div class="slide-notes" contenteditable="true"></div>
+</div></template></div></div><div class="paragraph code-paragraph locked collapsed" data-id="mh8ua8Lh" name="Slide Script Template"><pre data-type="content" type="text/javascript" contenteditable="false" id="slide-script-template">// Called on slide preload
 exports.preload = (paragraph, slide) =&gt; {
-	// Your code...
+  // Your code...
 };
 
 // Called on slide enter
 exports.enter = (paragraph, slide) =&gt; {
-	// Your code...
+  // Your code...
 };
 
 // Called on slide exit
 exports.exit = (paragraph, slide) =&gt; {
-	// Your code...
-};</pre></div><div class="paragraph style-paragraph collapsed locked" data-id="DMTZPYZk" name="Slide Style Template"><style data-type="content" type="text/css" codemirror="true" id="slide-style-template" contenteditable="false">html #slide-id .slide-content {
-	/* Your style... */
-}</style></div><div class="paragraph body-paragraph collapsed" data-id="D6kEDKbW" name="Heavy Slide Content Template" draggable="false" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true"><template id="heavy-slide-content-template">
-	<slide-content>
-		<template event="preload"></template>
-		<template event="enter"></template>
-		<template event="exit"></template>
-		<render-to></render-to>
-	</slide-content>
-</template></div></div><div class="paragraph code-paragraph collapsed" data-id="PPReesUi" name="Presentation Code" style=""><pre data-type="content" type="text/javascript" id="presentation-code">const presentationClass = "presentation";
+  // Your code...
+};</pre></div><div class="paragraph style-paragraph locked collapsed" data-id="DMTZPYZk" name="Slide Style Template"><style data-type="content" type="text/css" codemirror="true" id="slide-style-template" contenteditable="false">html #slide-id .slide-content {
+  /* Your style... */
+}</style></div><div class="paragraph body-paragraph locked collapsed" data-id="D6kEDKbW" name="Heavy Slide Content Template" draggable="false" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="false"><!-- DO NOT CHANGE FORMATTING OF HTML  -->
+<template id="heavy-slide-content-template"><slide-content>
+  <template event="preload"></template>
+  <template event="enter"></template>
+  <template event="exit"></template>
+  <render-to></render-to>
+</slide-content></template></div></div><div class="paragraph code-paragraph collapsed" data-id="PPReesUi" name="Presentation Code" style=""><pre data-type="content" type="text/javascript" id="presentation-code">const SlideScaling = require('#slide-scaling');
+
+/******************************************************************************/
+
+const presentationClass = "presentation";
 const transientPresentationAttribute = "transient-presentation";
 
 const preloadClass = "preload";
@@ -100,318 +108,319 @@ const transientWasContenteditableAttribtue = "transient-was-contenteditable";
 
 const slideNotesAttribute = "transient-slide-notes";
 
-const slideSelector = ".section:not(.section-hidden):not(.collapsed) .paragraph:not(.collapsed) &gt; .slide:not(.slide-hidden)";
-const slideSelectorIncludingHidden = ".paragraph &gt; .slide";
+const slideSelector = '.section:not(.section-hidden):not(.collapsed) .paragraph:not(.collapsed) &gt; .slide:not(.slide-hidden)';
+const slideSelectorIncludingHidden = '.paragraph &gt; .slide';
 
 /******************************************************************************/
 
 const getSlideParagraphs = () =&gt; {
-	const slides = Array.from(document.querySelectorAll(slideSelector));
-	return slides.map(slide =&gt; slide.closest(".paragraph"));
+  const slides = Array.from(document.querySelectorAll(slideSelector));
+  return slides.map(slide =&gt; slide.closest(".paragraph"));
 };
 
 const setActiveSlide = (currentSlide, slideParagraphs, transient = false, step = 0) =&gt; {
-	let index = slideParagraphs.indexOf(currentSlide);
-	if (index === -1) {
-		alert("Could not locate slide!");
-		return;
-	}
+  let index = slideParagraphs.indexOf(currentSlide);
+  if (index === -1) {
+    alert("Could not locate slide!");
+    return;
+  }
 
-	// Only one slide at a time
-	if (step &gt; 0) {
-		step = 1;
-	} else if (step &lt; 0) {
-		step = -1;
-	}
+  // Only one slide at a time
+  if (step &gt; 0) {
+    step = 1;
+  } else if (step &lt; 0) {
+    step = -1;
+  }
 
-	const newIndex = index + step;
+  const newIndex = index + step;
 
-	if (newIndex &gt;= 0 &amp;&amp; newIndex &lt; slideParagraphs.length) {
-		if (transient) {
-			slideParagraphs[index].removeAttribute(transientPresentationAttribute);
-			slideParagraphs[newIndex].setAttribute(transientPresentationAttribute, "true");
-			if (slideParagraphs[index + 1]) slideParagraphs[index + 1].removeAttribute(transientPreloadAttribute);
-			if (slideParagraphs[newIndex + 1]) slideParagraphs[newIndex + 1].setAttribute(transientPreloadAttribute, "true");
-		} else {
-			const oldSlideContent = slideParagraphs[index].querySelector(".slide-content");
-			if (oldSlideContent) oldSlideContent.setAttribute("contenteditable", "true");
-			
-			const newSlideContent = slideParagraphs[newIndex].querySelector(".slide-content");
-			if (newSlideContent) newSlideContent.setAttribute("contenteditable", "false");
-			
-			slideParagraphs[index].classList.remove(presentationClass);
-			slideParagraphs[newIndex].classList.add(presentationClass);
-			if (slideParagraphs[index + 1]) slideParagraphs[index + 1].classList.remove(preloadClass);
-			if (slideParagraphs[newIndex + 1]) slideParagraphs[newIndex + 1].classList.add(preloadClass);
-		}
-	}
+  if (newIndex &gt;= 0 &amp;&amp; newIndex &lt; slideParagraphs.length) {
+    if (transient) {
+      slideParagraphs[index].removeAttribute(transientPresentationAttribute);
+      slideParagraphs[newIndex].setAttribute(transientPresentationAttribute, "true");
+      if (slideParagraphs[index + 1]) slideParagraphs[index + 1].removeAttribute(transientPreloadAttribute);
+      if (slideParagraphs[newIndex + 1]) slideParagraphs[newIndex + 1].setAttribute(transientPreloadAttribute, "true");
+    } else {
+      const oldSlideContent = slideParagraphs[index].querySelector('.slide-content');
+      if (oldSlideContent) oldSlideContent.setAttribute("contenteditable", "true");
+
+      const newSlideContent = slideParagraphs[newIndex].querySelector('.slide-content');
+      if (newSlideContent) newSlideContent.setAttribute("contenteditable", "false");
+
+      slideParagraphs[index].classList.remove(presentationClass);
+      slideParagraphs[newIndex].classList.add(presentationClass);
+      if (slideParagraphs[index + 1]) slideParagraphs[index + 1].classList.remove(preloadClass);
+      if (slideParagraphs[newIndex + 1]) slideParagraphs[newIndex + 1].classList.add(preloadClass);
+    }
+  }
 };
 
 exports.updateSlideNumbers = (slideParagraphs = getSlideParagraphs()) =&gt; {
-	const slides = slideParagraphs.map(slideParagraph =&gt; slideParagraph.querySelector("[data-type='content']"));
+  const slides = slideParagraphs.map(slideParagraph =&gt; slideParagraph.querySelector('[data-type="content"]'));
 
-	let slideNumber = 0;
+  let slideNumber = 0;
 
-	slides.forEach(slide =&gt; {
-		const slideContent = slide.querySelector(".slide-content");
-		if (!slideContent) return;
-		
-		if (slide.classList.contains("skip-slide-number")) {
-			++slideNumber;
-			slideContent.removeAttribute("slide-number");
-			return;
-		}
+  slides.forEach(slide =&gt; {
+    const slideContent = slide.querySelector('.slide-content');
+    if (!slideContent) return;
 
-		if (slide.classList.contains("ignore-slide-number")) {
-			slideContent.removeAttribute("slide-number");
-			return;
-		}
+    if (slide.classList.contains("skip-slide-number")) {
+      ++slideNumber;
+      slideContent.removeAttribute("slide-number");
+      return;
+    }
 
-		if (!slide.classList.contains("prev-slide-number")) {
-			++slideNumber;
-		}
+    if (slide.classList.contains("ignore-slide-number")) {
+      slideContent.removeAttribute("slide-number");
+      return;
+    }
 
-		slideContent.setAttribute("slide-number", slideNumber);
-	});
+    if (!slide.classList.contains("prev-slide-number")) {
+      ++slideNumber;
+    }
+
+    slideContent.setAttribute("slide-number", slideNumber);
+  });
 };
 
 exports.startPresentation = (transient = false, fromStart = false) =&gt; {
-	if (exports.presentationVisible(transient)) return;
+  if (exports.presentationVisible(transient)) return;
 
-	const slideParagraphs = getSlideParagraphs();
-	exports.updateSlideNumbers(slideParagraphs);
+  const slideParagraphs = getSlideParagraphs();
+  exports.updateSlideNumbers(slideParagraphs);
 
-	// Find first slide
-	let firstSlide;
+  // Find first slide
+  let firstSlide;
 
-	if (Codestrate.focussedParagraph &amp;&amp;
-			Codestrate.focussedParagraph.querySelector(".slide") &amp;&amp;
-			!fromStart) {
-		firstSlide = Codestrate.focussedParagraph;
-	} else if (slideParagraphs &amp;&amp;
-						 slideParagraphs.length &gt; 0) {
-		firstSlide = slideParagraphs[0];
-	}
+  if (Codestrate.focussedParagraph &amp;&amp;
+    Codestrate.focussedParagraph.querySelector('.slide') &amp;&amp;
+    !fromStart) {
+    firstSlide = Codestrate.focussedParagraph;
+  } else if (slideParagraphs &amp;&amp;
+    slideParagraphs.length &gt; 0) {
+    firstSlide = slideParagraphs[0];
+  }
 
-	if (!firstSlide) {
-		alert("There are no slides in this codestrate!", "No Slides");
-		return;
-	}
+  if (!firstSlide) {
+    alert("There are no slides in this codestrate!", "No Slides");
+    return;
+  }
 
-	setActiveSlide(firstSlide, slideParagraphs, transient);
+  setActiveSlide(firstSlide, slideParagraphs, transient);
 
-	if (transient) {
-		//firstSlide.setAttribute(transientPresentationAttribute, "true");
-		document.body.setAttribute(transientPresentationAttribute, "true");
-		toast("Transient presentation started", 1500);
-	} else {
-		//firstSlide.classList.add(presentationClass);
-		document.body.classList.add(presentationClass);
-		toast("Presentation started", 1500);
-	}
+  if (transient) {
+    //firstSlide.setAttribute(transientPresentationAttribute, "true");
+    document.body.setAttribute(transientPresentationAttribute, "true");
+    toast("Transient presentation started", 1500);
+  } else {
+    //firstSlide.classList.add(presentationClass);
+    document.body.classList.add(presentationClass);
+    toast("Presentation started", 1500);
+  }
 };
 
 exports.exitPresentation = (transient = false) =&gt; {
-	if (!exports.presentationVisible(transient)) return;
-	
-	const slideParagraphs = getSlideParagraphs();
-	
-	const currentSlide = exports.currentSlide(transient);
-	
-	let index = slideParagraphs.indexOf(currentSlide);
+  if (!exports.presentationVisible(transient)) return;
 
-	if (transient) {
-		if (currentSlide) currentSlide.removeAttribute(transientPresentationAttribute);
-		if (slideParagraphs[index + 1]) slideParagraphs[index + 1].removeAttribute(transientPreloadAttribute);
-		document.body.removeAttribute(transientPresentationAttribute);
-		toast("Transient presentation exited", 1500);
-	} else {
-		if (currentSlide) {
-			const slideContent = currentSlide.querySelector(".slide-content");
-			if (slideContent) slideContent.setAttribute("contenteditable", "true");
-			currentSlide.classList.remove(presentationClass);
-		}
-		if (slideParagraphs[index + 1]) slideParagraphs[index + 1].classList.remove(preloadClass);
-		document.body.classList.remove(presentationClass);
-		toast("Presentation exited", 1500);
-	}
+  const slideParagraphs = getSlideParagraphs();
+
+  const currentSlide = exports.currentSlide(transient);
+
+  let index = slideParagraphs.indexOf(currentSlide);
+
+  if (transient) {
+    if (currentSlide) currentSlide.removeAttribute(transientPresentationAttribute);
+    if (slideParagraphs[index + 1]) slideParagraphs[index + 1].removeAttribute(transientPreloadAttribute);
+    document.body.removeAttribute(transientPresentationAttribute);
+    toast("Transient presentation exited", 1500);
+  } else {
+    if (currentSlide) {
+      const slideContent = currentSlide.querySelector('.slide-content');
+      if (slideContent) slideContent.setAttribute("contenteditable", "true");
+      currentSlide.classList.remove(presentationClass);
+    }
+    if (slideParagraphs[index + 1]) slideParagraphs[index + 1].classList.remove(preloadClass);
+    document.body.classList.remove(presentationClass);
+    toast("Presentation exited", 1500);
+  }
+  SlideScaling.updateScale();
 };
 
 exports.presentationVisible = (transient = false) =&gt; {
-	if (transient) {
-		return document.body.hasAttribute(transientPresentationAttribute);
-	} else {
-		return document.body.classList.contains(presentationClass);
-	}
+  if (transient) {
+    return document.body.hasAttribute(transientPresentationAttribute);
+  } else {
+    return document.body.classList.contains(presentationClass);
+  }
 };
 
 exports.togglePresentation = (transient) =&gt; {
-	if (exports.presentationVisible(transient)) {
-		exports.exitPresentation(transient);
-	} else {
-		exports.startPresentation(transient);
-	}
+  if (exports.presentationVisible(transient)) {
+    exports.exitPresentation(transient);
+  } else {
+    exports.startPresentation(transient);
+  }
 };
 
 /******************************************************************************/
 
 exports.currentSlide = (transient = false) =&gt; {
-	if (transient) {
-		return document.querySelector(`.paragraph[${transientPresentationAttribute}="true"]`);
-	} else {
-		return document.querySelector(`.paragraph.${presentationClass}`);
-	}
+  if (transient) {
+    return document.querySelector(`.paragraph[${transientPresentationAttribute}="true"]`);
+  } else {
+    return document.querySelector(`.paragraph.${presentationClass}`);
+  }
 };
 
 const changeSlide = (step) =&gt; {
-	const visible = exports.presentationVisible();
-	const transient = exports.presentationVisible(true);
-	
-	if (!visible &amp;&amp; !transient) return;
+  const visible = exports.presentationVisible();
+  const transient = exports.presentationVisible(true);
 
-	const currentSlide = exports.currentSlide(transient);
-	if (!currentSlide) {
-		alert("No current slide!");
-		return;
-	}
+  if (!visible &amp;&amp; !transient) return;
 
-	const slideParagraphs = getSlideParagraphs();
-	if (!slideParagraphs || slideParagraphs.length === 0) {
-		alert("No slides available!");
-		return;
-	}
+  const currentSlide = exports.currentSlide(transient);
+  if (!currentSlide) {
+    alert("No current slide!");
+    return;
+  }
 
-	setActiveSlide(currentSlide, slideParagraphs, transient, step);
+  const slideParagraphs = getSlideParagraphs();
+  if (!slideParagraphs || slideParagraphs.length === 0) {
+    alert("No slides available!");
+    return;
+  }
+
+  setActiveSlide(currentSlide, slideParagraphs, transient, step);
 };
 
 exports.previousSlide = () =&gt; {
-	changeSlide(-1);
+  changeSlide(-1);
 };
 
 exports.nextSlide = () =&gt; {
-	changeSlide(1);
+  changeSlide(1);
 };
 
 /******************************************************************************/
 
 exports.showNotes = () =&gt; {
-	document.body.setAttribute(slideNotesAttribute, "true");
+  document.body.setAttribute(slideNotesAttribute, "true");
 };
 
 exports.hideNotes = () =&gt; {
-	document.body.removeAttribute(slideNotesAttribute);
+  document.body.removeAttribute(slideNotesAttribute);
 };
 
 exports.notesVisible = () =&gt; {
-	return document.body.hasAttribute(slideNotesAttribute);
+  return document.body.hasAttribute(slideNotesAttribute);
 };
 
 exports.toggleNotes = () =&gt; {
-	if (exports.notesVisible()) {
-		exports.hideNotes();
-	} else {
-		exports.showNotes();
-	}
-};</pre></div><div class="paragraph code-paragraph collapsed" data-id="dJSYnMBT" last-execution-state="success" name="Slide Scaling" style="" draggable="false" run-on-load="true"><pre data-type="content" type="text/javascript">const presentationStyleClass = "presentation-style";
+  if (exports.notesVisible()) {
+    exports.hideNotes();
+  } else {
+    exports.showNotes();
+  }
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="dJSYnMBT" last-execution-state="success" name="Slide Scaling" style="" draggable="false" run-on-load="true"><pre data-type="content" type="text/javascript" id="slide-scaling">const presentationStyleClass = "presentation-style";
 
 /******************************************************************************/
 
 const updateStyle = (scale, presentationScale, presentationScale43, presentationScale1610, presentationScale11, width) =&gt; {
-	let style = document.head.querySelector(`.${presentationStyleClass} style`);
-	
-	if (!style) {
-		const transient = document.createElement("transient");
-		transient.setAttribute("class", presentationStyleClass);
-		style = document.createElement("style");
-		transient.appendChild(style);
-		document.head.appendChild(transient);
-	}
+  let style = document.head.querySelector(`.${presentationStyleClass} style`);
 
-	style.innerHTML = `
-.slide .slide-container {
-	width: ${width * scale}px !important;
-	height: ${width * 0.5625 * scale}px !important;
+  if (!style) {
+    const transient = document.createElement("transient");
+    transient.setAttribute("class", presentationStyleClass);
+    style = document.createElement("style");
+    transient.appendChild(style);
+    document.head.appendChild(transient);
+  }
+
+  style.innerHTML = `
+.slide[slide-aspect-ratio="16:9"] .slide-container {
+  width: ${width * scale}px !important;
+  height: ${width * 0.5625 * scale}px !important;
 }
 
-.slide .slide.aspect-4-3 .slide-container {
-	width: ${width * scale}px !important;
-	height: ${width * 0.75 * scale}px !important;
+.slide[slide-aspect-ratio="4:3"] .slide-container {
+  width: ${width * scale}px !important;
+  height: ${width * 0.75 * scale}px !important;
 }
 
-.slide .slide.aspect-16-10 .slide-container {
-	width: ${width * scale}px !important;
-	height: ${width * 0.625 * scale}px !important;
+.slide[slide-aspect-ratio="16:10"] .slide-container {
+  width: ${width * scale}px !important;
+  height: ${width * 0.625 * scale}px !important;
 }
 
-.slide .slide.aspect-1-1 .slide-container {
-	width: ${width * scale}px !important;
-	height: ${width * scale}px !important;
+.slide[slide-aspect-ratio="1:1"] .slide-container {
+  width: ${width * scale}px !important;
+  height: ${width * scale}px !important;
 }
 
 .slide .slide-content {
-	transform: scale(${scale}) !important;
-	transform-origin: 0 0 0 !important;
+  transform: scale(${scale}) !important;
+  transform-origin: 0 0 0 !important;
 }
 
-body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide .slide-content,
-body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide .slide-content {
-	transform: translate(-50%, -50%) scale(${presentationScale}) !important;
-	transform-origin: center !important;
+body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide[slide-aspect-ratio="16:9"] .slide-content,
+body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide[slide-aspect-ratio="16:9"] .slide-content {
+  transform: translate(-50%, -50%) scale(${presentationScale}) !important;
+  transform-origin: center !important;
 }
 
-body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide.aspect-4-3 .slide-content,
-body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide.aspect-4-3 .slide-content {
-	transform: translate(-50%, -50%) scale(${presentationScale43}) !important;
-	transform-origin: center !important;
+body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide[slide-aspect-ratio="4:3"] .slide-content,
+body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide[slide-aspect-ratio="4:3"] .slide-content {
+  transform: translate(-50%, -50%) scale(${presentationScale43}) !important;
+  transform-origin: center !important;
 }
 
-body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide.aspect-16-10 .slide-content,
-body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide.aspect-16-10 .slide-content {
-	transform: translate(-50%, -50%) scale(${presentationScale1610}) !important;
-	transform-origin: center !important;
+body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide[slide-aspect-ratio="16:10"] .slide-content,
+body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide[slide-aspect-ratio="16:10"] .slide-content {
+  transform: translate(-50%, -50%) scale(${presentationScale1610}) !important;
+  transform-origin: center !important;
 }
 
-body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide.aspect-1-1 .slide-content,
-body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide.aspect-1-1 .slide-content {
-	transform: translate(-50%, -50%) scale(${presentationScale11}) !important;
-	transform-origin: center !important;
+body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide[slide-aspect-ratio="1:1"] .slide-content,
+body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide[slide-aspect-ratio="1:1"] .slide-content {
+  transform: translate(-50%, -50%) scale(${presentationScale11}) !important;
+  transform-origin: center !important;
 }
 `;
 };
 
-const updateScale = () =&gt; {
-	const slide = document.querySelector(".section:not(.section-hidden):not(.collapsed) .paragraph:not(.collapsed) .slide");
-	const slideContent = slide ? slide.querySelector(".slide-content") : false;
-	const paragraph = slide ? slide.closest(".paragraph") : false;
+exports.updateScale = () =&gt; {
+  const slide = document.querySelector(".section:not(.section-hidden):not(.collapsed) .paragraph:not(.collapsed) .slide");
+  const slideContent = slide ? slide.querySelector(".slide-content") : false;
+  const paragraph = slide ? slide.closest(".paragraph") : false;
 
-	if (!slideContent || !paragraph) return;
+  if (!slideContent || !paragraph) return;
 
-	const width = slideContent.offsetWidth;
+  const width = slideContent.offsetWidth;
 
-	// Scale for paragraph view
-	const scale = Math.min(
-		paragraph.offsetWidth / width
-	);
+  // Scale for paragraph view
+  const scale = Math.min(
+    paragraph.offsetWidth / width
+  );
 
-	// Scales for presentation view
-	const presentationScale = Math.min(
-		window.innerWidth / width,    
-		window.innerHeight / (width * 0.5625)
-	);
-	const presentationScale43 = Math.min(
-		window.innerWidth / width,    
-		window.innerHeight / (width * 0.75)
-	);
-	const presentationScale1610 = Math.min(
-		window.innerWidth / width,    
-		window.innerHeight / (width * 0.625)
-	);
-	const presentationScale11 = Math.min(
-		window.innerWidth / width,    
-		window.innerHeight / width
-	);
+  // Scales for presentation view
+  const presentationScale = Math.min(
+    window.innerWidth / width,
+    window.innerHeight / (width * 0.5625)
+  );
+  const presentationScale43 = Math.min(
+    window.innerWidth / width,
+    window.innerHeight / (width * 0.75)
+  );
+  const presentationScale1610 = Math.min(
+    window.innerWidth / width,
+    window.innerHeight / (width * 0.625)
+  );
+  const presentationScale11 = Math.min(
+    window.innerWidth / width,
+    window.innerHeight / width
+  );
 
-	updateStyle(scale, presentationScale, presentationScale43, presentationScale1610, presentationScale11, width);
+  updateStyle(scale, presentationScale, presentationScale43, presentationScale1610, presentationScale11, width);
 };
 
 /******************************************************************************/
@@ -419,73 +428,106 @@ const updateScale = () =&gt; {
 let counter = 0;
 let resizeTimer;
 window.addEventListener("resize", (event) =&gt; {
-	clearTimeout(resizeTimer);
-	resizeTimer = setTimeout(() =&gt; {
-		updateScale();
-	}, 250);
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() =&gt; {
+    exports.updateScale();
+  }, 250);
 });
 
 document.body.liveAttribute("transient-menu-pinned").changed((value, oldValue) =&gt; {
-	// Wait for animation
-	document.body.addEventListener("transitionend", function pinnedTransition(event) {
-		if (event.propertyName === "margin-left") {
-			document.body.removeEventListener("transitionend", pinnedTransition);
-			updateScale();
-		}
-	});
+  // Wait for animation
+  document.body.addEventListener("transitionend", function pinnedTransition(event) {
+    if (event.propertyName === "margin-left") {
+      document.body.removeEventListener("transitionend", pinnedTransition);
+      exports.updateScale();
+    }
+  });
 });
 
 document.body.liveQuerySelectorAll('.paragraph .slide').added((slide) =&gt; {
-	if (document.body.querySelectorAll('.paragraph .slide').length === 1) {
-		updateScale();
-	}
+  if (document.body.querySelectorAll('.paragraph .slide').length === 1) {
+    exports.updateScale();
+  }
 });
 
-updateScale();</pre></div><div class="paragraph code-paragraph collapsed" data-id="qaCgfY8m" name="Presentation Key Map" style=""><pre data-type="content" type="text/javascript" id="presentation-key-map">const PresentationCode = require("#presentation-code");
+exports.updateScale();</pre></div><div class="paragraph code-paragraph collapsed" data-id="qaCgfY8m" name="Presentation Key Map" style=""><pre data-type="content" type="text/javascript" id="presentation-key-map">const PresentationCode = require("#presentation-code");
 
 /******************************************************************************/
 
 exports.mappings = [{
-	keys: ["mod+enter", "f5"],
-	action(event) {
-		PresentationCode.togglePresentation();
-		return false;
-	}
+  keys: ["mod+enter", "f5"],
+  action(event) {
+    PresentationCode.togglePresentation();
+    return false;
+  }
 }, {
-	keys: "esc",
-	action(event) {
-		PresentationCode.exitPresentation();
-		return false;
-	}
+  keys: "esc",
+  action(event) {
+    PresentationCode.exitPresentation();
+    return false;
+  }
 }, {
-	keys: ["mod+alt+enter", "alt+f5"],
-	action(event) {
-		PresentationCode.togglePresentation(true);
-		return false;
-	}
+  keys: ["mod+alt+enter", "alt+f5"],
+  action(event) {
+    PresentationCode.togglePresentation(true);
+    return false;
+  }
 }, {
-	keys: "alt+esc",
-	action(event) {
-		PresentationCode.exitPresentation(true);
-		return false;
-	}
+  keys: "alt+esc",
+  action(event) {
+    PresentationCode.exitPresentation(true);
+    return false;
+  }
 }, {
-	keys: ["left", "pageup"],
-	action(event) {
-		PresentationCode.previousSlide();
-	}
+  keys: ["left", "pageup"],
+  action(event) {
+    PresentationCode.previousSlide();
+  }
 }, {
-	keys: ["right", "pagedown"],
-	action(event) {
-		PresentationCode.nextSlide();
-	}
+  keys: ["right", "pagedown"],
+  action(event) {
+    PresentationCode.nextSlide();
+  }
 }, {
-	keys: ["mod+k"],
-	action(event) {
-		PresentationCode.toggleNotes();
-		return false;
-	}
-}];</pre></div><div class="paragraph code-paragraph collapsed" data-id="ScPwnHCY" name="Presentation Shortcuts" run-on-load="true" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">const PresentationKeyMap = require("#presentation-key-map");
+  keys: ["mod+k"],
+  action(event) {
+    PresentationCode.toggleNotes();
+    return false;
+  }
+}];</pre></div><div class="paragraph code-paragraph collapsed" data-id="pZbLtiu8" run-on-load="true" name="Gestures to control slideshow" draggable="false" style="" last-execution-state="success"><pre data-type="content" type="text/javascript">importLib([
+  "hammer.min.js",
+  "hammer-time.min.js"
+]).then(() =&gt; {
+
+  const PresentationCode = require("#presentation-code");
+
+  var mc = new Hammer.Manager(window);
+
+  mc.add(new Hammer.Swipe({
+    direction: Hammer.DIRECTION_ALL,
+  }));
+
+  const handleSwipe = (event) =&gt; {
+
+    switch (event.type) {
+    case "swipeleft":
+      PresentationCode.previousSlide();
+      break;
+    case "swiperight":
+      PresentationCode.nextSlide();
+      break;
+    case "swipeup":
+      break;
+    case "swipedown":
+      break;
+    }
+  };
+
+  mc.on("swipeleft", handleSwipe);
+  mc.on("swiperight", handleSwipe);
+  mc.on("swipeup", handleSwipe);
+  mc.on("swipedown", handleSwipe);
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="ScPwnHCY" name="Presentation Shortcuts" run-on-load="true" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">const PresentationKeyMap = require("#presentation-key-map");
 
 /******************************************************************************/
 
@@ -710,258 +752,268 @@ const slideToolsClass = "slide-tools";
 
 /******************************************************************************/
 
+const getSlideFragment = () =&gt; {
+  const slideTemplate = document.querySelector('#slide-template');
+  return document.importNode(slideTemplate.content, true);
+};
+
+/******************************************************************************/
+
 GlobalToolbarUtils.addDivider(1, packageClass);
 GlobalToolbarUtils.addButton("Add Slide", "", "slide-button " + packageClass, 1, () =&gt; {
-	const paragraph = ParagraphUtils.createBodyParagraph();
-	const content = paragraph.querySelector("[data-type='content']");
-	content.classList.add(slideClass, "basic");
+  const paragraph = ParagraphUtils.createBodyParagraph();
+  const content = paragraph.querySelector('[data-type="content"]');
+  content.classList.add("slide");
 
-	const elements = require("#slide-template", {
-		slideContent: "",
-		slideNotes: ""
-	});
+  // create slide from template and add it to content
+  const slideFragment = getSlideFragment();
+  content.appendChild(slideFragment);
 
-	elements.forEach(e =&gt; content.appendChild(e));
-
-	ParagraphUtils.insertParagraphAfterFocussed(paragraph);
-	PresentationCode.updateSlideNumbers();
+  ParagraphUtils.insertParagraphAfterFocussed(paragraph);
+  PresentationCode.updateSlideNumbers();
 });
 
 GlobalToolbarUtils.addButton("Start Presentation", "", "presentation-button " + packageClass, 1, () =&gt; {
-	PresentationCode.startPresentation(false, true);
+  PresentationCode.startPresentation(false, true);
 });
 
 /******************************************************************************/
 
 SnackbarTools.addTools((target) =&gt; {
-	return (Codestrate.focussedParagraph &amp;&amp;
-					Codestrate.focussedParagraph.querySelector("[data-type='content']").classList.contains(slideClass));
+  return (Codestrate.focussedParagraph &amp;&amp;
+    Codestrate.focussedParagraph.querySelector("[data-type='content']").classList.contains(slideClass));
 }, slideToolsClass);
 
 SnackbarUtils.addDivider(1, "body-tools " + packageClass);
 
+const moveContentAndClasses = (from, to) =&gt; {
+
+  // copy slide content back to regular paragraph
+  Array.from(from.childNodes).forEach((child) =&gt; to.appendChild(child));
+
+  // Move CSS class back to content
+  // Array.from is required to create a copy of classList items!!!
+  Array.from(from.classList).forEach((className) =&gt; {
+    if (className.startsWith("slide-")) return;
+    
+    to.classList.add(className);
+    from.classList.remove(className);
+  });
+};
+
+const upgradeToSlide = (content) =&gt; {
+  const slideFragment = getSlideFragment();
+  const slideContent = slideFragment.querySelector('.slide-content');
+
+  // append all childNodes from content to slide content
+  moveContentAndClasses(content, slideContent);
+
+  // append slide fragment to content
+  content.appendChild(slideFragment);
+  content.classList.add(slideClass);
+};
+
+const downgradeFromSlide = (content) =&gt; {
+  const oldClassList = content.getAttribute("class");
+  const slideContainer = content.querySelector(".slide-container");
+  const slideContent = slideContainer.querySelector(".slide-content");
+  const slideNotesContainer = content.querySelector(".slide-notes-container");
+  const slideNotes = slideNotesContainer.querySelector(".slide-notes");
+
+  // remove slide container
+  if (slideContainer) {
+    slideContainer.remove();
+  }
+
+  // remove slide notes container
+  if (slideNotesContainer) {
+    slideNotesContainer.remove();
+  }
+
+  if (slideContent) {
+    // copy slide content back to regular paragraph
+    moveContentAndClasses(slideContent, content);
+
+    // Variant: Keep slideContent div
+    // content.insertBefore(slideContent, slideContainer);
+    // slideContent.removeAttribute("contenteditable");
+  }
+
+  if (slideNotes) {
+    // Variant: Keep slideNotes div
+    // content.insertBefore(slideNotes, slideContainer);
+    // slideNotes.removeAttribute("contenteditable");
+  }
+
+  content.classList.remove(slideClass);
+};
+
+const toggleSlide = (paragraph) =&gt; {
+  const content = paragraph.querySelector('[data-type="content"]');
+
+  const oldContentChildNodes = Array.from(content.childNodes);
+  const oldClassList = content.getAttribute("class");
+
+  // upgrade and downgrade content to and from slide
+  if (!content.classList.contains(slideClass)) {
+    upgradeToSlide(content);
+  } else {
+    downgradeFromSlide(content);
+  }
+
+  PresentationCode.updateSlideNumbers();
+};
+
 SnackbarUtils.addButton("Toggle Slide", "", "body-tools slide-button " + packageClass, 1, () =&gt; {
-	const paragraph = Codestrate.focussedParagraph;
-	if (!paragraph) return;
+  const paragraph = Codestrate.focussedParagraph;
+  if (!paragraph) return;
 
-	const content = paragraph.querySelector("[data-type='content']");
-	const oldHTML = content.innerHTML;
-	const oldClassList = content.getAttribute("class");
+  toggleSlide(paragraph);
 
-	if (content.classList.contains(slideClass)) {
-		const slideContainer = content.querySelector(".slide-container");
-		const slideContent = slideContainer.querySelector(".slide-content");
-		const slideNotesContainer = content.querySelector(".slide-notes-container");
-		const slideNotes = slideNotesContainer.querySelector(".slide-notes");
-
-		if (slideContent) {
-			const children = Array.from(slideContent.children);
-			for (let i = 0; i &lt; children.length; i++) {
-				content.appendChild(children[i]);
-			}
-
-			// Move CSS class back to content
-			slideContent.classList.forEach(classes =&gt; {
-				if (classes !== "slide-content") {
-					content.classList.add(classes);
-					slideContent.classList.remove(classes);
-				}
-			});
-
-			// Variant: Keep slideContent div
-			// content.insertBefore(slideContent, slideContainer);
-			// slideContent.removeAttribute("contenteditable");
-		}
-
-		if (slideNotes) {
-			// Variant: Keep slideNotes div
-			// content.insertBefore(slideNotes, slideContainer);
-			// slideNotes.removeAttribute("contenteditable");
-		}
-
-		if (slideContainer) content.removeChild(slideContainer);
-		if (slideNotesContainer) content.removeChild(slideNotesContainer);
-	} else {
-		let slideContentHTML = "";
-		let slideNotesHTML = "";
-
-		const slideContent = Array.from(content.querySelectorAll(".slide-content"));
-		const slideNotes = Array.from(content.querySelectorAll(".slide-notes"));
-
-		if (slideContent &amp;&amp; slideContent.length &gt; 0) {
-			if (slideContent.length &gt; 1) {
-				slideContent.forEach(el =&gt; {
-					if (el.innerHTML !== "") slideContentHTML += `&lt;div&gt;${el.innerHTML}&lt;/div&gt;`;
-				});
-			} else {
-				slideContentHTML = slideContent[0].innerHTML;
-			}
-		}
-
-		if (slideNotes &amp;&amp; slideNotes.length &gt; 0) {
-			if (slideNotes.length &gt; 1) {
-				slideNotes.forEach(el =&gt; {
-					if (el.innerHTML !== "") slideNotesHTML += `&lt;div&gt;${el.innerHTML}&lt;/div&gt;`;
-				});
-			} else {
-				slideNotesHTML = slideNotes[0].innerHTML;
-			}
-		}
-
-		const elements = require("#slide-template", {
-			slideContent: slideContentHTML ? slideContentHTML : content.innerHTML,
-			slideNotes: slideNotesHTML
-		});
-
-		content.innerHTML = "";
-		elements.forEach(e =&gt; content.appendChild(e));
-
-		// Move CSS class into slide-content
-		const newSlideContent = content.querySelector(".slide-content");
-		content.classList.forEach(classes =&gt; {
-			content.classList.remove(classes);
-			newSlideContent.classList.add(classes);
-		});
-	}
-
-	PresentationCode.updateSlideNumbers();
-
-	content.classList.toggle(slideClass);
-	toast(`Toggled slide "${paragraph.getAttribute("name") || "No Name"}"`, 5000, () =&gt; {
-		content.innerHTML = oldHTML;
-		content.setAttribute("class", oldClassList);
-		PresentationCode.updateSlideNumbers();
-	}, "Undo");
+  toast(`Toggled slide "${paragraph.getAttribute("name") || "No Name"}"`, 5000, () =&gt; {
+    toggleSlide(paragraph);
+  }, "Undo");
 });
 
 /******************************************************************************/
 
 const getParagraphAndId = async() =&gt; {
-	return new Promise(async(resolve, reject) =&gt; {
-		const paragraph = Codestrate.focussedParagraph;
-		if (!paragraph) return resolve(false);
+  return new Promise(async(resolve, reject) =&gt; {
+    const paragraph = Codestrate.focussedParagraph;
+    if (!paragraph) return resolve(false);
 
-		const content = paragraph.querySelector("[data-type='content']");
-		let id = content.getAttribute("id");
+    const content = paragraph.querySelector("[data-type='content']");
+    let id = content.getAttribute("id");
 
-		if (!id) {
-			const result = await prompt("To add a slide script the slide needs an ID. Enter ID (or leave blank to generate one).", "", "Missing Slide ID");
-			if (result === false) {
-				return resolve(false);
-			} else if (result === "") {
-				id = "slide-" + Codestrate.util.randomString();
-			} else {
-				id = result;
-			}
-			content.setAttribute("id", id);
-		}
+    if (!id) {
+      const result = await prompt("To add a slide script the slide needs an ID. Enter ID (or leave blank to generate one).", "", "Missing Slide ID");
+      if (result === false) {
+        return resolve(false);
+      } else if (result === "") {
+        id = "slide-" + Codestrate.util.randomString();
+      } else {
+        id = result;
+      }
+      content.setAttribute("id", id);
+    }
 
-		resolve({ paragraph: paragraph, id: id });
-	});
+    resolve({
+      paragraph: paragraph,
+      id: id
+    });
+  });
 };
 
 SnackbarUtils.addButton("Add Slide Script", "", slideToolsClass + " slide-script-button " + packageClass, 1, async() =&gt; {
-	const data = await getParagraphAndId();
-	if (!data) return;
+  const data = await getParagraphAndId();
+  if (!data) return;
 
-	const paragraph = data.paragraph;
-	const id = data.id;
+  const paragraph = data.paragraph;
+  const id = data.id;
 
-	if (document.querySelector(`#${id}-script`)) {
-		alert("Slide script already exists!", "Script Exists");
-		return;
-	}
+  if (document.querySelector(`#${id}-script`)) {
+    alert("Slide script already exists!", "Script Exists");
+    return;
+  }
 
-	const scriptParagraph = ParagraphUtils.createCodeParagraph();
-	if (paragraph.hasAttribute("name")) scriptParagraph.setAttribute("name", `${paragraph.getAttribute("name")} Script`);
-	const scriptContent = scriptParagraph.querySelector("[data-type='content']");
-	scriptContent.classList.add("slide-script");
-	scriptContent.setAttribute("id", `${id}-script`);
+  const scriptParagraph = ParagraphUtils.createCodeParagraph();
+  if (paragraph.hasAttribute("name")) scriptParagraph.setAttribute("name", `${paragraph.getAttribute("name")} Script`);
+  const scriptContent = scriptParagraph.querySelector("[data-type='content']");
+  scriptContent.classList.add("slide-script");
+  scriptContent.setAttribute("id", `${id}-script`);
 
-	const scriptTemplate = document.querySelector("#slide-script-template");
-	if (scriptTemplate) scriptContent.innerHTML = scriptTemplate.innerHTML;
+  const scriptTemplate = document.querySelector("#slide-script-template");
+  if (scriptTemplate) scriptContent.innerHTML = scriptTemplate.innerHTML;
 
-	paragraph.closest(".section").insertBefore(scriptParagraph, paragraph.nextSibling);
+  paragraph.closest(".section").insertBefore(scriptParagraph, paragraph.nextSibling);
 });
 
 SnackbarUtils.addButton("Add Slide Style", "", slideToolsClass + " slide-style-button " + packageClass, 1, async() =&gt; {
-	const data = await getParagraphAndId();
-	if (!data) return;
+  const data = await getParagraphAndId();
+  if (!data) return;
 
-	const paragraph = data.paragraph;
-	const id = data.id;
+  const paragraph = data.paragraph;
+  const id = data.id;
 
-	if (document.querySelector(`#${id}-style`)) {
-		alert("Slide style already exists!", "Style Exists");
-		return;
-	}
+  if (document.querySelector(`#${id}-style`)) {
+    alert("Slide style already exists!", "Style Exists");
+    return;
+  }
 
-	const styleParagraph = ParagraphUtils.createStyleParagraph();
-	if (paragraph.hasAttribute("name")) styleParagraph.setAttribute("name", `${paragraph.getAttribute("name")} Style`);
-	const styleContent = styleParagraph.querySelector("[data-type='content']");
-	styleContent.classList.add("slide-style");
-	styleContent.setAttribute("id", `${id}-style`);
+  const styleParagraph = ParagraphUtils.createStyleParagraph();
+  if (paragraph.hasAttribute("name")) styleParagraph.setAttribute("name", `${paragraph.getAttribute("name")} Style`);
+  const styleContent = styleParagraph.querySelector("[data-type='content']");
+  styleContent.classList.add("slide-style");
+  styleContent.setAttribute("id", `${id}-style`);
 
-	const styleTemplate = document.querySelector("#slide-style-template");
-	if (styleTemplate) styleContent.innerHTML = styleTemplate.innerHTML.replace("slide-id", id);
+  const styleTemplate = document.querySelector("#slide-style-template");
+  if (styleTemplate) styleContent.innerHTML = styleTemplate.innerHTML.replace("slide-id", id);
 
-	paragraph.closest(".section").insertBefore(styleParagraph, paragraph.nextSibling);
+  paragraph.closest(".section").insertBefore(styleParagraph, paragraph.nextSibling);
 });
 
 SnackbarUtils.addButton("Start Presentation", "", slideToolsClass + " presentation-button " + packageClass, 1, () =&gt; {
-	PresentationCode.startPresentation();
+  PresentationCode.startPresentation();
 });
 
 // add heavy content "template" at cursor position in HTML inspector
 SnackbarUtils.addButton("Add Heavy Content", "", slideToolsClass + " add-heavy-content-button " + packageClass, 1, () =&gt; {
-	let content = document.querySelector('[transient-content-paragraph="true"] [data-type="content"]');
-	if (content.__editor) {
-		let template = document.querySelector('#heavy-slide-content-template');
-		let fragment = document.importNode(template.content, true);
-		
-		let editor = content.__editor.editor;
-		let doc = editor.getDoc();
-		let cursor = doc.getCursor();
-		doc.replaceRange(fragment.firstElementChild.outerHTML, cursor);
-	}
+  let content = document.querySelector('[transient-content-paragraph="true"] [data-type="content"]');
+  if (content.__editor) {
+    let template = document.querySelector('#heavy-slide-content-template');
+    let fragment = document.importNode(template.content, true);
+
+    let editor = content.__editor.editor;
+    let doc = editor.getDoc();
+    let cursor = doc.getCursor();
+    doc.replaceRange(fragment.firstElementChild.outerHTML, cursor);
+  }
 });</pre></div><div class="paragraph style-paragraph collapsed" data-id="khjUmJzS" name="Presentation Style" style=""><style data-type="content" type="text/css" codemirror="true" class="themable persistent">html body.presentation:not([transient-presentation="true"]),
 html body[transient-presentation="true"]:not(.presentation) {
-	overflow: hidden;
+  overflow: hidden;
+}
+
+html body.presentation:not([transient-presentation="true"]) #sections,
+html body[transient-presentation="true"]:not(.presentation) #sections {
+  overflow: unset;
 }
 
 html body.presentation:not([transient-presentation="true"]) .paragraph.presentation,
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] {
-	display: block;
-	position: fixed;
-	padding: 0;
-	margin: 0;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
-	z-index: 250;
-	user-select: none;
-	cursor: url(presentation_pointer.png), default;
-	background: var(--material-color-black);
+  display: block;
+  position: fixed;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 250;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Webkit requires -webkit prefix */
+  cursor: url(presentation_pointer.png), default;
+  background: var(--material-color-black);
 }
 
 /*html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] #global-toolbar,*/
+
 html body.presentation[transient-presentation="true"]:after {
-	content: "\f429";
-	font-family: "Material Design Icons";
-	text-align: center;
-	font-size: 24px;
-	line-height: 48px;
-	bottom: 16px;
-	left: 16px;
-	position: fixed;
-	height: 48px;
-	width: 48px;
-	z-index: 100;
-	background: var(--material-color-red);
-	color: var(--material-color-black);
-	border-radius: 50%;
-	box-shadow: var(--material-shadow-z2);
+  content: "\f429";
+  font-family: "Material Design Icons";
+  text-align: center;
+  font-size: 24px;
+  line-height: 48px;
+  bottom: 16px;
+  left: 16px;
+  position: fixed;
+  height: 48px;
+  width: 48px;
+  z-index: 100;
+  background: var(--material-color-red);
+  color: var(--material-color-black);
+  border-radius: 50%;
+  box-shadow: var(--material-shadow-z2);
 }
 
 /******************************************************************************/
@@ -972,109 +1024,114 @@ html body.presentation:not([transient-presentation="true"]) .paragraph.presentat
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .html-editor,
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .paragraph-header,
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .text-tools {
-	display: none;
+  display: none;
 }
 
 html body.presentation:not([transient-presentation="true"]) .paragraph.presentation .CodeMirror,
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .CodeMirror {
-	overflow: auto;
-	height: 100vh;
+  overflow: auto;
+  height: 100vh;
 }
 
 /******************************************************************************/
 
 html .paragraph .slide[data-type="content"],
-html .paragraph .slide .slide-content{
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-	font-family: "Roboto", "Avenir", sans-serif;
-	font-weight: 400;
+html .paragraph .slide .slide-content {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: "Roboto", "Avenir", sans-serif;
+  font-weight: 400;
 }
 
 html .paragraph .slide.slide-hidden {
-	outline: 0.25rem solid var(--material-color-orange);
+  outline: 0.25rem solid var(--material-color-orange);
+}
+
+/******************************************************************************/
+
+html .paragraph .slide .slide-content ul,
+html .paragraph .slide .slide-content ol {
+  margin-left: 1rem;
 }
 
 /******************************************************************************/
 
 html .slide .slide-content {
-	background: var(--material-color-white);
-	color: var(--material-color-black);
-	font-size: 48px;
-	display: flex;
-	flex-direction: column;
+  background: var(--material-color-white);
+  color: var(--material-color-black);
+  font-size: 48px;
+  display: flex;
+  flex-direction: column;
 }
 
 html body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide .slide-content,
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .slide .slide-content {
-	position: fixed;
-	top: 50%;
-	left: 50%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
 }
 
 html .slide:not(.skip-slide-number) .slide-content[slide-number]:after {
-    content: attr(slide-number);
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    padding: 8px 16px;
-    background-color: rgba(var(--material-color-white-rgb), 0.5);
-    border-radius: 2px;
-    font-size: 24px;
-    z-index: 299;
-    pointer-events: none;
+  content: attr(slide-number);
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 8px 16px;
+  background-color: rgba(var(--material-color-white-rgb), 0.5);
+  border-radius: 2px;
+  font-size: 24px;
+  z-index: 299;
+  pointer-events: none;
 }
 
 /******************************************************************************/
 
 html .slide .slide-content {
-	width: 1920px;
-	height: 1080px;
+  transform: scale(0.5);
+  transform-origin: 0 0 0;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="XFYfghGw" name="Slide Aspect Ratios"><style data-type="content" type="text/css" codemirror="true" class="themable persistent">html .slide[slide-aspect-ratio="16:9"] .slide-content {
+  width: 1920px;
+  height: 1080px;
 }
 
-html .slide.aspect-4-3 .slide-content {
-	width: 1920px;
-	height: 1440px;
+html .slide[slide-aspect-ratio="4:3"] .slide-content {
+  width: 1920px;
+  height: 1440px;
 }
 
-html .slide.aspect-16-10 .slide-content {
-	width: 1920px;
-	height: 1200px;
+html .slide[slide-aspect-ratio="16:10"] .slide-content {
+  width: 1920px;
+  height: 1200px;
 }
 
-html .slide.aspect-1-1 .slide-content {
-	width: 1920px;
-	height: 1920px;
+html .slide[slide-aspect-ratio="1:1"] .slide-content {
+  width: 1920px;
+  height: 1920px;
 }
 
 /******************************************************************************/
 
 /* Fallback scaling if only persistent parts are left */
 
-html .slide .slide-container {
-	width: 960px;
-	height: 540px;
+html .slide[slide-aspect-ratio="16:9"] .slide-container {
+  width: 960px;
+  height: 540px;
 }
 
-html .slide .slide.aspect-4-3 .slide-container {
-	width: 960px;
-	height: 720px;
+html .slide[slide-aspect-ratio="4:3"] .slide-container {
+  width: 960px;
+  height: 720px;
 }
 
-html .slide .slide.aspect-16-10 .slide-container {
-	width: 960px;
-	height: 600px;
+html .slide[slide-aspect-ratio="16:10"] .slide-container {
+  width: 960px;
+  height: 600px;
 }
 
-html .slide .slide.aspect-1-1 .slide-container {
-	width: 960px;
-	height: 960px;
-}
-
-html .slide .slide-content {
-	transform: scale(0.5);
-	transform-origin: 0 0 0;
+html .slide[slide-aspect-ratio="1:1"] .slide-container {
+  width: 960px;
+  height: 960px;
 }</style></div><div class="paragraph style-paragraph collapsed" data-id="cxhUgB5x" name="Slide Notes Style" style=""><style data-type="content" type="text/css" codemirror="true" class="persistent">html .slide .slide-notes {
 	background: var(--material-color-black);
 	color: var(--material-color-grey-100);
@@ -1166,7 +1223,8 @@ html #snackbar .presentation-button i:after {
 	}
 
 	html,
-	body {
+	body,
+	#sections {
 		padding: 0 !important;
 		margin: 0 !important;
 		background-color: transparent !important;
@@ -1176,7 +1234,7 @@ html #snackbar .presentation-button i:after {
 		display: none;
 	}
 
-	#sections {
+	#sections .section {
 		margin: 0 !important;
 		padding: 0 !important;
 
@@ -1185,7 +1243,7 @@ html #snackbar .presentation-button i:after {
 		left: 0;
 
 		min-width: 297mm;
-		min-height: 100%;
+		height: 209mm;
 	}
 
 	#sections .section .paragraph {
@@ -1226,320 +1284,124 @@ html #snackbar .presentation-button i:after {
 	#sections .section > .paragraph > .slide table thead {
 		display: table-row-group;
 	}
-}</style></div><div class="paragraph style-paragraph collapsed" data-id="zXb5uycG" name="Basic Slide Style" style="" draggable="false"><style data-type="content" type="text/css" codemirror="true" class="themable persistent">/* Hack for a margin without increasing the size of the element */
-html .slide.basic .slide-content {
-	box-sizing: border-box !important;
-	border: 48px solid rgba(0, 0, 0, 0);
-}
+}</style></div><div class="paragraph code-paragraph collapsed" data-id="UiFcUVAs" run-on-load="true" last-execution-state="success" name="Allow to mute videos with muted attribute" style=""><pre data-type="content" type="text/javascript">const mutedVideoSelector = 'video[muted=""],video[muted="true"]';
 
-/******************************************************************************/
+const muteVideo = (video) =&gt; {
+// 	window.console.log('mute video', video);
+	video.muted = true;
+};
 
-html .slide.basic .slide-content .no-padding {
-	padding: 0 !important;
-}
+// observe the document for added video elements with muted attribute set or
+// muted attribute set to true
+let observer = new MutationObserver((mutations) =&gt; {
+	
+	mutations.forEach((mutation) =&gt; {
+		
+		Array.prototype.forEach.call(mutation.addedNodes, (node) =&gt; {
+			
+			// only process element nodes
+			if (node.nodeType !== Node.ELEMENT_NODE) return;
+			
+			if (node.matches(mutedVideoSelector)) {
+				muteVideo(node);
+			}
+			
+			const mutedVideos = node.querySelectorAll(mutedVideoSelector);
+			Array.prototype.forEach.call(mutedVideos, muteVideo);
+		});
+	});
+});
 
-html .slide.basic .slide-content .no-margin {
-	margin: 0 !important;
-}
+observer.observe(document.body, {
+	childList: true,
+	subtree: true
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="F9jz9VQS" name="Presentation Config"><pre data-type="content" type="text/javascript" id="presentation-config">const ParagraphUtils = require('#paragraph-utils');
 
-html .slide.basic .slide-content .center,
-html .slide.basic .slide-content .middle,
-html .slide.basic .slide-content .left,
-html .slide.basic .slide-content .right,
-html .slide.basic .slide-content .top,
-html .slide.basic .slide-content .bottom {
-	display: flex;
-	flex-direction: column;
-}
+const slideTemplates = new Set();
+slideTemplates.add("default");
 
-html .slide.basic  .slide-content .center {
-	align-items: center;
-}
+Object.defineProperty(exports, "slideTemplates", {
+  get() {
+    return Array.from(slideTemplates.values());
+  }
+});
 
-html .slide.basic .slide-content .left {
-	align-items: flex-start;
-}
+exports.updateSlideTemplates = (paragraph) =&gt; {
+  const header = ParagraphUtils.getHeaderElement(paragraph);
+  const content = ParagraphUtils.getContentElement(paragraph);
+  ParagraphUtils.addSelectElement(header, "slide-template", content, exports.slideTemplates);
+};
 
-html .slide.basic .slide-content .right {
-	align-items: flex-end;
-}
+const updateExistingSlideParagraphs = () =&gt; {
+  const slides = document.querySelectorAll('.body-paragraph .slide');
 
-html .slide.basic .slide-content .middle {
-	justify-content: center;
-	height: 100%;
-}
+  Array.prototype.forEach.call(slides, (slide) =&gt; {
+    const paragraph = slide.closest('.paragraph');
+    exports.updateSlideTemplates(paragraph);
+  });
+};
 
-html .slide.basic .slide-content .top {
-	justify-content: flex-start;
-	height: 100%;
-}
+exports.addSlideTemplate = (name) =&gt; {
+  slideTemplates.add(name);
+  updateExistingSlideParagraphs();
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="9dUnaZsX" run-on-load="true" last-execution-state="success" name="Add selector for slide template" style=""><pre data-type="content" type="text/javascript">const ParagraphUtils = require('#paragraph-utils');
+const PresentationConfig = require('#presentation-config');
 
-html .slide.basic .slide-content .bottom {
-	justify-content: flex-end;
-	height: 100%;
-}
+const liveSelector = document.liveQuerySelectorAll('.body-paragraph');
+liveSelector.added((paragraph) =&gt; {
+  const header = ParagraphUtils.getHeaderElement(paragraph);
+  const content = ParagraphUtils.getContentElement(paragraph);
 
-html .slide.basic .slide-content .middle-self {
-	justify-self: center;
-}
+  const liveAttribute = content.liveAttribute("class");
+  liveAttribute.changed(() =&gt; {
+    if (content.classList.contains("slide")) {
+      
+      // add default slide template
+      if (!content.hasAttribute("slide-template")) {
+        content.setAttribute("slide-template", "default");
+      }
+      
+      PresentationConfig.updateSlideTemplates(paragraph);
+    } else {
+      const select = header.querySelector('select.slide-template-input');
+      if (select) {
+        select.remove();
+      }
+    }
+  });
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="tzpxN7Zh" run-on-load="true" last-execution-state="success" name="Add selector for aspect ratio" draggable="false" style=""><pre data-type="content" type="text/javascript">const ParagraphUtils = require('#paragraph-utils');
 
-/******************************************************************************/
+const aspectRatios = [
+  "16:9",
+  "4:3",
+  "16:10",
+  "1:1"
+];
 
-html .slide.basic .slide-content .split-h {
-	display: flex;
-	flex-direction: row;
-	height: 100%;
-}
+Codestrate.addEventListener("loaded", function onLoaded() {
+  Codestrate.removeEventListener("loaded", onLoaded);
 
-html .slide.basic .slide-content .split-v {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
+  const liveSelector = document.liveQuerySelectorAll('.body-paragraph');
+  liveSelector.added((paragraph) =&gt; {
+    const header = ParagraphUtils.getHeaderElement(paragraph);
+    const content = ParagraphUtils.getContentElement(paragraph);
 
-html .slide.basic .slide-content .split-h > *,
-html .slide.basic .slide-content .split-v > * {
-	flex: 1 1 50%;
-	margin: 0 !important;
-}
+    const liveAttribute = content.liveAttribute("class");
+    liveAttribute.changed(() =&gt; {
+      if (content.classList.contains("slide")) {
 
-html .slide.basic .slide-content .split-h > * + * {
-	margin-left: 32px !important;
-}
+        // add default aspect ratio
+        if (!content.hasAttribute("slide-aspect-ratio")) {
+          content.setAttribute("slide-aspect-ratio", "16:9");
+        }
 
-html .slide.basic .slide-content .split-v > * + * {
-	margin-top: 32px !important;
-}
-
-/******************************************************************************/
-
-html .slide.basic .slide-content slide-content,
-html .slide.basic .slide-content render-to,
-html .slide.basic .slide-content render-to > transient,
-html .slide.basic .slide-content iframe {
-	width: 100%;
-	height: 100%;
-}
-
-/******************************************************************************/
-
-html .slide.basic .slide-content h1,
-html .slide.basic .slide-content h2,
-html .slide.basic .slide-content h3 {
-	margin: 0;
-}
-
-/* Title */
-html .slide.basic .slide-content h1:first-of-type {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%) translateY(-48px);
-	width: 100%;
-	text-align: center;
-}
-
-/* Slide Header */
-html .slide.basic .slide-content h2:first-of-type {
-	margin-bottom: 96px;
-}
-
-/* Subtitle */
-html .slide.basic .slide-content h3:first-of-type {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%) translateY(48px);
-	width: 100%;
-	text-align: center;
-}
-
-html .slide.basic .slide-content a {
-	color: orange !important;
-}
-
-html .slide.basic .slide-content .keyword {
-	position: absolute;
-	left: 10%;
-	top: 40%;
-	font-size: 1.2em;
-	font-weight: bold;
-}
-
-html .slide.basic .slide-content .slogan {
-	position: absolute;
-	top: 40%;
-	left: 10%;
-	width: 80%;
-	margin-top: 120px;
-	margin-left: 20px;
-	font-size: .8em;
-}
-
-html .slide.basic .slide-content ul.items {
-	list-style: none;
-	font-size: .7em;
-	width: 90% !important;
-}
-
-html .slide.basic .slide-content ul.items li {
-	padding-bottom: 55px;
-}
-
-html .slide.basic .slide-content .highlight {
-	font-weight: bold;
-}
-
-html .slide.basic .slide-content .image-footer {
-  display: block;
-  text-align: center;
-  font-size: .4em;
-  width: 100%;
-}
-
-html .slide.basic .slide-content .fill {
-  width: 100%;
-  height: 100%;
-}
-
-html .slide.basic .slide-content .fill-horizontal {
-  width: 100%;
-  height: auto;
-}
-
-html .slide.basic .slide-content .fill-vertical {
-  width: auto;
-  height: 100%;
-}
-
-html .slide.basic .slide-content .center-with-title {
-	position: absolute;
-  top: 60%;
-	left: 50%;
-	transform: translate3d(-50%, -50%, 0);
-  width: auto;
-  height: 70%;
-}
-
-html .slide.basic .slide-content .center {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate3d(-50%, -50%, 0);
-}
-
-html .slide.basic .slide-content .slide-title {
-  position: absolute;
-  top: 80px;
-  left: 10px;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, .75);
-  border-radius: 2px;
-  z-index: 2;
-}
-
-html .slide.basic .slide-content .slide-title.right {
-  display: inline-block;
-  left: 82%;
-}
-
-html .slide.basic .slide-content .slide-title-focus {
-  font-size: .6em;
-}
-
-html .slide.basic .slide-content .full-publication {
-  position: absolute;
-  font-size: .6em;
-  top: 60%;
-  left: 50%;
-  width: 80%;
-  transform: translate3d(-50%, -50%, 0);
-}
-
-html .slide.basic .slide-content .left-box,
-html .slide.basic .slide-content .right-box {
-  width: 45%;
-  float: left;
-  position: absolute;
-  top: 50%;
-}
-
-html .slide.basic .slide-content .left-box {
-  left: 25%;
-  transform: translate3d(-50%, -50%, 0);
-}
-
-html .slide.basic .slide-content .right-box {
-  left: 75%;
-  transform: translate3d(-50%, -50%, 0);
-}
-
-html .slide.basic .slide-content .topleft-box,
-html .slide.basic .slide-content .topright-box,
-html .slide.basic .slide-content .bottomleft-box,
-html .slide.basic .slide-content .bottomright-box {
-  position: absolute;
-  width: 45%;
-}
-
-html .slide.basic .slide-content .topleft-box .copyright,
-html .slide.basic .slide-content .topright-box .copyright,
-html .slide.basic .slide-content .bottomleft-box .copyright,
-html .slide.basic .slide-content .bottomright-box .copyright {
-  margin-bottom: 25px;
-  max-width: 90%;
-}
-
-html .slide.basic .slide-content .topleft-box {
-  top: 20px;
-  left: 60px;
-}
-
-html .slide.basic .slide-content .topright-box {
-  top: 20px;
-  right: 60px;
-}
-
-html .slide.basic .slide-content .bottomleft-box {
-  bottom: 5px;
-  left: 60px;
-}
-
-html .slide.basic .slide-content .bottomright-box {
-  bottom: 5px;
-  right: 60px;
-}
-
-html .slide.basic .slide-content .publication {
-	display: flex;
-	align-items: flex-end;
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, .75);
-  border-radius: 2px;
-  font-size: .4em;
-  max-width: 50%;
-  z-index: 2;
-}
-
-html .slide.basic .slide-content .publication .cover {
-	min-height: 100px;
-	min-width: 100px;
-	max-height: 150px;
-	background-size: contain;
-	margin-right: 10px;
-}
-
-html .slide.basic .slide-content .copyright {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, .75);
-  border-radius: 2px;
-  font-size: .4em;
-  max-width: 50%;
-  z-index: 2;
-}</style></div></div>
+        ParagraphUtils.addSelectElement(header, "slide-aspect-ratio", content, aspectRatios);
+      } else {
+        const select = header.querySelector('select.slide-aspect-ratio-input');
+        if (select) {
+          select.remove();
+        }
+      }
+    });
+  });
+});</pre></div></div>
