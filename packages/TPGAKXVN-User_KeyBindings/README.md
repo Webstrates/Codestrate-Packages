@@ -25,9 +25,9 @@
 | :--- | :--- |
 | Name | User KeyBindings |
 | ID | TPGAKXVN |
-| Version | 1.0.2 |
+| Version | 1.0.3 |
 | Description | Utility to overwrite keybindings with user defined bindings. |
 | Tags | `devtools` |
 | Assets | - |
 | Dependencies | - |
-| Changelog | `{"1.0":"Initial version.","1.0.1":"Added check if codestrate has already loaded to trigger initialize user key bindings, which is important if the package is installed after the window.addEventListener(\"codestrateloaded\", () =&gt; {}) event was triggered.","1.0.2":"Using the new codestrate event loaded to initialize user key binding functionality."}` |
+| Changelog | `{"1.0":"Initial version.","1.0.1":"Added check if codestrate has already loaded to trigger initialize user key bindings, which is important if the package is installed after the window.addEventListener(\"codestrateloaded\", () =&gt; {}) event was triggered.","1.0.2":"Using the new codestrate event loaded to initialize user key binding functionality.","1.0.3":"Fixed a bug causing the undo of toasts not working."}` |
