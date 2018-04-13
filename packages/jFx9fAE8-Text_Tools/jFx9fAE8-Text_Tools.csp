@@ -3,7 +3,8 @@
 	"icon": "text_fields",
 	"description": "Adds rich-text editing capabilities for body-paragraphs.",
 	"tags": [
-		"text editing"
+		"text editing",
+		"body paragraphs"
 	],
 	"assets": [],
 	"dependecies": [],
