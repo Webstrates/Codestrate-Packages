@@ -8,7 +8,7 @@
 | ID | jFx9fAE8 |
 | Version | 1.1 |
 | Description | Adds rich-text editing capabilities for body-paragraphs. |
-| Tags | `text editing` |
+| Tags | `text editing, body paragraphs` |
 | Assets | - |
 | Dependencies | - |
 | Changelog | `{"1.1":"Moved Text Tools to the snackbar.","1.0":"Initital Release"}` |
