@@ -1,0 +1,57 @@
+<div class="section section-visible" data-id="eZRsryZi" name="Duplicate Section or Paragraph" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="bGHX5t5C"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>A small utility to duplicate sections or paragraphs.</div><h3>Usage</h3><div>Select a section or paragraph and press the "Duplicate" button in the snackbar or the <kbd>Mod</kbd> + <kbd>J</kbd> shortcut.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="M4Nth7zW"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+  "version": "1.0",
+  "icon": "content_copy",
+  "description": "A small utility to duplicate sections or paragraphs.",
+  "tags": [
+    "utility"
+  ],
+  "assets": [],
+  "dependencies": [],
+  "changelog": {
+    "1.0": "Initial version."
+  },
+  "github": {
+    "url": "https://github.com/Webstrates/Codestrate-Packages",
+    "folder": "packages/eZRsryZi-Duplicate_Section_or_Paragraph"
+  }
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="R8yEyfwg" name="Duplicate Code" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const SnackbarUtils = require("#snackbar-utils");
+
+/******************************************************************************/
+
+const duplicateElement = () =&gt; {
+  let section = false;
+
+  // Find section or paragraph
+  let element = Codestrate.focussedParagraph;
+  if (!element) {
+    element = Codestrate.focussedSection;
+    section = true;
+  }
+
+  if (!element) {
+    alert("No section or paragraph selected.", "Duplicate Section or Paragraph");
+    return;
+  }
+
+  // Clone element and remove selection attribute and data-ids
+  const clone = element.cloneNode(true);
+
+  clone.querySelectorAll("transient").forEach((transient) =&gt; transient.remove());
+  clone.querySelectorAll(".paragraph[data-id]").forEach((dataId) =&gt; dataId.removeAttribute("data-id"));
+  clone.removeAttribute("data-id");
+  clone.removeAttribute("transient-focussed");
+
+  // Insert clone after element
+  element.parentNode.insertBefore(clone, element.nextSibling);
+
+  // Display toast with undo action
+  const name = element.getAttribute("name");
+  toast(`Duplicated ${section ? "section" : "paragraph"} "${name ? name : "No Name"}"`, 5000, () =&gt; {
+    clone.remove();
+  }, "Undo");
+};
+
+Codestrate.addCommand("duplicate.duplicate", "Duplicate Section or Paragraph", () =&gt; duplicateElement());
+Codestrate.addKeyBinding("duplicate.duplicate", "mod+j", true);
+
+SnackbarUtils.addButton("Duplicate", "content_copy", "section-tools", 1, () =&gt; duplicateElement());</pre></div></div>
