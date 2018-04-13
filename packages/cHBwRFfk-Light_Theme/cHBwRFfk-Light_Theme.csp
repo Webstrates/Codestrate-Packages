@@ -1,39 +1,37 @@
 <div class="section section-visible" name="Light Theme" data-id="cHBwRFfk" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="65H4Ysj6" draggable="false" style="" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>A theme with an inverted color scheme for a brighter Codestrate.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="Q6KFBYkY" draggable="false" style="" name="Properties"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.0.1",
-	"icon": "palette",
-	"description": "A theme with an inverted color scheme for a brighter Codestrate.",
-	"tags": [
-		"themes"
-	],
-	"assets": [],
-	"dependencies": [
-		{
-			"id": "w2AXGDAm",
-			"name": "Theme Creator",
-			"optional": true,
-			"usage": "The Theme Creator is needed to update themes."
-		}
-	],
-	"changelog":
-	{
-		"1.0.1": "Updated dependency to be optional.",
-		"1.0": "Initial Version."
-	},
-	"github": {
-		"url": "https://github.com/Webstrates/Codestrate-Packages",
-		"folder": "packages/cHBwRFfk-Light_Theme"
-	}
+  "version": "1.0.5",
+  "icon": "palette",
+  "description": "A theme with an inverted color scheme for a brighter Codestrate.",
+  "tags": [
+    "themes"
+  ],
+  "assets": [],
+  "dependencies": [],
+  "changelog": {
+    "1.0": "Initial Version.",
+    "1.0.1": "Updated dependency to be optional.",
+    "1.0.2": "Used Commands API.",
+    "1.0.3": "Fixed 'Update Theme'.",
+    "1.0.4": "Adjusted to new theme API.",
+    "1.0.5": "Removed dependency on theme creator."
+  },
+  "github": {
+    "url": "https://github.com/Webstrates/Codestrate-Packages",
+    "folder": "packages/cHBwRFfk-Light_Theme"
+  }
 }</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="QHQAMayX" name="Add Global Menu Entry" style="" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript" class="" contenteditable="false">const GlobalMenuUtils = require("#global-menu-utils");
 
 /******************************************************************************/
 
-const toggleThemeButton = GlobalMenuUtils.createButton("Toggle Light Theme", null, event =&gt; {
-	if (document.documentElement.hasAttribute("transient-theme") &amp;&amp;
-		  (document.documentElement.getAttribute("transient-theme") === "Light")) {
-		document.documentElement.removeAttribute("transient-theme");
+Codestrate.addCommand("themes.toggleLightTheme", "Toggle Light Theme", () =&gt; {
+	if (Codestrate.theme === "Light") {
+    Codestrate.theme = undefined;
 	} else {
-		document.documentElement.setAttribute("transient-theme", "Light");
+    Codestrate.theme = "Light";
 	}
+});
+const toggleThemeButton = GlobalMenuUtils.createButton("Toggle Light Theme", null, event =&gt; {
+	Codestrate.executeCommand("themes.toggleLightTheme");
 });
 
 /******************************************************************************/
@@ -41,15 +39,12 @@ const toggleThemeButton = GlobalMenuUtils.createButton("Toggle Light Theme", nul
 const subMenuName = "Themes";
 
 GlobalMenuUtils.addMenuItemToSubMenu(toggleThemeButton, subMenuName);</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="rTQ75TU9" name="Update Theme" style="" last-execution-state="success"><pre data-type="content" type="text/javascript" class="" contenteditable="false">try {
-	const ThemeCreatorCode = require("#theme-creator-code");
+  const ThemeCreatorCode = require("#theme-creator-code");
+  ThemeCreatorCode.updateTheme("cHBwRFfk", "Light");
 } catch (e) {
-	alert(`You need to install the optional dependency "Theme Creator" (w2AXGDAm) to update themes!`, "Missing Theme Creator");
-	return;
-}
-
-/******************************************************************************/
-
-ThemeCreatorCode.updateTheme("cHBwRFfk", "Light");</pre></div><div class="paragraph style-paragraph collapsed" data-id="dyLiA5CB" draggable="false" style="" name="Theme Variables" orig-data-id="Z2h2eCWM"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Light"]:root {
+  alert(`You need to install the optional dependency "Theme Creator" (w2AXGDAm) to update themes!`, "Missing Theme Creator");
+  return;
+}</pre></div><div class="paragraph style-paragraph collapsed" data-id="dyLiA5CB" draggable="false" style="" name="Theme Variables" orig-data-id="Z2h2eCWM"><style data-type="content" type="text/css" codemirror="true" class="">html[transient-theme="Light"]:root {
 
 	/* Fonts */
 	--font-primary: "Roboto", "Avenir", sans-serif;
