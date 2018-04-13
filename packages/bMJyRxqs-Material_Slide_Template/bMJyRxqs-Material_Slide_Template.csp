@@ -1,0 +1,750 @@
+<div class="section section-visible" data-id="bMJyRxqs" name="Material Slide Template" data-type="package"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="xd6wYUAy"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>This package provides a Material slide template for the Presentations package.</div><div class="warning"><b>Hint</b>: This slide tempalte uses CSS classes for style and thus can not be modified as easily with the Text Tools package as the basic slide template. See the examples below for the usage of them.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="xcvPVmx2"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+  "version": "1.0.10",
+  "icon": "style",
+  "description": "This package provides a material slide template for the Presentations package.",
+  "tags": [
+    "presentation",
+    "template"
+  ],
+  "dependencies": [
+    {
+      "id": "qcWPfzfc",
+      "name": "Presentations",
+      "optional": false,
+      "usage": "The basic slide template only works together with the Presentations package."
+    }
+  ],
+  "changelog": {
+    "1.0.10": "Small fix for fill image.",
+    "1.0.9": "Overview style.",
+    "1.0.8": "Added stepper styles.",
+    "1.0.7": "Fill image caption.",
+    "1.0.6": "Filled fill image style.",
+    "1.0.5": "Fill image style.",
+    "1.0.4": "Added style for 1/3 2/3 split and 'three-points' list.",
+    "1.0.3": "Small fix for .filled class.",
+    "1.0.2": "Centered headers.",
+    "1.0.1": "Adapted style to new default slide styles.",
+    "1.0": "Initial version."
+  },
+  "github": {
+    "url": "https://github.com/Webstrates/Codestrate-Packages",
+    "folder": "packages/bMJyRxqs-Material_Slide_Template"
+  }
+}</pre></div><div class="paragraph code-paragraph collapsed" data-id="gpPFQxxP" name="Install Material Slide Template" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const PresentationConfig = require('#presentation-config');
+PresentationConfig.addSlideTemplate("material");</pre></div><div class="paragraph style-paragraph collapsed" data-id="KRP4pyKe" name="Material Slide Styles" style=""><style data-type="content" type="text/css" codemirror="true">html body .paragraph .slide[slide-template="material"] .slide-content[slide-number]:after {
+  content: attr(slide-number);
+  position: absolute;
+  font-size: 0.5em;
+	top: auto;
+	bottom: 72px;
+	right: 96px;
+	padding: 0;
+	background: none;
+	line-height: 24px;
+	color: var(--material-color-grey-600);
+	font-weight: 400;
+	font-family: var(--font-monospace);
+  z-index: 20;
+}
+
+html .slide[slide-template="material"] .slide-content {
+	background: var(--material-color-grey-100);
+  font-size: 48px;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .card {
+	color: var(--material-color-grey-900);
+	background: var(--material-color-white);
+	margin: 48px;
+	width: calc(100% - 192px) !important;
+	height: calc(100% - 192px) !important;
+	box-shadow: var(--material-shadow-z8);
+	border-radius: 4px;
+	display: flex;
+	flex-direction: column;
+	padding: 48px;
+	z-index: 1;
+}
+
+html .slide[slide-template="material"] .slide-content .card > * {
+	z-index: 10;
+}
+
+html .slide[slide-template="material"]:not(.skip-slide-number) .card {
+	height: calc(100% - 264px) !important;
+	padding-bottom: 120px;
+}
+
+html .slide[slide-template="material"]:not(.skip-slide-number) .slide-content .card:after {
+	position: absolute;
+	bottom: 48px;
+	align-self: center;
+	font-weight: 500;
+	font-size: 0.5em;
+	line-height: 24px;
+	border-top: 1px solid var(--material-color-grey-400);
+	width: calc(100% - 192px);
+	background: var(--material-color-grey-50);
+	padding: 24px 48px;
+	text-align: left;
+	border-radius: 0 0 4px 4px;
+	color: var(--material-color-grey-600);
+	font-weight: 400;
+	font-family: var(--font-monospace);
+  z-index: 15;
+}
+
+html .slide[slide-template="material"] .slide-content .card.filled {
+	padding: 0;
+	width: calc(100% - 96px) !important;
+	height: calc(100% - 96px) !important;
+}
+
+html .slide[slide-template="material"]:not(.skip-slide-number) .card.filled {
+	height: calc(100% - 168px) !important;
+	padding-bottom: 72px;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .no-padding {
+	padding: 0 !important;
+}
+
+html .slide[slide-template="material"] .slide-content .no-margin {
+	margin: 0 !important;
+}
+
+html .slide[slide-template="material"] .slide-content .center,
+html .slide[slide-template="material"] .slide-content .middle,
+html .slide[slide-template="material"] .slide-content .left,
+html .slide[slide-template="material"] .slide-content .right,
+html .slide[slide-template="material"] .slide-content .top,
+html .slide[slide-template="material"] .slide-content .bottom {
+	display: flex;
+	flex-direction: column;
+}
+
+html .slide[slide-template="material"] .slide-content .center {
+	align-items: center;
+}
+
+html .slide[slide-template="material"] .slide-content .left {
+	align-items: flex-start;
+}
+
+html .slide[slide-template="material"] .slide-content .right {
+	align-items: flex-end;
+}
+
+html .slide[slide-template="material"] .slide-content .middle {
+	justify-content: center;
+	height: 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .top {
+	justify-content: flex-start;
+	height: 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .bottom {
+	justify-content: flex-end;
+	height: 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .middle-self {
+	justify-self: center;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .split-h {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .split-v {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .split-h > *,
+html .slide[slide-template="material"] .slide-content .split-v > * {
+	flex: 1 1 50%;
+	margin: 0 !important;
+}
+
+html .slide[slide-template="material"] .slide-content .split-h > * + * {
+	margin-left: 32px !important;
+}
+
+html .slide[slide-template="material"] .slide-content .split-v > * + * {
+	margin-top: 32px !important;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .split-h-1-2 {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .split-h-1-2 > *:first-child {
+	flex: 1 1 33%;
+	margin: 0 !important;
+}
+
+html .slide[slide-template="material"] .slide-content .split-h-1-2 > *:last-child {
+	flex: 1 1 67%;
+	margin: 0 !important;
+	margin-left: 48px !important;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content slide-content,
+html .slide[slide-template="material"] .slide-content render-to,
+html .slide[slide-template="material"] .slide-content render-to > transient,
+html .slide[slide-template="material"] .slide-content iframe {
+	width: 100%;
+	height: 100%;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .fill-image,
+html .slide[slide-template="material"] .fill-image-filled {
+  margin: 0 !important;
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+html .slide[slide-template="material"] .fill-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  box-shadow: var(--material-shadow-z4);
+}
+
+html .slide[slide-template="material"] .fill-image-filled {
+  width: calc(100% + 48px) !important;
+  height: calc(100% + 96px) !important;
+  border-top-right-radius: 4px;
+  margin-right: -48px !important;
+  margin-top: -48px !important;
+  margin-bottom: -48px !important;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .overview {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 1362px;
+  height: 816px;
+}
+
+html .slide[slide-template="material"] .overview > * {
+  width: 416px;
+  height: 234px;
+  background: var(--material-color-white);
+  border-radius: 4px;
+  box-shadow: var(--material-shadow-z4);
+  margin-bottom: 57px;
+  margin-right: 57px;
+  cursor: pointer;
+}
+
+html .slide[slide-template="material"] .overview > *:nth-child(3n) {
+  margin-right: 0;
+}
+
+html .slide[slide-template="material"] .overview > * > * {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  border-radius: 4px;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="hVXkpZCL" name="Material Text Styles" style=""><style data-type="content" type="text/css" codemirror="true">html .slide[slide-template="material"] .slide-content .presentation-title {
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: 1.75em;
+	font-family: var(--font-monospace);
+	letter-spacing: 0.02em;
+  text-align: center;
+}
+
+html .slide[slide-template="material"] .slide-content .presentation-subtitle {
+	color: var(--material-color-grey-850);
+	font-size: 1.1666em;
+	margin-top: 24px;
+	font-family: var(--font-monospace);
+  text-align: center;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .section-title {
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: 1.5em;
+	font-family: var(--font-monospace);
+	letter-spacing: 0.02em;
+  text-align: center;
+}
+
+html .slide[slide-template="material"] .slide-content .section-subtitle {
+	color: var(--material-color-grey-850);
+	font-size: 1em;
+	margin-top: 16px;
+	font-family: var(--font-monospace);
+  text-align: center;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .slide-title {
+	font-weight: 500;
+	font-size: 1.25em;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-subtitle {
+	font-size: 0.8333em;
+	color: var(--material-color-grey-850);
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .slide-body {
+	color: var(--material-color-grey-850);
+	margin-top: 48px;
+	flex: 1 1 100%;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-body > *:first-child {
+	margin-top: 0;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-body .medium {
+	font-weight: 500;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .slide-body div {
+	margin-bottom: 16px;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-body ul {
+	list-style-type: disc;
+	margin-top: 0;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-body li {
+	margin-bottom: 16px;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-body .conclusion {
+	font-weight: 700;
+	margin-left: 48px;
+}
+
+html .slide[slide-template="material"] .slide-content .slide-body .conclusion:before {
+	content: "⇒";
+	margin-left: -56px;
+	position: absolute;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content iframe {
+	border: none;
+}
+
+html .slide[slide-template="material"] .slide-content .card.filled iframe {
+	border-radius: 4px;
+	-webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+html .slide[slide-template="material"]:not(.skip-slide-number) .slide-content .card.filled iframe {
+	border-radius: 4px 4px 0 0;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .slide-content .card.filled .alice-bob {
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+}
+
+html .slide[slide-template="material"] .slide-content .card.filled iframe.alice {
+	border-radius: 4px 0 0 4px;
+}
+
+html .slide[slide-template="material"] .slide-content .card.filled iframe.bob {
+	border-radius: 0 4px 4px 0;
+}
+
+html .slide[slide-template="material"]:not(.skip-slide-number) .slide-content .card.filled iframe.alice {
+	border-radius: 4px 0 0 0;
+	border-right: 1px solid var(--material-color-grey-400);
+}
+
+html .slide[slide-template="material"]:not(.skip-slide-number) .slide-content .card.filled iframe.bob {
+	border-radius: 0 4px 0 0;
+	border-left: 1px solid var(--material-color-grey-400);
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] figure {
+	margin: 0;
+}
+
+html .slide[slide-template="material"] figure > * {
+	width: 100%;
+}
+
+html .slide[slide-template="material"] figcaption {
+	font-size: 0.625em;
+	font-weight: 500;
+	text-align: center;
+}
+
+html .slide[slide-template="material"] .fill-image-caption {
+  background: var(--material-color-white);
+  font-size: 0.625em;
+  font-weight: 500;
+  flex: 0 1 auto;
+  margin: 16px;
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] .left-text {
+  text-align: left;
+}
+
+html .slide[slide-template="material"] .center-text {
+  text-align: center;
+}
+
+html .slide[slide-template="material"] .right-text {
+  text-align: right;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] ul.three-points {
+  list-style: none !important;
+  margin-left: -40px;
+  height: 100%;
+}
+
+html .slide[slide-template="material"] ul.three-points li {
+  padding-top: 16px;
+  height: 192px;
+  margin: 0;
+  border-top: 4px solid var(--material-color-grey-850);
+  font-size: 1.1em;
+}
+
+/******************************************************************************/
+
+html .slide[slide-template="material"] ul.stepper {
+  display: block;
+  list-style: none !important;
+  counter-reset: stepper;
+  margin: 0;
+  padding-left: 24px;
+}
+
+html .slide[slide-template="material"] ul.stepper li {
+  position: relative;
+}
+
+html .slide[slide-template="material"] ul.stepper li .step-title {
+  margin: 0 -48px;
+  padding: 24px 0 48px 128px;
+  display: block;
+  font-weight: 500;
+}
+html .slide[slide-template="material"] ul.stepper li:before {
+  position: absolute;
+  top: 24px;
+  counter-increment: stepper;
+  content: counter(stepper);
+  height: 56px;
+  width: 56px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 56px;
+  font-weight: 400;
+  color: var(--material-color-white);
+  background-color: var(--material-color-blue);
+  font-size: 29px;
+}
+
+html .slide[slide-template="material"] ul.stepper li:after {
+  content: "";
+  position: absolute;
+  top: 100px;
+  left: 27px;
+  width: 2px;
+  background-color: var(--material-color-grey-500);
+  height: calc(100% - 96px);
+}
+
+html .slide[slide-template="material"] ul.stepper li:last-child:after {
+  display: none;
+}
+
+html .slide[slide-template="material"] ul.stepper li.done:before {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  word-wrap: normal;
+  font-feature-settings: "liga";
+  content: "check";
+  font-size: 36px;
+}
+
+html .slide[slide-template="material"] ul.stepper li.new .step-title {
+  color: var(--material-color-grey-500);
+}
+
+html .slide[slide-template="material"] ul.stepper li.new:before {
+  background-color: var(--material-color-grey-500);
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="36GmbVE2" name="Material Slide Footer" draggable="false" style=""><style data-type="content" type="text/css" codemirror="true">html .slide[slide-template="material"]:not(.skip-slide-number) .slide-content .card:after {
+	content: "XX.XX.20XX                                 Footer Title — Footer Author";
+}</style></div><div class="paragraph body-paragraph collapsed" data-id="43Mwdgds" name="Presentation Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide skip-slide-number" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+	<div class="slide-content" contenteditable="true">
+		<div class="card center middle">
+			<div class="presentation-title">Presentation Title</div>
+			<div class="presentation-subtitle">Presentation Subtitle — 01.01.2018</div>
+		</div>
+	</div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+	<div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" data-id="AhYAvc4X" name="Segment Template" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+	<div class="slide-content" contenteditable="true" slide-number="2">
+		<div class="card center middle">
+			<div class="section-title">Segment Title</div>
+			<div class="section-subtitle">“segment subtitle”</div>
+		</div>
+	</div>
+</div><div class="slide-notes-container" contenteditable="false">
+	<div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" data-id="wAZfEycz" name="Stepper Segment Template" draggable="false" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+  <div class="slide-content" contenteditable="true" slide-number="1">
+    <div class="card">
+      <div class="split-h-1-2">
+        <div class="middle">
+          <ul class="stepper">
+            <li class="done">
+              <div class="step-title">Motivation</div>
+            </li>
+            <li class="done">
+              <div class="step-title">Technologies</div>
+            </li>
+            <li>
+              <div class=" step-title">Implementation</div>
+            </li>
+            <li class="new">
+              <div class="step-title">Further Development</div>
+            </li>
+            <li class="new">
+              <div class="step-title">Outlook</div>
+            </li>
+          </ul>
+        </div>
+        <div class="middle">
+          <div class="section-title">Segement Title</div>
+          <div class="section-subtitle">“segment subtitle”</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+  <div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" data-id="YSFbj9eH" name="Body Template" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+	<div class="slide-content" contenteditable="true" slide-number="3">
+    <div class="card">
+      <div class="slide-title">Title</div>
+      <div class="slide-body">Body</div>
+    </div>
+  </div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+  <div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" data-id="Z9CrtzpP" name="List Template" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+  <div class="slide-content" contenteditable="true" slide-number="4">
+    <div class="card">
+      <div class="slide-title">Title</div>
+      <div class="slide-body">
+        <div class="medium">Subtitle 1</div>
+        <div>
+          <ul>
+            <li>List element 1</li>
+            <li>List element 2</li>
+            <li>List element 3</li>
+          </ul>
+        </div>
+        <div class="medium">Subtitle 2</div>
+        <div>
+          <ul>
+            <li>List element 1</li>
+            <li>List element 2</li>
+            <li>List element 3</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+  <div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" data-id="tkcMVL3D" name="Split Template" style=""><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+	<div class="slide-content" contenteditable="true" slide-number="5">
+		<div class="card">
+			<div class="slide-title">Motivation</div>
+			<div class="slide-body split-h">
+				<div>
+          <div class="medium">Subtitle 1</div>
+          <div>
+            <ul>
+              <li>List element 1</li>
+              <li>List element 2</li>
+              <li>List element 3</li>
+            </ul>
+          </div>
+          <div class="medium">Subtitle 2</div>
+          <div>
+            <ul>
+              <li>List element 1</li>
+              <li>List element 2</li>
+              <li>List element 3</li>
+            </ul>
+          </div>
+        </div>
+				<div class="center">
+					<figure>
+						<img src="favicon-android-chrome-512x512.png">
+						<figcaption>Fig. 1: Caption</figcaption>
+					</figure>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+	<div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" name="Fill Split Template" data-id="sWfKdKCe"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+  <div class="slide-content" contenteditable="true" slide-number="1">
+    <div class="card">
+      <div class="split-h-1-2">
+        <div>
+          <div class="slide-title">Application-Centric Model<br></div>
+          <div class="slide-body">
+            <div>
+              <ul class="three-points">
+                <li>List element 1<br>Second line</li>
+                <li>List element 2<br>Second line</li>
+                <li>Fill image is 1125.6 x 816 Pixels (~4:3)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="center middle">
+          <div class="fill-image" style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);">
+            <div class="fill-image-caption">My Caption</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+  <div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" name="Fill-Filled Split Template" data-id="Lik76rhi" style="" draggable="false"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+  <div class="slide-content" contenteditable="true" slide-number="1">
+    <div class="card">
+      <div class="split-h-1-2">
+        <div>
+          <div class="slide-title">Example<br><br></div>
+          <div class="slide-body">
+            <div>
+              <ul class="three-points">
+                <li>List element 1<br>Second line</li>
+                <li>List element 2<br>Second line</li>
+                <li>Fill image is 1173.6 x 912 Pixels (~4:3)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="center middle">
+          <div class="fill-image-filled" style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);">
+            <div class="fill-image-caption">My Caption</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+  <div class="slide-notes" contenteditable="true"></div>
+</div></div></div><div class="paragraph body-paragraph collapsed" data-id="a47gTGff" name="Overview Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" class="slide" slide-template="material" slide-aspect-ratio="16:9"><div class="slide-container" contenteditable="false">
+  <div class="slide-content" contenteditable="true" slide-number="1">
+    <div class="card center middle">
+      <div class="overview">
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+        <div>
+          <div style="background-image: url(&quot;https://picsum.photos/1920/1080&quot;);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="slide-notes-container" contenteditable="false">
+  <div class="slide-notes" contenteditable="true"></div>
+</div></div></div></div>
