@@ -6,9 +6,9 @@
 | :--- | :--- |
 | Name | Theme Creator |
 | ID | w2AXGDAm |
-| Version | 1.0.3 |
+| Version | 1.0.8 |
 | Description | Utility to create new themes. |
 | Tags | `themes, devtools, utility` |
 | Assets | - |
 | Dependencies | - |
-| Changelog | `{"1.0.3":"Updated the template to make the dependency on this package optional.","1.0.2":"Remove 'persistent' class from style paragraphs.","1.0.1":"Better properties template.","1.0":"Initial version."}` |
+| Changelog | `{"1.0":"Initial version.","1.0.1":"Better properties template.","1.0.2":"Remove 'persistent' class from style paragraphs.","1.0.3":"Updated the template to make the dependency on this package optional.","1.0.4":"Used Commands API and added tags to the properties template.","1.0.5":"Fixed 'Update Theme' template.","1.0.6":"Fix typo in menu entry.","1.0.7":"Adjusted theme creator to match new theme API.","1.0.8":"Removed optional dependency on theme creator from template."}` |
