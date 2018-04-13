@@ -1,5 +1,5 @@
-<div name="Shared Pointers" class="section section-visible" data-type="package" data-group="basic" data-id="mhzRF233" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="XUF62tu7"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to see mouse pointers of other people on a codestrate.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="xVmNyYKM"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.1",
+<div name="Shared Pointers" class="section section-visible" data-type="package" data-group="basic" data-id="mhzRF233" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="XUF62tu7"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to see mouse pointers of other people on a codestrate.</div></div></div><div class="paragraph data-paragraph collapsed locked" name="Properties" data-id="xVmNyYKM"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.1.1",
 	"icon": "mouse",
 	"description": "Adds the functionality to see mouse pointers of other people on a codestrate.",
 	"tags": [
@@ -9,8 +9,9 @@
 	"dependencies": [],
 	"changelog":
 	{
+		"1.0": "Initital Release",
 		"1.1": "Calculation with new margins fixed.",
-		"1.0": "Initital Release"
+    "1.1.1": "Fixed issue with throttling function and Codestrate.on event listener."
 	},
 	"github": {
 		"url": "https://github.com/Webstrates/Codestrate-Packages",
@@ -19,8 +20,14 @@
 }</pre></div>
 
 <div class="paragraph code-paragraph collapsed" name="Shared Pointers Code" run-on-load="true" last-execution-state="success" data-id="KaMxKCbr"><pre data-type="content" type="text/javascript">const ClientManager = require('#client-manager');
+const EventUtils = require('#event-utils');
 
 var clients = {};
+
+const throttledSignal = EventUtils.throttle((msg, clientId) =&gt; {
+	if (clientId) document.body.webstrate.signal(msg, clientId);
+	else document.body.webstrate.signal(msg);
+}, 100);
 
 /**
  * Returns an object with the position relative to the body and relative to a given
@@ -159,7 +166,7 @@ function createCursor(clientId) {
 	return cursor;
 }
 
-Codestrate.on("clientUpdateProperty", ({ property, client }) =&gt; {
+Codestrate.addEventListener("clientUpdateProperty", ({ property, client }) =&gt; {
 	let cursor = document.querySelector(`.remote-cursor[client-id="${client.id}"]`);
 	if (cursor) {
 		cursor.setAttribute("username", client.username);
@@ -223,34 +230,6 @@ function getRemoteCursorPostion(msg) {
 	return {
 		x: x,
 		y: y
-	};
-}
-
-var count = 0;
-
-function signal(msg, clientId) {
-	if (clientId) document.body.webstrate.signal(msg, clientId);
-	else document.body.webstrate.signal(msg);
-}
-
-const throttledSignal = throttleFn(signal, 100);
-
-function throttleFn(fn, limit) {
-	var timeout;
-	var lastCall = 0;
-	return function (...args) {
-		var now = Date.now();
-		var delay = lastCall + limit - now;
-		if (delay &lt;= 0) {
-			fn(...args);
-			lastCall = now;
-		} else {
-			clearTimeout(timeout);
-			timeout = setTimeout(function () {
-				fn(...args);
-				lastCall = now;
-			}, delay);
-		}
 	};
 }
 
