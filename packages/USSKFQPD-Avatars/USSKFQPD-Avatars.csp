@@ -1,5 +1,5 @@
 <div name="Avatars" data-type="package" class="section section-visible" data-group="basic" data-id="USSKFQPD" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" draggable="false" name="Documentation" data-id="rVwMQEUm"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Displays an avatar in the bottom right corner for every user on a Codestrate. Clicking on the avatar will flash the screen on the other users Codestrate.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="7kcnKK3R"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.0.1",
+	"version": "1.0.3",
 	"icon": "account_circle",
 	"description": "Displays an avatar in the bottom right corner for every user on a Codestrate.",
 	"tags": [
@@ -9,8 +9,10 @@
 	"dependencies": [],
 	"changelog":
 	{
+		"1.0": "Initital Release",
 		"1.0.1": "Some styling and description.",
-		"1.0": "Initital Release"
+		"1.0.2": "Fixed issue with Codestrate.on event API, which was @deprecated and use Codestrate.addEventListener instead.",
+    "1.0.3": "Added style for notification bar."
 	},
 	"github": {
 		"url": "https://github.com/Webstrates/Codestrate-Packages",
@@ -196,16 +198,16 @@ webstrate.on("signal", (message, senderId) =&gt; {
 Codestrate.clients.forEach((client) =&gt; addAvatar(client));
 
 // Add clients added later on
-Codestrate.on("clientAdd", (client) =&gt; addAvatar(client));
+Codestrate.addEventListener("clientAdd", (client) =&gt; addAvatar(client));
 
 // Update avatars
-Codestrate.on("clientUpdate", (client) =&gt; updateAvatar(client));
+Codestrate.addEventListener("clientUpdate", (client) =&gt; updateAvatar(client));
 
 // Update avatars
-Codestrate.on("clientUpdateProperty", ({propertyName, client}) =&gt; updateAvatar(client));
+Codestrate.addEventListener("clientUpdateProperty", ({propertyName, client}) =&gt; updateAvatar(client));
 
 // Remove leaving clients
-Codestrate.on("clientRemove", (client) =&gt; removeAvatar(client));
+Codestrate.addEventListener("clientRemove", (client) =&gt; removeAvatar(client));
 
 // Clear all update idle timers and remove all avatars.
 webstrate.on("disconnect", () =&gt; {
@@ -219,6 +221,11 @@ webstrate.on("disconnect", () =&gt; {
 	position: fixed;
 	bottom: 16px;
 	right: 16px;
+  transition: right var(--navigation-transition);
+}
+
+html body[transient-notification-pinned="true"] .avatars {
+  right: 400px;
 }
 
 /* Make the .avatars-test only occupy minimal space */
