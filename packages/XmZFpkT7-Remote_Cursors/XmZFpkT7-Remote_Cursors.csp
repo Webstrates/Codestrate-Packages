@@ -1,5 +1,5 @@
-<div class="section section-visible" name="Remote Cursors" data-type="package" data-group="basic" data-id="XmZFpkT7" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="R7n9mXrD"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to see cursors of other people on a codestrate.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="auHPMEdC"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.0",
+<div class="section section-visible" name="Remote Cursors" data-type="package" data-group="basic" data-id="XmZFpkT7" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="R7n9mXrD"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds the functionality to see cursors of other people on a codestrate.</div></div></div><div class="paragraph data-paragraph collapsed locked" name="Properties" data-id="auHPMEdC"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+	"version": "1.0.1",
 	"icon": "keyboard_return",
 	"description": "Adds the functionality to see cursors of other people on a codestrate.",
 	"tags": [
@@ -9,7 +9,8 @@
 	"dependencies": [],
 	"changelog":
 	{
-		"1.0": "Initital Release"
+		"1.0": "Initital Release",
+		"1.0.1": "Fixed issue with Codestrate.on preventing the remote cursor package to work."
 	},
 	"github": {
 		"url": "https://github.com/Webstrates/Codestrate-Packages",
@@ -351,7 +352,7 @@ function addClient(clientId) {
 		displayName = clone;
 	});
 
-	Codestrate.on("clientUpdateProperty", ({ client, propertyName }) =&gt; {
+	Codestrate.addEventListener("clientUpdateProperty", ({ client, propertyName }) =&gt; {
 		if (propertyName === "color") {
 			displayName.style.backgroundColor = client.color;
 		}
