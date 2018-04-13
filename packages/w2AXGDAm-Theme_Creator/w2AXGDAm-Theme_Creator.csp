@@ -1,36 +1,46 @@
 <div class="section section-visible" data-id="w2AXGDAm" name="Theme Creator" data-type="package" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" data-id="MNx74Vf4" name="Documentation"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Makes it possible to create new theme sections.</div><h2>Themable Style Paragraphs</h2><div>When creating packages or sections, style paragraphs, which should be available in themes, i.e. which describe properties a user should be able to modify in a theme, can be declared "themable" by adding the "themable" class to them. This indicates the Theme Creator, that these should be available in a theme.</div><div>When declaring a stye paragraph as themable, every style selector should begin with "html ". This is because this "html" will be replaced when creating a new theme (see Usage -&gt; Creation of a theme).</div><h2>Usage</h2><h3>Creation of a theme</h3><div>In order to create a new theme, one just has to use the button "Create New Theme" inside the "Themes" submenu of the global menu. This will create a new package with the selected name of the theme. All template paragraphs as well as themable paragraphs will be copied into the new theme. These can then be modified to alter the theme.</div><div>The copied style paragraphs with the "themable" class will be modified in the following way:</div><div><ul><li>The old <code>data-id</code> will be written in a <code>orig-data-id</code> attribute to support later updating of the theme.</li><li>The paragrah will receive a newly generated <code>data-id</code>.</li><li>The <code>themable</code> class will be removed.</li><li>The word <code>html</code> inside the styles will be replaced by <code>html[transient-theme="THEME_NAME"]</code>. So changes to the theme will only be applied when activating the theme.</li></ul></div><h3>Updating a theme</h3><div>If new packages, i.e. new themable paragraphs are added to the Codestrate, it is possible to update a theme by running the "Update Theme" code paragraph within a theme. Updating a theme will perform the following steps:</div><div><ul><li>Add new themable style paragraphs to the theme</li><li>Sort all style paragraphs of the theme</li><li>Update the name of existing style paragraphs</li><li>If the content of a style paragraph of the theme has the attribute "media='none'" it's content will become updated with the current style of the themable style paragraph</li></ul></div><div>Updating works by comparing the <code>orig-data-id</code> of the theme paragraphs with the <code>data-id</code> of the paragraphs with the <code>themable</code> class.</div></div></div><div class="paragraph data-paragraph locked collapsed" data-id="ZLUWA8QH" name="Properties"><pre data-type="content" type="application/json" contenteditable="false" class="section-properties">{
-	"version": "1.0.3",
-	"icon": "palette",
-	"description": "Utility to create new themes.",
-	"tags": [
-		"themes",
-		"devtools",
-		"utility"
-	],
-	"assets": [],
-	"dependencies": [],
-	"changelog":
-	{
-		"1.0.3": "Updated the template to make the dependency on this package optional.",
-		"1.0.2": "Remove 'persistent' class from style paragraphs.",
-		"1.0.1": "Better properties template.",
-		"1.0": "Initial version."
-	},
-	"github": {
-		"url": "https://github.com/Webstrates/Codestrate-Packages",
-		"folder": "packages/w2AXGDAm-Theme_Creator"
-	}
+  "version": "1.0.8",
+  "icon": "palette",
+  "description": "Utility to create new themes.",
+  "tags": [
+    "themes",
+    "devtools",
+    "utility"
+  ],
+  "assets": [],
+  "dependencies": [],
+  "changelog": {
+    "1.0": "Initial version.",
+    "1.0.1": "Better properties template.",
+    "1.0.2": "Remove 'persistent' class from style paragraphs.",
+    "1.0.3": "Updated the template to make the dependency on this package optional.",
+    "1.0.4": "Used Commands API and added tags to the properties template.",
+    "1.0.5": "Fixed 'Update Theme' template.",
+    "1.0.6": "Fix typo in menu entry.",
+    "1.0.7": "Adjusted theme creator to match new theme API.",
+    "1.0.8": "Removed optional dependency on theme creator from template."
+  },
+  "github": {
+    "url": "https://github.com/Webstrates/Codestrate-Packages",
+    "folder": "packages/w2AXGDAm-Theme_Creator"
+  }
 }</pre></div><div class="paragraph code-paragraph collapsed" data-id="quyf8T2R" draggable="false" style="" name="Add Global Menu Entry" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript" contenteditable="null">const GlobalMenuUtils = require("#global-menu-utils");
 const ThemeCreatorCode = require("#theme-creator-code");
 
 /******************************************************************************/
 
-const createThemeButton = GlobalMenuUtils.createButton("Create New Theme", null, event =&gt; {
+Codestrate.addCommand("themes.createNewTheme", "Create New Theme", () =&gt; {
 	ThemeCreatorCode.createTheme();
 });
+const createThemeButton = GlobalMenuUtils.createButton("Create New Theme", null, event =&gt; {
+	Codestrate.executeCommand("themes.createNewTheme");
+});
 
-const toggleDefaultThemeButton = GlobalMenuUtils.createButton("Activate Default Theme", null, event =&gt; {
+Codestrate.addCommand("themes.activateDefaultTheme", "Activate Default Theme", () =&gt; {
 	ThemeCreatorCode.toggleDefaultTheme();
+});
+const toggleDefaultThemeButton = GlobalMenuUtils.createButton("Activate Default Theme", null, event =&gt; {
+	Codestrate.executeCommand("themes.activateDefaultTheme");
 });
 
 /******************************************************************************/
@@ -207,30 +217,28 @@ exports.updatedThemable = (id, name) =&gt; {
 	"version": "1.0",
 	"icon": "palette",
 	"description": "A theme created by the theme creator.",
-	"assets": [],
-	"dependencies": [
-		{
-			"id": "w2AXGDAm",
-			"name": "Theme Creator",
-			"optional": true,
-			"usage": "The Theme Creator is needed to update themes."
-		}
+	"tags": [
+		"themes"
 	],
+	"assets": [],
+	"dependencies": [],
 	"changelog":
 	{
 		"1.0": "Initial version."
 	}
-}</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="xMWSNbnz" name="Add Global Menu Entry" style="" last-execution-state="success"><pre data-type="content" type="text/javascript" class="theme-template run-on-load" contenteditable="false">const GlobalMenuUtils = require("#global-menu-utils");
+}</pre></div><div class="paragraph code-paragraph collapsed locked" data-id="xMWSNbnz" name="Add Global Menu Entry" style="" last-execution-state="success"><pre data-type="content" type="text/javascript" class="theme-template run-on-load" contenteditable="false">const GlobalMenuUtils = require("#global-menu-utils");
 
 /******************************************************************************/
 
-const toggleThemeButton = GlobalMenuUtils.createButton("Toggle THEME_NAME Theme", null, event =&gt; {
-	if (document.documentElement.hasAttribute("transient-theme") &amp;&amp;
-		  (document.documentElement.getAttribute("transient-theme") === "THEME_NAME")) {
-		document.documentElement.removeAttribute("transient-theme");
+Codestrate.addCommand("themes.toggleTHEME_NAMETheme", "Toggle THEME_NAME Theme", () =&gt; {
+	if (Codestrate.theme === "THEME_NAME") {
+    Codestrate.theme = undefined;
 	} else {
-		document.documentElement.setAttribute("transient-theme", "THEME_NAME");
+    Codestrate.theme = "THEME_NAME";
 	}
+});
+const toggleThemeButton = GlobalMenuUtils.createButton("Toggle THEME_NAME Theme", null, event =&gt; {
+	Codestrate.executeCommand("themes.toggleTHEME_NAMETheme");
 });
 
 /******************************************************************************/
@@ -238,12 +246,9 @@ const toggleThemeButton = GlobalMenuUtils.createButton("Toggle THEME_NAME Theme"
 const subMenuName = "Themes";
 
 GlobalMenuUtils.addMenuItemToSubMenu(toggleThemeButton, subMenuName);</pre></div><div class="paragraph code-paragraph locked collapsed" data-id="Cr7BxPYL" name="Update Theme" style=""><pre data-type="content" type="text/javascript" class="theme-template" contenteditable="false">try {
-	const ThemeCreatorCode = require("#theme-creator-code");
+  const ThemeCreatorCode = require("#theme-creator-code");
+  ThemeCreatorCode.updateTheme("THEME_ID", "THEME_NAME");
 } catch (e) {
-	alert(`You need to install the optional dependency "Theme Creator" (w2AXGDAm) to update themes!`, "Missing Theme Creator");
-	return;
-}
-
-/******************************************************************************/
-
-ThemeCreatorCode.updateTheme("THEME_ID", "THEME_NAME");</pre></div></div>
+  alert(`You need to install the optional dependency "Theme Creator" (w2AXGDAm) to update themes!`, "Missing Theme Creator");
+  return;
+}</pre></div></div>
