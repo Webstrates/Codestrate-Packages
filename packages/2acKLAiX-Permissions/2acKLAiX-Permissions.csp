@@ -1,5 +1,5 @@
 <div class="section section-visible" name="Permissions" data-type="package" data-group="basic" data-id="2acKLAiX" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="V97VARVD" draggable="false"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2>The permissions section adds a user interface to change permissions of the codestrate. The section adds a menu item to the global menu to access the permissions user interface through a dialog.</div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="6W7YshS2" style=""><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.2",
+	"version": "1.2.1",
 	"icon": "vpn_key",
 	"description": "Adds an menu entry to change the permissions of the codestrate.",
 	"tags": [
@@ -9,6 +9,7 @@
 	"dependencies": [],
 	"changelog":
 	{
+		"1.2.1": "Used Commands API.",
 		"1.2": "Fixed conflict of permissions object on webstrate object by adding it to the Codestrate object instead.",
 		"1.1.1": "Fixed submenu name of menu entry.",
 		"1.1": "Added menu entry (was in Global Menu section before).",
@@ -112,8 +113,7 @@
 	return this;
 }).call({});
 
-window.Codestrate.permissions = Permissions;</pre></div><div class="paragraph code-paragraph collapsed" name="Permissions Dialog" run-on-load="true" last-execution-state="success" data-id="NDi9y4Pu" style=""><pre data-type="content" type="text/javascript">Codestrate.showPermissions = () =&gt; {
-
+window.Codestrate.permissions = Permissions;</pre></div><div class="paragraph code-paragraph collapsed" name="Permissions Dialog" run-on-load="true" last-execution-state="success" data-id="NDi9y4Pu" style=""><pre data-type="content" type="text/javascript">Codestrate.addCommand("permissions.showPermissions", "Show Permissions", () =&gt; {
 	const transient = document.createElement("transient");
 	transient.classList.add("permissions-dialog");
 
@@ -205,12 +205,12 @@ window.Codestrate.permissions = Permissions;</pre></div><div class="paragraph co
 	closeBtn.addEventListener("click", close);
 
 	document.body.appendChild(transient);
-};</pre></div><div class="paragraph code-paragraph collapsed" data-id="yr7rUXQf" name="Global Menu Entry" draggable="false" style="" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const GlobalMenuUtils = require('#global-menu-utils');
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="yr7rUXQf" name="Global Menu Entry" draggable="false" style="" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const GlobalMenuUtils = require('#global-menu-utils');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const showPermissions = GlobalMenuUtils.createButton("Show Permissions", null, () =&gt; {
-	Codestrate.showPermissions();
+	Codestrate.executeCommand("permissions.showPermissions");
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
