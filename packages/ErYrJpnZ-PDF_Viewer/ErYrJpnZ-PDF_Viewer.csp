@@ -1,5 +1,5 @@
 <div class="section section-visible" name="PDF Viewer" data-type="package" data-id="ErYrJpnZ" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="J94dr6d5"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description<br></h2><div>PDF viewer paragraph.</div><h2>Changes</h2><div>Consider changing the <code>this.getPageScreenViewPort</code> in the PDF Rendering to render pdf pages using the paragraph's width instead of <code>window.innerWidth</code>. See code paragraph below.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="kHFXgsu5"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.1.2",
+	"version": "1.2.2",
 	"icon": "picture_as_pdf",
 	"description": "PDF viewer paragraph.",
 	"tags": [
@@ -13,11 +13,14 @@
 	"dependencies": [],
 	"changelog":
 	{
-		"1.1.2": "Text highlight button is added only once.",
-		"1.1.1": "Fixed pdf rendering when multiple paragraphs with pdfs are in a document and one document is scrolled. This issue was caused because all pdf paragraphs shared the same pdf renderer.",
-		"1.1": "A pdf body paragraph can be added through the toolbar, which will render a dropped pdf inside of it.",
+		"1.0": "Initital version",
 		"1.0.1": "Added missing JavaScript dependency to pdf.worker.js.",
-		"1.0": "Initital version"
+		"1.1": "A pdf body paragraph can be added through the toolbar, which will render a dropped pdf inside of it.",
+		"1.1.1": "Fixed pdf rendering when multiple paragraphs with pdfs are in a document and one document is scrolled. This issue was caused because all pdf paragraphs shared the same pdf renderer.",		
+		"1.1.2": "Text highlight button is added only once.",
+		"1.2": "Added debounce on scroll and resize events to make scrolling and resizing not jerk.",
+		"1.2.1": "Displaying/rendering pdf also in transient-fullscreen=\"false\" mode.",
+		"1.2.2": "Fixed rendering and re-rendering of pdf when changing between fullscreen and non-fullscreen modes."
 	},
 	"github": {
 		"url": "https://github.com/Webstrates/Codestrate-Packages",
@@ -30,7 +33,7 @@ GlobalToolbarUtils.addDivider(1, "pdf-package");
 GlobalToolbarUtils.addButton("Add PDF Paragraph", "picture_as_pdf", "pdf-toolbar-icon", 1, () =&gt; {
 	const paragraph = ParagraphUtils.createBodyParagraph();
 	const content = paragraph.querySelector('[data-type="content"]');
-	content.setAttribute("pdf", "true");
+	content.classList.add("pdf");
 	content.innerHTML = `&lt;div class="document"&gt;
   &lt;div class="pages"&gt;&lt;/div&gt;
 &lt;/div&gt;
@@ -250,100 +253,104 @@ exports.AnnotationLayer = function(svg, strokeWidth) {
 }</style></div><div class="paragraph code-paragraph collapsed" name="PDF rendering" data-id="xQE7xw85"><pre data-type="content" type="text/javascript" id="pdfrendering" contenteditable="null">//var TextOverlay = require("#textoverlay");
 
 // This module is a simple wrapper around PDF.JS to load a PDF and show a page on a canvas
-exports.PDFRenderer = function() {
-	let pages = 0;
-	let pdf = null;
+exports.PDFRenderer = function () {
+  let pages = 0;
+  let pdf = null;
 
-	// Loads a PDF from a data URI and returns the PDF.JS object
-	this.loadPdf = function(source, callback) {
-		if (window.PDFJS === undefined) {
-			console.error("PDFJS is not loaded!");
-			return;
-		}
-		PDFJS.getDocument(source).then(function(thePdf) {
-			pages = thePdf.pdfInfo.numPages; 
-			pdf = thePdf;
-			callback(pdf, pages);
-		});
-	};
+  // Loads a PDF from a data URI and returns the PDF.JS object
+  this.loadPdf = function (source, callback) {
+    if (window.PDFJS === undefined) {
+      console.error("PDFJS is not loaded!");
+      return;
+    }
+    PDFJS.getDocument(source).then(function (thePdf) {
+      pages = thePdf.pdfInfo.numPages;
+      pdf = thePdf;
+      callback(pdf, pages);
+    });
+  };
 
-	// Gives the viewport of a given page number in a callback
-	this.getPageSceenViewPort = function(pageNo, callback) {
-		pdf.getPage(pageNo).then(function(page) {
-			let result = {};
-			let width = window.innerWidth;
-			let scale = width / page.getViewport(1).width;
-			let height = Math.floor(page.getViewport(scale).height);
-			callback(pageNo, {width: width, height: height});
-		});	
-	};
+  // Gives the viewport of a given page number in a callback
+  this.getPageSceenViewPort = function (containerWidth, pageNo, callback) {
+    pdf.getPage(pageNo).then(function (page) {
+      let result = {};
+      let scale = containerWidth / page.getViewport(1).width;
+      let height = Math.floor(page.getViewport(scale).height);
+      callback(pageNo, {
+        width: containerWidth,
+        height: height
+      });
+    });
+  };
 
-	// Shows a given page number in a given container
-	this.showPage = function(pageNo, container, textLayerDiv, callback) {
-		pdf.getPage(pageNo).then(function(page) {
-			let canvas = document.createElement("canvas");
-			canvas.classList.add("pdfcanvas");
-			if (container.firstElementChild) {
-				container.insertBefore(canvas, container.firstElementChild);
-			} else {
-				container.appendChild(canvas);
-			}
-			
-			let canvasWidth = window.innerWidth;
-			let scale = (canvasWidth / page.getViewport(1).width) * 2;
+  // Shows a given page number in a given container
+  this.showPage = function (pageNo, container, textLayerDiv, callback) {
+    pdf.getPage(pageNo).then(function (page) {
+      let canvas = document.createElement("canvas");
+      canvas.classList.add("pdfcanvas");
+      if (container.firstElementChild) {
+        container.insertBefore(canvas, container.firstElementChild);
+      } else {
+        container.appendChild(canvas);
+      }
 
-			let viewport = page.getViewport(scale);
+      // 			debugger;
+      let canvasWidth = parseInt(window.getComputedStyle(container).width);
+      // 			let canvasWidth = window.innerWidth;
+      let scale = (canvasWidth / page.getViewport(1).width) * 2;
 
-			let ctx = canvas.getContext('2d');
-			ctx.canvas.width  = canvasWidth;
-			ctx.canvas.height = viewport.height / 2;
+      let viewport = page.getViewport(scale);
 
-			let oldWidth = canvas.width;
-			let oldHeight = canvas.height;
+      let ctx = canvas.getContext('2d');
+      ctx.canvas.width = canvasWidth;
+      ctx.canvas.height = viewport.height / 2;
 
-			canvas.width = oldWidth * 2;
-			canvas.height = oldHeight * 2;
+      let oldWidth = canvas.width;
+      let oldHeight = canvas.height;
 
-			canvas.style.width = oldWidth + 'px';
-			canvas.style.height = oldHeight + 'px';
-			
-			// Generate text layer (for text selection)
-			let textLayer = container.querySelector(".textLayer");
-			if (!textLayer) {
-				textLayer = document.createElement("transient");
-				textLayer.classList.add("textLayer");
-				container.appendChild(textLayer);
-			}
-			textLayer.style.width = oldWidth + 'px';
-			textLayer.style.height = oldHeight + 'px';
-			page.getTextContent().then(function (textContent) {
-				PDFJS.renderTextLayer({
-					textContent: textContent,
-					container: textLayer,
-					viewport: page.getViewport(canvasWidth / page.getViewport(1).width),
-					textDivs: []
-				});
-			});
-			
-			// Render the page
-			let renderContext = {
-				canvasContext: ctx,
-				viewport: viewport
-			};
-			page.cleanupAfterRender = true;
-			page.render(renderContext);
-			callback(pageNo, page.getViewport(1));
+      canvas.width = oldWidth * 2;
+      canvas.height = oldHeight * 2;
 
-		});    
-	};
+      canvas.style.width = oldWidth + 'px';
+      canvas.style.height = oldHeight + 'px';
 
-	this.getPageCount = function() {
-		return pages;
-	};
+      // Generate text layer (for text selection)
+      let textLayer = container.querySelector(".textLayer");
+      if (!textLayer) {
+        textLayer = document.createElement("transient");
+        textLayer.classList.add("textLayer");
+        container.appendChild(textLayer);
+      }
+      textLayer.style.width = oldWidth + 'px';
+      textLayer.style.height = oldHeight + 'px';
+      page.getTextContent().then(function (textContent) {
+        PDFJS.renderTextLayer({
+          textContent: textContent,
+          container: textLayer,
+          viewport: page.getViewport(canvasWidth / page.getViewport(1).width),
+          textDivs: []
+        });
+      });
 
-	this.getPdf = function() {
-		return pdf;
-	};
+      // Render the page
+      let renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+      page.cleanupAfterRender = true;
+      page.render(renderContext);
+      callback(pageNo, page.getViewport(1));
+
+    });
+  };
+
+  this.getPageCount = function () {
+    return pages;
+  };
+
+  this.getPdf = function () {
+    return pdf;
+  };
 };</pre></div><div class="paragraph code-paragraph collapsed" name="File loader" data-id="EkxYeUVV"><pre data-type="content" type="text/javascript" id="fileloader" contenteditable="null">// This module can process a drop of a PDF, store it as an asset and returns a link to the file
 
 exports.processFileDrop = function (event, callback) {
@@ -380,24 +387,48 @@ exports.processFileDrop = function (event, callback) {
   "pdf.js"
 ]).then(() =&gt; {
 
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // N milliseconds. If `immediate` is passed, trigger the function on the
+  // leading edge, instead of the trailing.
+  const debounce = (func, wait, immediate) =&gt; {
+    var timeout;
+    return function () {
+      const context = this;
+      const args = arguments;
+      const later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      const callNow = immediate &amp;&amp; !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  };
+
   let FileLoader = require("#fileloader");
   let PDFRenderer = require("#pdfrendering").PDFRenderer;
   let AnnotationLayer = require("#annotationlayer").AnnotationLayer;
   let TextHighlight = require("#texthighlight");
 
   class PdfParagraphWrapper {
-		
-		get pages() {
-			return this.content.querySelectorAll('.page');
-		}
-		
-		get url() {
-			const pdfUrl = this.content.querySelector("a.pdfdata");
-			if (pdfUrl) {
-				return pdfUrl.getAttribute("href");
-			}
-			return null;
-		}
+
+    get pages() {
+      return this.content.querySelectorAll('.page');
+    }
+
+    get url() {
+      const pdfUrl = this.content.querySelector("a.pdfdata");
+      if (pdfUrl) {
+        return pdfUrl.getAttribute("href");
+      }
+      return null;
+    }
+
+    get containerWidth() {
+      return parseInt(window.getComputedStyle(this.paragraph).width);
+    }
 
     constructor(paragraph, content) {
       this.paragraph = paragraph;
@@ -405,8 +436,8 @@ exports.processFileDrop = function (event, callback) {
 
       // create actual pdf renderer
       this.pdfRenderer = new PDFRenderer();
-			
-			TextHighlight.addTextHighlightButton(content);
+
+      TextHighlight.addTextHighlightButton(content);
 
       this.initialize();
     }
@@ -461,6 +492,8 @@ exports.processFileDrop = function (event, callback) {
     // This is the callback function for the PDF renderer when the data has loaded
     pdfLoadCallback(pdf, pages) {
 
+
+
       // Used to resize all of the canvas containers to match the width of the screen
       const resizeCanvasContainers = () =&gt; {
         let pages = this.pages;
@@ -472,7 +505,7 @@ exports.processFileDrop = function (event, callback) {
         };
 
         for (let i = 0; i &lt; pages.length; i++) {
-          this.pdfRenderer.getPageSceenViewPort(i + 1, onPageScreenViewPort);
+          this.pdfRenderer.getPageSceenViewPort(this.containerWidth, i + 1, onPageScreenViewPort);
         }
       };
 
@@ -488,11 +521,11 @@ exports.processFileDrop = function (event, callback) {
       // Renders the page with the given page number. If it hasn't been shown before it updates the width and height of the svg annotation layer
       const showPage = (pageNo) =&gt; {
         let page = this.content.querySelector(`[page="${pageNo}"]`);
-				let pageCanvasContainer = page.querySelector(".canvascontainer");
-				let pageText = page.querySelector(".text");
+        let pageCanvasContainer = page.querySelector(".canvascontainer");
+        let pageText = page.querySelector(".text");
 
-				this.pdfRenderer.showPage(pageNo, pageCanvasContainer, pageText, (pageNo, viewPort) =&gt; {
-					
+        this.pdfRenderer.showPage(pageNo, pageCanvasContainer, pageText, (pageNo, viewPort) =&gt; {
+
           let page = this.content.querySelector(`[page="${pageNo}"]`);
           if (!page.querySelector("svg").hasAttribute("viewBox")) {
             page.querySelector("svg").setAttribute("viewBox", `0 0 ${viewPort.width} ${viewPort.height}`);
@@ -506,11 +539,11 @@ exports.processFileDrop = function (event, callback) {
       const renderVisiblePages = () =&gt; {
         var pages = this.pages;
         for (let i = 0; i &lt; pages.length; i++) {
-					let pageCanvasContainer = pages[i].querySelector(".canvascontainer");
+          let pageCanvasContainer = pages[i].querySelector(".canvascontainer");
           if (isScrolledIntoView(pageCanvasContainer)) {
             if (pages[i].querySelector("canvas")) {
-							continue;
-						}
+              continue;
+            }
             showPage(i + 1);
           } else {
             let canvas = pages[i].querySelector("canvas");
@@ -519,45 +552,45 @@ exports.processFileDrop = function (event, callback) {
         }
       };
 
-      // Setup handling of window resizing
-      let oldWindowWidth = window.innerWidth;
+      // Setup handling of window resizing, set old window size to -1 to trigger an initial rendering
+      // of at least the first pdf page.
+      let oldWindowWidth = -1;
 
       const resize = () =&gt; {
-        if (oldWindowWidth == window.innerWidth) return;
+        if (oldWindowWidth === this.containerWidth) return;
         resizeCanvasContainers();
         let pages = this.pages;
         for (let i = 0; i &lt; pages.length; i++) {
           let canvas = pages[i].querySelector("canvas");
           if (canvas) canvas.remove();
         }
-        renderVisiblePages();
-        oldWindowWidth = window.innerWidth;
+				
+				// render visible pages on next tick
+				setTimeout(renderVisiblePages, 0);
+        oldWindowWidth = this.containerWidth;
       };
-			
-      let resizeTimer;
-      window.addEventListener("resize", () =&gt; {
-        if (resizeTimer) {
-          clearTimeout(resizeTimer);
-        }
-        resizeTimer = setTimeout(resize, 200);
-      });
-			
+
+      // general debounced resize
+      const debouncedResize = debounce(resize, 250);
+
       let currentPages = this.pages;
       let firstLoad = false;
-			
+
       // If its the first time we setup elements for each page
       if (!currentPages || currentPages.length != pages) {
         this.createPageElements(pages);
       }
       this.createAnnotationLayers(pages);
-			
-      resizeCanvasContainers();
-      renderVisiblePages();
 
       // Every time the user scrolls we test visibility of pages
-      this.content.addEventListener("scroll", () =&gt; {
-        renderVisiblePages();
-      });
+      this.content.addEventListener("scroll", debounce(renderVisiblePages, 250));
+
+      // adjust pdf render size on window resize
+      window.addEventListener("resize", debouncedResize);
+
+      // react on changes between fullscreen and non-fullscreen mode and adjust pdf render size
+      this.paragraph.liveAttribute("class").changed(debouncedResize);
+      document.documentElement.liveAttribute("transient-fullscreen").changed(debouncedResize);
     }
 
     // Creates an element for each page and adds an SVG annotation layer
@@ -575,9 +608,9 @@ exports.processFileDrop = function (event, callback) {
         pagesElement.appendChild(page);
       }
     }
-		
-		createAnnotationLayers(pages) {
-			let annotationLayers = [];
+
+    createAnnotationLayers(pages) {
+      let annotationLayers = [];
       let textHighlightHandlers = [];
       // We now run through the pages and create a transient canvas container for the individual pages
       // We furthermore setup the SVG annotation layer
@@ -588,89 +621,100 @@ exports.processFileDrop = function (event, callback) {
         page.insertBefore(canvasContainer, page.firstChild);
         annotationLayers[i] = new AnnotationLayer(page.querySelector(".annotationlayer"), 2);
       }
-		}
+    }
   }
 
-  let liveSelector = document.liveQuerySelectorAll('[data-type="content"][pdf="true"]');
+  let liveSelector = document.liveQuerySelectorAll('.paragraph .pdf[data-type="content"]');
   liveSelector.added((content) =&gt; {
-		
+
     // get paragraph to associate it with renderer
     const paragraph = content.closest('.paragraph');
-		
-		// only install pdf paragraph wrapper once
-		if (!paragraph.pdfParagraphWrapper) {
-			paragraph.pdfParagraphWrapper = new PdfParagraphWrapper(paragraph, content);
-		}
+
+    // only install pdf paragraph wrapper once
+    if (!paragraph.pdfParagraphWrapper) {
+      paragraph.pdfParagraphWrapper = new PdfParagraphWrapper(paragraph, content);
+    }
   });
-});</pre></div><div class="paragraph style-paragraph collapsed" name="PDF Style" data-id="TVM2R7tM"><style data-type="content" type="text/css" codemirror="true" contenteditable="null">[data-type="content"][pdf="true"] {
-	position: relative;
-	background-color: gray;
-	min-height: 300px;
+});</pre></div><div class="paragraph style-paragraph collapsed" name="PDF Style" data-id="TVM2R7tM"><style data-type="content" type="text/css" codemirror="true" contenteditable="null">.pdf[data-type="content"] {
+  position: relative;
+  background-color: gray;
+  min-height: 300px;
+}
+
+html[transient-fullscreen="false"] .paragraph.fullscreen > .pdf,
+html:not([transient-fullscreen="true"]) .paragraph:not(.fullscreen) > .pdf {
+  max-height: 800px;
+	overflow: hidden;
+	overflow-y: auto;
 }
 
 .pages {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
-.page, .canvascontainer, .pdfcanvas {
-	width: 100%;  
-	position: relative;
-	display: none;
+.page,
+.canvascontainer,
+.pdfcanvas {
+  width: 100%;
+  position: relative;
+  display: none;
 }
 
-.fullscreen .page, .fullscreen .canvascontainer, .fullscreen .pdfcanvas {
-	width: 100%;  
-	position: relative;
-	display: inline-block;
+.fullscreen .page,
+.fullscreen .canvascontainer,
+.fullscreen .pdfcanvas {
+  width: 100%;
+  position: relative;
+  display: inline-block;
 }
 
 .fullscreen a.pdfdata {
-	display: none !important;
+  display: none !important;
 }
 
 .fullscreen .remote-cursor {
-	display: none;	
+  display: none;
 }
 
-[data-type="content"][pdf="true"] a.pdfdata {
-	text-align: center;
-	display: block;
-	padding-top: 4em;
-	font-size: 24pt;
+.pdf[data-type="content"] a.pdfdata {
+  text-align: center;
+  display: block;
+  padding-top: 4em;
+  font-size: 24pt;
 }
 
 .annotationlayer {
-	position: absolute;
-	left: 0px;
-	top: 0px;
-	width: 100%;
-	height: 100%;
-	pointer-events:none;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .annotationlayer rect {
-	fill: yellow;
+  fill: yellow;
 }
 
 svg.annotationlayer {
-	mix-blend-mode: multiply;
+  mix-blend-mode: multiply;
 }
 
-[data-type="content"][pdf="true"] .dropzone {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate3d(-50%, -50%, 0);
-	font-family: monospace;
-	font-size: 18px;
-	width: 28.5em;
-	height: 5em;
-	text-align: center;
-	border: 2px dashed black;
-	border-radius: 4px;
-	background-color: transparent;
-	padding-top: 3.5em;
+.pdf[data-type="content"] .dropzone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  font-family: monospace;
+  font-size: 18px;
+  width: 28.5em;
+  height: 5em;
+  text-align: center;
+  border: 2px dashed black;
+  border-radius: 4px;
+  background-color: transparent;
+  padding-top: 3.5em;
 }</style></div><div class="paragraph code-paragraph collapsed" name="Text overlay" data-id="TByVL7dn"><pre data-type="content" type="text/javascript" id="textoverlay" contenteditable="null">/**
  * Code extracted from pdf.js' viewer.js file. This contains code that is relevant to building the text overlays. I
  * have removed dependencies on viewer.js and viewer.html.
