@@ -18,7 +18,7 @@ exports.exit = (paragraph, slide) =&gt; {
   &lt;template event="exit"&gt;&lt;/template&gt;
   &lt;render-to&gt;&lt;/render-to&gt;
 &lt;/slide-content&gt;</code></pre><div>This element will render the contents of the <code>&lt;template&gt;</code> elements into the <code>&lt;render-to&gt;</code> element on the same slide states as described in slide scripts.</div><h2>Transient Presentation (experimental)</h2><div>When starting a presentation it is started persistent, i.e. on every client. When one wants to preview a presentation or leave a presentation just on the local client, one can add the <kbd>Alt</kbd> key to the shortcuts from above (e.g. <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Enter</kbd>) in order to do that. An orange border indicates, that the presentation is started (or left) just on the local client.</div><div><b>Warning</b>: This is an experimental function, so some things like presentation scripts or <code>&lt;slide-content&gt;</code> are not loading.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="zntLciQX"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-  "version": "1.2.3",
+  "version": "1.2.10",
   "icon": "slideshow",
   "description": "Makes it possible to create slides and presentations.",
   "tags": [
@@ -60,7 +60,14 @@ exports.exit = (paragraph, slide) =&gt; {
     "1.2": "Added slide template select to the paragraph header when slide class is active.",
     "1.2.1": "Removed optional dependencies",
     "1.2.2": "Added aspect ratio select to paragraph header when slide class is active.",
-    "1.2.3": "Removed console.log"
+    "1.2.3": "Removed console.log",
+    "1.2.4": "Added a blank template that does not have much style except a white background and black color.",
+    "1.2.5": "Binding contenteditable of [data-type=\"content\"] to .slide-content contenteditable.",
+    "1.2.6": "Changed direction of swipe gestures to switch slides.",
+    "1.2.7": "Used commands and keybindings API for shortcuts.",
+    "1.2.8": "Do not change slides on arrow key left/right when focus is on a slide note.",
+    "1.2.9": "Show default cursor when hovering over slide notes. The center of the laser-pointer cursor is now the tip of the arrow (default) cursor making it easier to hit elements on click.",
+    "1.2.10": "Added 'paragraph' parameter to manually set the start slide of a presentation."
   },
   "github": {
     "url": "https://github.com/Webstrates/Codestrate-Packages",
@@ -183,7 +190,7 @@ exports.updateSlideNumbers = (slideParagraphs = getSlideParagraphs()) =&gt; {
   });
 };
 
-exports.startPresentation = (transient = false, fromStart = false) =&gt; {
+exports.startPresentation = (transient = false, fromStart = false, paragraph = false) =&gt; {
   if (exports.presentationVisible(transient)) return;
 
   const slideParagraphs = getSlideParagraphs();
@@ -192,12 +199,11 @@ exports.startPresentation = (transient = false, fromStart = false) =&gt; {
   // Find first slide
   let firstSlide;
 
-  if (Codestrate.focussedParagraph &amp;&amp;
-    Codestrate.focussedParagraph.querySelector('.slide') &amp;&amp;
-    !fromStart) {
+  if (!fromStart &amp;&amp; paragraph) {
+    firstSlide = paragraph;
+  } else if (!fromStart &amp;&amp; Codestrate.focussedParagraph &amp;&amp; Codestrate.focussedParagraph.querySelector('.slide')) {
     firstSlide = Codestrate.focussedParagraph;
-  } else if (slideParagraphs &amp;&amp;
-    slideParagraphs.length &gt; 0) {
+  } else if (slideParagraphs &amp;&amp; slideParagraphs.length &gt; 0) {
     firstSlide = slideParagraphs[0];
   }
 
@@ -275,8 +281,9 @@ exports.currentSlide = (transient = false) =&gt; {
 const changeSlide = (step) =&gt; {
   const visible = exports.presentationVisible();
   const transient = exports.presentationVisible(true);
-
-  if (!visible &amp;&amp; !transient) return;
+  const isFocusOnSlideNotes = !!document.activeElement.closest('.slide-notes');
+  
+  if ((!visible &amp;&amp; !transient) || isFocusOnSlideNotes) return;
 
   const currentSlide = exports.currentSlide(transient);
   if (!currentSlide) {
@@ -321,7 +328,8 @@ exports.toggleNotes = () =&gt; {
   } else {
     exports.showNotes();
   }
-};</pre></div><div class="paragraph code-paragraph collapsed" data-id="dJSYnMBT" last-execution-state="success" name="Slide Scaling" style="" draggable="false" run-on-load="true"><pre data-type="content" type="text/javascript" id="slide-scaling">const presentationStyleClass = "presentation-style";
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="dJSYnMBT" last-execution-state="success" name="
+Slide Scaling" style="" draggable="false" run-on-load="true"><pre data-type="content" type="text/javascript" id="slide-scaling">const presentationStyleClass = "presentation-style";
 
 /******************************************************************************/
 
@@ -456,40 +464,60 @@ exports.updateScale();</pre></div><div class="paragraph code-paragraph collapsed
 
 exports.mappings = [{
   keys: ["mod+enter", "f5"],
+  preventDefault: true,
+  id: "presentations.togglePresentation",
+  name: "Toggle Presentation",
   action(event) {
     PresentationCode.togglePresentation();
     return false;
   }
 }, {
   keys: "esc",
+  preventDefault: true,
+  id: "presentations.exitPresentation",
+  name: "Exit Presentation",
   action(event) {
     PresentationCode.exitPresentation();
     return false;
   }
 }, {
   keys: ["mod+alt+enter", "alt+f5"],
+  preventDefault: true,
+  id: "presentations.toggleTransientPresentation",
+  name: "Toggle Transient Presentation",
   action(event) {
     PresentationCode.togglePresentation(true);
     return false;
   }
 }, {
   keys: "alt+esc",
+  preventDefault: true,
+  id: "presentations.exitTransientPresentation",
+  name: "Exit Transient Presentation",
   action(event) {
     PresentationCode.exitPresentation(true);
     return false;
   }
 }, {
   keys: ["left", "pageup"],
+  preventDefault: false,
+  id: "presentations.previousSlide",
+  name: "Previous Slide",
   action(event) {
     PresentationCode.previousSlide();
   }
 }, {
   keys: ["right", "pagedown"],
+  preventDefault: false,
+  id: "presentations.nextSlide",
+  name: "Next Slide",
   action(event) {
     PresentationCode.nextSlide();
   }
 }, {
   keys: ["mod+k"],
+  id: "presentations.toggleNotes",
+  name: "Toggle Presentation Notes",
   action(event) {
     PresentationCode.toggleNotes();
     return false;
@@ -511,10 +539,10 @@ exports.mappings = [{
 
     switch (event.type) {
     case "swipeleft":
-      PresentationCode.previousSlide();
+      PresentationCode.nextSlide();
       break;
     case "swiperight":
-      PresentationCode.nextSlide();
+      PresentationCode.previousSlide();
       break;
     case "swipeup":
       break;
@@ -527,17 +555,13 @@ exports.mappings = [{
   mc.on("swiperight", handleSwipe);
   mc.on("swipeup", handleSwipe);
   mc.on("swipedown", handleSwipe);
-});</pre></div><div class="paragraph code-paragraph collapsed" data-id="ScPwnHCY" name="Presentation Shortcuts" run-on-load="true" last-execution-state="success" style=""><pre data-type="content" type="text/javascript">const PresentationKeyMap = require("#presentation-key-map");
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="v7j7cbL4" name="Presentation Commands and KeyBindings" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const PresentationKeyMap = require("#presentation-key-map");
 
 /******************************************************************************/
 
-importLib([
-	"mousetrap.min.js",
-	"mousetrap-global-bind.min.js"
-]).then(() =&gt; {
-	PresentationKeyMap.mappings.forEach((mapping) =&gt; {
-		Mousetrap.bindGlobal(mapping.keys, mapping.action);
-	});
+PresentationKeyMap.mappings.forEach((mapping) =&gt; {
+  Codestrate.addCommand(mapping.id, mapping.name, () =&gt; mapping.action());
+  Codestrate.addKeyBinding(mapping.id, mapping.keys, mapping.prevendDefault);
 });</pre></div><div class="paragraph code-paragraph collapsed" data-id="sC9VJnBL" name="Presentation Heavy Content" style="" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const PresentationKeyMap = require("#presentation-key-map");
 
 /******************************************************************************/
@@ -757,10 +781,29 @@ const getSlideFragment = () =&gt; {
   return document.importNode(slideTemplate.content, true);
 };
 
+// bind contenteditable of content to slide-content to make the lock paragraph
+// also work in slide mode
+const slideContentLiveSelector = document.liveQuerySelectorAll('.slide-content');
+slideContentLiveSelector.added((slideContent) =&gt; {
+  const content = slideContent.closest('[data-type="content"]');
+  if (content) {
+    const liveAttribute = content.liveAttribute("contenteditable");
+    liveAttribute.changed((value) =&gt; {
+      slideContent.setAttribute("contenteditable", value);
+    });
+    slideContent.__contentContenteditable = liveAttribute;
+  }
+});
+slideContentLiveSelector.removed((slideContent) =&gt; {
+  if (slideContent.__contentContenteditable) {
+    slideContent.__contentContenteditable.stop();
+    delete slideContent.__contentContenteditable;
+  }
+});
+
 /******************************************************************************/
 
-GlobalToolbarUtils.addDivider(1, packageClass);
-GlobalToolbarUtils.addButton("Add Slide", "", "slide-button " + packageClass, 1, () =&gt; {
+Codestrate.addCommand("presentations.addSlide", "Add Slide", () =&gt; {
   const paragraph = ParagraphUtils.createBodyParagraph();
   const content = paragraph.querySelector('[data-type="content"]');
   content.classList.add("slide");
@@ -773,8 +816,14 @@ GlobalToolbarUtils.addButton("Add Slide", "", "slide-button " + packageClass, 1,
   PresentationCode.updateSlideNumbers();
 });
 
+GlobalToolbarUtils.addDivider(1, packageClass);
+GlobalToolbarUtils.addButton("Add Slide", "", "slide-button " + packageClass, 1, () =&gt; {
+  Codestrate.executeCommand("presentations.addSlide");
+});
+
 GlobalToolbarUtils.addButton("Start Presentation", "", "presentation-button " + packageClass, 1, () =&gt; {
-  PresentationCode.startPresentation(false, true);
+  Codestrate.executeCommand("presentations.togglePresentation");
+  //PresentationCode.startPresentation(false, true);
 });
 
 /******************************************************************************/
@@ -795,7 +844,7 @@ const moveContentAndClasses = (from, to) =&gt; {
   // Array.from is required to create a copy of classList items!!!
   Array.from(from.classList).forEach((className) =&gt; {
     if (className.startsWith("slide-")) return;
-    
+
     to.classList.add(className);
     from.classList.remove(className);
   });
@@ -952,9 +1001,9 @@ SnackbarUtils.addButton("Add Slide Style", "", slideToolsClass + " slide-style-b
   paragraph.closest(".section").insertBefore(styleParagraph, paragraph.nextSibling);
 });
 
-SnackbarUtils.addButton("Start Presentation", "", slideToolsClass + " presentation-button " + packageClass, 1, () =&gt; {
+/*SnackbarUtils.addButton("Start Presentation", "", slideToolsClass + " presentation-button " + packageClass, 1, () =&gt; {
   PresentationCode.startPresentation();
-});
+});*/
 
 // add heavy content "template" at cursor position in HTML inspector
 SnackbarUtils.addButton("Add Heavy Content", "", slideToolsClass + " add-heavy-content-button " + packageClass, 1, () =&gt; {
@@ -992,7 +1041,7 @@ html body[transient-presentation="true"]:not(.presentation) .paragraph[transient
   user-select: none;
   -webkit-user-select: none;
   /* Webkit requires -webkit prefix */
-  cursor: url(presentation_pointer.png), default;
+  cursor: url(presentation_pointer.png) 12 12, default;
   background: var(--material-color-black);
 }
 
@@ -1031,17 +1080,11 @@ html body.presentation:not([transient-presentation="true"]) .paragraph.presentat
 html body[transient-presentation="true"]:not(.presentation) .paragraph[transient-presentation="true"] .CodeMirror {
   overflow: auto;
   height: 100vh;
-}
-
-/******************************************************************************/
-
-html .paragraph .slide[data-type="content"],
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="rubFRTHQ" name="Blank Slide Style (Template Base)"><style data-type="content" type="text/css" codemirror="true">html .paragraph .slide[data-type="content"],
 html .paragraph .slide .slide-content {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family: "Roboto", "Avenir", sans-serif;
-  font-weight: 400;
 }
 
 html .paragraph .slide.slide-hidden {
@@ -1050,19 +1093,9 @@ html .paragraph .slide.slide-hidden {
 
 /******************************************************************************/
 
-html .paragraph .slide .slide-content ul,
-html .paragraph .slide .slide-content ol {
-  margin-left: 1rem;
-}
-
-/******************************************************************************/
-
 html .slide .slide-content {
-  background: var(--material-color-white);
+  background-color: var(--material-color-white);
   color: var(--material-color-black);
-  font-size: 48px;
-  display: flex;
-  flex-direction: column;
 }
 
 html body.presentation:not([transient-presentation="true"]) .paragraph.presentation .slide .slide-content,
@@ -1072,7 +1105,25 @@ html body[transient-presentation="true"]:not(.presentation) .paragraph[transient
   left: 50%;
 }
 
-html .slide:not(.skip-slide-number) .slide-content[slide-number]:after {
+/******************************************************************************/
+
+html .slide .slide-content {
+  transform: scale(0.5);
+  transform-origin: 0 0 0;
+}</style></div><div class="paragraph style-paragraph collapsed" data-id="74dTWDaZ" name="Default Slide Template"><style data-type="content" type="text/css" codemirror="true">html .slide[slide-template="default"] .slide-content {
+  font-family: "Roboto", "Avenir", sans-serif;
+  font-weight: 400;
+  font-size: 48px;
+  display: flex;
+  flex-direction: column;
+}
+
+html .slide[slide-template="default"] .slide-content ul,
+html .slide[slide-template="default"] .slide-content ol {
+  margin-left: 1rem;
+}
+
+html .slide[slide-template="default"]:not(.skip-slide-number) .slide-content[slide-number]:after {
   content: attr(slide-number);
   position: absolute;
   top: 16px;
@@ -1083,13 +1134,6 @@ html .slide:not(.skip-slide-number) .slide-content[slide-number]:after {
   font-size: 24px;
   z-index: 299;
   pointer-events: none;
-}
-
-/******************************************************************************/
-
-html .slide .slide-content {
-  transform: scale(0.5);
-  transform-origin: 0 0 0;
 }</style></div><div class="paragraph style-paragraph collapsed" data-id="XFYfghGw" name="Slide Aspect Ratios"><style data-type="content" type="text/css" codemirror="true" class="themable persistent">html .slide[slide-aspect-ratio="16:9"] .slide-content {
   width: 1920px;
   height: 1080px;
@@ -1136,6 +1180,7 @@ html .slide[slide-aspect-ratio="1:1"] .slide-container {
 	background: var(--material-color-black);
 	color: var(--material-color-grey-100);
 	padding: 8px;
+  cursor: default;
 }
 
 html .slide .slide-notes:empty:before {
@@ -1318,6 +1363,7 @@ observer.observe(document.body, {
 });</pre></div><div class="paragraph code-paragraph collapsed" data-id="F9jz9VQS" name="Presentation Config"><pre data-type="content" type="text/javascript" id="presentation-config">const ParagraphUtils = require('#paragraph-utils');
 
 const slideTemplates = new Set();
+slideTemplates.add("blank");
 slideTemplates.add("default");
 
 Object.defineProperty(exports, "slideTemplates", {
