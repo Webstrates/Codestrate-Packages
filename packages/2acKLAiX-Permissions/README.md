@@ -6,9 +6,9 @@
 | :--- | :--- |
 | Name | Permissions |
 | ID | 2acKLAiX |
-| Version | 1.2 |
+| Version | 1.2.1 |
 | Description | Adds an menu entry to change the permissions of the codestrate. |
 | Tags | `devtools` |
 | Assets | - |
 | Dependencies | - |
-| Changelog | `{"1.2":"Fixed conflict of permissions object on webstrate object by adding it to the Codestrate object instead.","1.1.1":"Fixed submenu name of menu entry.","1.1":"Added menu entry (was in Global Menu section before).","1.0":"Initital Release"}` |
+| Changelog | `{"1.2.1":"Used Commands API.","1.2":"Fixed conflict of permissions object on webstrate object by adding it to the Codestrate object instead.","1.1.1":"Fixed submenu name of menu entry.","1.1":"Added menu entry (was in Global Menu section before).","1.0":"Initital Release"}` |
