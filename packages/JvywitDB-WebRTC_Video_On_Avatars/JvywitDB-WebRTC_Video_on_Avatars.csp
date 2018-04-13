@@ -1,5 +1,5 @@
 <div class="section section-visible" name="WebRTC Video on Avatars" data-type="package" data-group="basic" data-id="JvywitDB" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="3gpHCaHH"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2><div>Adds WebRTC video communication to avatars.</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="r79E9WYH"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
-	"version": "1.0",
+	"version": "1.0.2",
 	"icon": "video_call",
 	"description": "Adds WebRTC video communication to avatars.",
 	"tags": [
@@ -15,6 +15,8 @@
 	],
 	"changelog":
 	{
+    "1.0.2": "Added notifications.",
+    "1.0.1": "Fixed issue that caused audio echo due to muted attribute not applied on local video element in lastest version of Chrome.",
 		"1.0": "Initital Release"
 	},
 	"github": {
@@ -25,78 +27,96 @@
 
 <div class="paragraph code-paragraph collapsed" name="Event Handling" run-on-load="true" last-execution-state="success" data-id="rjKcVvbm" style=""><pre data-type="content" type="text/javascript">webstrate.on("signal", (message, senderId) =&gt; {
 
-	if (message.type === "Call") {
+  if (message.type === "Call") {
 
-		// Received request for video call.
-		if (message.cmd === "video") {
-			console.log("Requesting video");
+    // Received request for video call.
+    if (message.cmd === "video") {
+      console.log("Requesting video");
 
-			const result = confirm(`User ${senderId} calls you. Do you want to accept the call?`);
+      const result = confirm(`User ${senderId} calls you. Do you want to accept the call?`);
 
-			if (result) {
-				VideoManager.start(senderId);
+      if (result) {
+        VideoManager.start(senderId);
 
-				// Signal accept
-				webstrate.signal({ type: "Call", cmd: "accept" }, senderId);
-			} else {
-				// Signal reject
-				webstrate.signal({ type: "Call", cmd: "reject" }, senderId);
-			}
-		} else if (message.cmd === "accept") {
-			// Approved video call request
-			console.log("Accepting video");
+        // Signal accept
+        webstrate.signal({ type: "Call", cmd: "accept" }, senderId);
+      } else {
+        // Signal reject
+        webstrate.signal({ type: "Call", cmd: "reject" }, senderId);
+      }
+    } else if (message.cmd === "accept") {
+      // Approved video call request
+      console.log("Accepting video");
 
-			VideoManager.start(senderId);
-		} else if (message.cmd === "reject") {
-			console.log("Rejecting video");
-			alert(`User ${senderId} rejected call.`);
-		}
+      VideoManager.start(senderId);
+    } else if (message.cmd === "reject") {
+      console.log("Rejecting video");
+      alert(`User ${senderId} rejected call.`);
+    }
 
-		return;
-	}
+    return;
+  }
 });
 
 const createUserVideo = (clientId) =&gt; {
-	const avatar = document.querySelector(`.avatars .avatar[client-id="${clientId}"]`);
+  const avatar = document.querySelector(`.avatars .avatar[client-id="${clientId}"]`);
 
-	var videoWrapper = document.createElement("div");
-	videoWrapper.classList.add("video-wrapper");
+  var videoWrapper = document.createElement("div");
+  videoWrapper.classList.add("video-wrapper");
 
-	var video = document.createElement("video");
-	video.classList.add("remote-video");
-	videoWrapper.appendChild(video);
-	avatar.appendChild(videoWrapper);
+  var video = document.createElement("video");
+  video.classList.add("remote-video");
+  videoWrapper.appendChild(video);
+  avatar.appendChild(videoWrapper);
 
-	return video;
+  return video;
 };
 
 const listenForStreams = (clientId, meta, accept) =&gt; {
-	console.log('create user video', clientId);
-	const videoElement = createUserVideo(clientId);
+//   console.log('create user video', clientId);
+  const videoElement = createUserVideo(clientId);
 
-	if (videoElement) {
-		console.log('create user element', videoElement);
+  if (videoElement) {
+//     console.log('create user element', videoElement);
 
-		var conn = accept(function(stream) {
-			// Add stream to video element and play it
-			videoElement.srcObject = stream;
-			videoElement.play();
+    const client = Codestrate.clients.find(client =&gt; client.id === clientId);
+    Codestrate.localNotification({
+      color: "var(--material-color-red)",
 
-			conn.onclose(function() {
-				if (stream) {
-					stream.getVideoTracks().forEach(t =&gt; t.stop());
-					stream.getAudioTracks().forEach(t =&gt; t.stop());
-				}
+      header: {
+        icon: "videocam",
+        appName: "WebRTC Video",
+        text: `${client.displayName || client.username}`,
+        timestamp: new Date()
+      },
 
-				videoElement.closest('.video-wrapper').remove();
+      content: {
+        title: "New Video Stream",
+        text: `${client.displayName || client.username} (${client.userId}) started a video stream on the codestrate "${window.document.title}".`,
+        imagePath: client.avatarUrl
+      }
+    });
 
-				// document.body.webstrate.on("signalStream", listenForStreams);
-			});
-		});
-	}
+    var conn = accept(function(stream) {
+      // Add stream to video element and play it
+      videoElement.srcObject = stream;
+      videoElement.play();
 
-	// Listen for further streams...
-	// document.body.webstrate.on("signalStream", listenForStreams);
+      conn.onclose(function() {
+        if (stream) {
+          stream.getVideoTracks().forEach(t =&gt; t.stop());
+          stream.getAudioTracks().forEach(t =&gt; t.stop());
+        }
+
+        videoElement.closest('.video-wrapper').remove();
+
+        // document.body.webstrate.on("signalStream", listenForStreams);
+      });
+    });
+  }
+
+  // Listen for further streams...
+  // document.body.webstrate.on("signalStream", listenForStreams);
 };
 
 document.body.webstrate.on("signalStream", listenForStreams);</pre></div><div class="paragraph code-paragraph collapsed" name="Video Manager" data-id="AjDjPGuu"><pre data-type="content" type="text/javascript" id="video-manager">const createUserVideo = (clientId) =&gt; {
@@ -116,6 +136,7 @@ document.body.webstrate.on("signalStream", listenForStreams);</pre></div><div cl
 	video = document.createElement("video");
 	video.classList.add("local-video");
 	video.setAttribute("muted", "");
+  video.muted = true;
 
 	videoWrapper.appendChild(video);
 	avatar.appendChild(videoWrapper);
