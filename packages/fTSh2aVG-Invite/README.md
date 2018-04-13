@@ -6,9 +6,9 @@
 | :--- | :--- |
 | Name | Invite |
 | ID | fTSh2aVG |
-| Version | 1.1 |
+| Version | 2.0.1 |
 | Description | Adds the functionality to invite other people to a codestrate. |
 | Tags | `collaboration` |
 | Assets | - |
-| Dependencies | `[{"id":"4MdLqZhf","name":"Toast Messages"}]` |
-| Changelog | `{"1.1":"Fixed entry in global menu.","1.0":"Initial Release"}` |
+| Dependencies | - |
+| Changelog | `{"2.0.1":"Removed dependency as notifications are now part of the system.","2.0":"Used new Notifications package instead of deprecated Toast Messages.","1.1.1":"Used Commands API.","1.1":"Fixed entry in global menu.","1.0":"Initial Release"}` |
