@@ -1,0 +1,712 @@
+<div class="section section-visible" data-id="xXeazcuk" data-type="package" name="Chat" transient-focussed="true"><div class="paragraph body-paragraph locked collapsed" name="Documentation" data-id="4biPYEWn"><div data-type="content" type="text/html" codemirror="true" contenteditable="false" class="section-documentation"><h2>Description</h2>
+<div>Adds chat functionality to a codestrate. It is possible to chat with individual persons or on local channel on a codestrate.</div>
+<div class="warning"><b>Account required</b>: You need to be logged in to use the chat functionality.</div>
+<h2>Usage</h2>
+<h3>Local Chat</h3>
+<div>To open the local chat select the "Open Local Chat" menu entry. It will open a chat window for the current codestrate. The messages of the local chat are stored in the HTML of a codestrate.</div>
+<h3>Direct Chat</h3>
+<div>To open a direct chat select the "Open Direct Chat" menu entry. You need to enter the userId of a user to start a chat (e.g. "example:github"). Direct chat messages are stored within the messages API of Webstrates.</div>
+<div class="danger"><b>Storage time</b>: As messages are cleared up by webstrates, direct messages are only available for 30 days.</div>
+<h3>Deleting Chats</h3>
+<div>Chat messages chat be deleted individually by right-clicking on them or by selecting the "Delete Chat" button in the header of a chat. Deleting messages from the local chat deletes them for all users. Deleting messages from a direct chat only deletes them for the user who deletes it, <b>the other chat-partner still has all the messages</b>.<br></div><h3>Avatars</h3><div>If the Avatars package is installed, a chat can be started right from the avatar button.</div>
+<h2>TODO</h2>
+<div>
+  <ul>
+    <li>Add notifications</li>
+    <li>Fix Bugs</li>
+    <li><strike>Better Styling</strike></li>
+    <li><strike>Detect own user in local chat</strike></li>
+    <li><strike>Delete Chat-History</strike></li>
+    <li><strike>Show date and time</strike></li>
+  </ul>
+</div></div></div><div class="paragraph data-paragraph locked collapsed" name="Properties" data-id="C2KEUvPA"><pre data-type="content" type="application/json" class="section-properties" contenteditable="false">{
+  "version": "0.3",
+  "icon": "chat",
+  "description": "Adds chat functionality to a codestrate.",
+  "tags": [
+    "collaboration"
+  ],
+  "assets": [
+    "interact.min.js"
+  ],
+  "dependencies": [],
+  "changelog": {
+    "0.3": "Deletion of single messages.",
+    "0.2": "Fixed creation of chats.",
+    "0.1": "Initial version."
+  },
+  "github": {
+    "url": "https://github.com/Webstrates/Codestrate-Packages",
+    "folder": "packages/xXeazcuk-Chat"
+  }
+}</pre></div><div class="paragraph body-paragraph collapsed" data-id="4jzhMynv" name="Chat Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" id="chat-template"><div class="chat" data-chat-id="${chatId}">
+  <div class="chat-title">
+    <div class="chat-title-text">${titleText}</div>
+    <div class="chat-button chat-delete-button" title="Delete Chat">
+      <i class="material-icons">delete</i>
+    </div>
+    <div class="chat-button chat-close-button" title="Close Chat">
+      <i class="material-icons">close</i>
+    </div>
+    <div class="chat-button chat-collapse-button" title="Collapse/Expand">
+      <i class="material-icons"></i>
+    </div>
+  </div>
+  <div class="chat-messages-container"></div>
+  <div class="chat-compose">
+    <input class="chat-message-input" type="text" placeholder="Write message...">
+    <div class="chat-button chat-send-button" title="Send Message">
+      <i class="material-icons">send</i>
+    </div>
+  </div>
+</div>
+</div></div><div class="paragraph style-paragraph collapsed" data-id="iMrGGins" name="Chat Style"><style data-type="content" type="text/css" codemirror="true" class="themable">html #chat-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: none;
+  z-index: 275;
+  display: inline-block;
+  
+  --color-primary: var(--material-color-white);
+	--color-primary-shade-1: var(--material-color-grey-100);
+	--color-primary-shade-2: var(--material-color-grey-200);
+	--color-primary-shade-3: var(--material-color-grey-300);
+
+	--color-primary-text: var(--material-color-grey-900);
+	--color-secondary-text: var(--material-color-grey-700);
+	--color-tertiary-text: var(--material-color-grey-500);
+
+	--color-accent: var(--material-color-deep-orange);
+	--color-accent-text: var(--material-color-black);
+
+		/* Colors RGB */
+	--color-primary-rgb: var(--material-color-white-rgb);
+	--color-primary-shade-1-rgb: var(--material-color-grey-100-rgb);
+	--color-primary-shade-2-rgb-rgb: var(--material-color-grey-200-rgb);
+	--color-primary-shade-3-rgb: var(--material-color-grey-300-rgb);
+
+	--color-primary-text-rgb: var(--material-color-grey-900-rgb);
+	--color-secondary-text-rgb: var(--material-color-grey-700-rgb);
+	--color-tertiary-text-rgb: var(--material-color-grey-500-rgb);
+
+	--color-accent-rgb: var(--material-color-deep-orange-rgb);
+	--color-accent-text-rgb: var(--material-color-black-rgb);
+}
+
+html .chat {
+  width: 512px;
+  height: 320px;
+  position: fixed;
+  left: calc(50% - 256px);
+  top: calc(50% - 160px);
+  pointer-events: all;
+  background: var(--color-primary);
+  border-radius: 2px;
+  box-shadow: var(--material-shadow-z8);
+  transition: box-shadow var(--navigation-transition);
+  display: flex;
+  flex-direction: column;
+}
+
+/* html .chat:hover {
+  box-shadow: var(--material-shadow-z12);
+} */
+
+html .chat-title {
+  color: var(--color-primary-text);
+  display: flex;
+  align-items: center;
+  font-size: 1.425rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 2rem;
+  flex: 0 0 auto;
+  margin: 24px 24px 0;
+  flex-direction: row;
+}
+
+html .chat-title-text {
+  flex: 1 0 auto;
+}
+
+html .chat-button {
+  height: 32px;
+  cursor: pointer;
+}
+
+html .chat-button i {
+  line-height: 32px;
+}
+
+html .chat-messages-container {
+  flex: 1 1 auto;
+  margin: 24px 24px 0;
+  background: var(--color-primary-shade-3);
+  border-radius: 4px 4px 0 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  color: var(--color-primary-text);
+}
+
+html .chat-compose {
+  flex: 0 0 auto;
+  margin: 0 24px 24px;
+  background: var(--color-primary-shade-3);
+  border-radius: 0 0 4px 4px;
+  display: flex;
+  flex-direction: row;
+  border-top: 2px solid var(--color-primary-shade-1);
+  padding: 8px 12px;
+  color: var(--color-secondary-text);
+}
+
+html .chat-message-input {
+  background: none;
+  border: none;
+  flex: 1 0 auto;
+  color: var(--color-primary-text);
+  font-size: 16px;
+  outline: none;
+}
+
+/******************************************************************************/
+
+html .chat-close-button,
+html .chat-delete-button {
+  margin-right: 8px;
+}
+
+html .chat-collapse-button i:after {
+  content: "expand_less";
+}
+
+html .chat.collapsed .chat-collapse-button i:after {
+  content: "expand_more";
+}
+
+html .chat.collapsed .chat-title {
+  margin: 24px;
+}
+
+html .chat.collapsed .chat-messages-container,
+html .chat.collapsed .chat-compose {
+  display: none;
+}
+
+html .chat-delete-button {
+  transition: color var(--navigation-transition);
+}
+
+html .chat-delete-button:hover {
+  color: var(--material-color-red);
+}</style></div><div class="paragraph body-paragraph collapsed" data-id="e3aBk9SA" name="Message Template"><div data-type="content" type="text/html" codemirror="true" contenteditable="true" id="message-template"><div class="chat-message" data-sent="${chatMessageSent}" data-chat-message-id="${chatMessageId}">
+  <div class="chat-message-user">${chatMessageUser}</div>
+  <div class="chat-message-time">${chatMessageTime}</div>
+  <div class="chat-message-content">${chatMessageContent}</div>
+</div></div></div><div class="paragraph style-paragraph collapsed" data-id="b9dm6RB5" name="Message Style"><style data-type="content" type="text/css" codemirror="true" class="themable">html .chat-message {
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+html .chat-message-user,
+html .chat-message-time {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--color-secondary-text);
+}
+
+html .chat-message-user {
+  flex: 0 1 auto;
+}
+
+html .chat:not([data-chat-id="local"]) .chat-message-user,
+html .chat-message[data-sent="true"] .chat-message-user {
+  display: none;
+}
+
+html .chat-message-time {
+  flex: 1 0 auto;
+}
+
+html .chat-message-content {
+  background: var(--color-primary-shade-2);
+  border-radius: 4px;
+  padding: 8px 12px;
+  flex: 1 0 100%;
+}
+
+html .chat-message[data-sent="true"] {
+  align-self: flex-end;
+}
+
+html .chat[data-chat-id="local"] .chat-message-time,
+html .chat-message[data-sent="true"] .chat-message-time {
+  text-align: right;
+}
+
+html .chat-message[data-sent="false"] {
+  align-self: flex-start;
+}</style></div><div class="paragraph code-paragraph collapsed" data-id="LtMxVS7p" name="Add Commands and Menu Entries" run-on-load="true" last-execution-state="success"><pre data-type="content" type="text/javascript">const GlobalMenuUtils = require("#global-menu-utils");
+const ChatUtils = require("#chat-utils");
+
+/******************************************************************************/
+
+if (!document.querySelector("#local-chat")) {
+  const localChat = document.createElement("div");
+  localChat.id = "local-chat";
+  document.body.appendChild(localChat);
+}
+
+const chatContainer = document.createElement("transient");
+chatContainer.id = "chat-container";
+document.body.appendChild(chatContainer);
+
+/******************************************************************************/
+
+Codestrate.addCommand("chat.direct", "Open Direct Chat", () =&gt; {
+  ChatUtils.openDirectChat();
+});
+
+Codestrate.addCommand("chat.local", "Open Local Chat", () =&gt; {
+  ChatUtils.openLocalChat();
+});
+
+/******************************************************************************/
+
+GlobalMenuUtils.addButtonToSubMenu("Open Direct Chat", false, () =&gt; {
+  Codestrate.executeCommand("chat.direct");
+}, "Chat");
+
+GlobalMenuUtils.addButtonToSubMenu("Open Local Chat", false, () =&gt; {
+  Codestrate.executeCommand("chat.local");
+}, "Chat");</pre></div><div class="paragraph style-paragraph collapsed" data-id="ijZnejnQ" name="Hide Local Chat"><style data-type="content" type="text/css" codemirror="true">html #local-chat {
+  display: none;
+}</style></div><div class="paragraph code-paragraph collapsed" data-id="kdvTa6y9" name="Chat Utils"><pre data-type="content" type="text/javascript" id="chat-utils">const ChatManager = require("#chat-manager");
+
+/******************************************************************************/
+
+const dialogTitle = "Chat";
+
+/******************************************************************************/
+
+exports.openDirectChat = async() =&gt; {
+  if (!webstrate.messages) {
+    alert("You need to be logged in to use direct chat.", dialogTitle);
+    return;
+  }
+  
+  const user = await prompt("Which user to you want to chat with?", "", dialogTitle, {
+    trueLabel: "Chat"
+  });
+  
+  if (user === "") {
+    alert("You need to enter a chat user name.", dialogTitle);
+    return;
+  } else if (!user) {
+    return;
+  }
+  
+  ChatManager.addChat(user);
+};
+
+exports.openLocalChat = () =&gt; {
+  ChatManager.addChat();
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="9VnQzAgD" name="Chat Manager" style=""><pre data-type="content" type="text/javascript" id="chat-manager">const ContextMenuManager = require("#context-menu-manager");
+
+/******************************************************************************/
+
+const localChat = document.querySelector("#local-chat");
+
+/******************************************************************************/
+
+const getDirectMessages = (user) =&gt; {
+  return webstrate.messages.filter((message) =&gt; (message.message.chat &amp;&amp; message.message.chat.user === user)).map((message) =&gt; message.message.chat);
+};
+
+const getLocalMessages = () =&gt; {
+  return Array.from(localChat.querySelectorAll(".local-message")).map((messageElement) =&gt; {
+    return {
+      user: messageElement.getAttribute("data-user"),
+      content: messageElement.getAttribute("data-content"),
+      time: messageElement.getAttribute("data-time"),
+      chatMessageId: messageElement.getAttribute("data-chat-message-id")
+    };
+  });
+};
+
+/******************************************************************************/
+
+const sendDirectMessage = (user, content) =&gt; {
+  const id = Codestrate.util.randomString();
+  
+  // Send message to target user
+  webstrate.message({
+    chat: {
+      user: user,
+      content: content,
+      time: new Date().toISOString(),
+      sent: true,
+      chatMessageId: id
+    }
+  }, webstrate.user.userId);
+  
+  // Send same message to myself
+  webstrate.message({
+    chat: {
+      user: webstrate.user.userId,
+      content: content,
+      time: new Date().toISOString(),
+      sent: false,
+      chatMessageId: id
+    }
+  }, user);
+};
+
+const sendLocalMessage = (content) =&gt; {
+  const time = new Date().toISOString();
+  const id = Codestrate.util.randomString();
+  
+  const localMessage = document.createElement("div");
+  localMessage.classList.add("local-message");
+  localMessage.setAttribute("data-user", webstrate.user.userId);
+  localMessage.setAttribute("data-content", content);
+  localMessage.setAttribute("data-time", time);
+  localMessage.setAttribute("data-chat-message-id", id);
+  
+  localChat.appendChild(localMessage);
+  
+  webstrate.signal({
+    chat: {
+      user: webstrate.user.userId,
+      content: content,
+      time: time,
+      chatMessageId: id
+    }
+  });
+};
+
+/******************************************************************************/
+
+const addMessage = (message, messagesContainer, local = false) =&gt; {
+  const dateTime = new Date(message.time);
+  const elements = require("#message-template", {
+    chatMessageSent: message.sent || message.user === webstrate.user.userId,
+    chatMessageId: message.chatMessageId,
+    chatMessageUser: message.user,
+    chatMessageTime: `${("0" + dateTime.getHours()).substr(-2)}:${("0" + dateTime.getMinutes()).substr(-2)}`,
+    chatMessageContent: message.content
+  });
+  messagesContainer.appendChild(elements[0]);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+  const exampleContextMenuData = [{
+    type: "item",
+    label: "Remove Message",
+    icon: "delete",
+    action: () =&gt; {
+      removeChatMessage(message.chatMessageId, local);
+    }
+  }];
+  
+  ContextMenuManager.register(messagesContainer, elements[0], exampleContextMenuData);
+};
+
+exports.addChat = (user = false) =&gt; {
+  
+  if (!webstrate.message) {
+    alert("You need to be logged in to use the chat!", "Chat");
+    return;
+  }
+  
+  // Cleanup old chats
+  const id = user || "local";
+  const local = id === "local";
+  let chat = document.querySelector(`.chat[data-chat-id="${id}"]`);
+  if (chat) {
+    chat.remove();
+  }
+  
+  // Create new chat
+  const elements = require("#chat-template", {
+    chatId: id,
+    titleText: local ? "Local Chat" : id
+  });
+  chat = elements[0];
+  const collapseButton = chat.querySelector(".chat-collapse-button");
+  const deleteButton = chat.querySelector(".chat-delete-button");
+  const closeButton = chat.querySelector(".chat-close-button");
+  const messagesContainer = chat.querySelector(".chat-messages-container");
+  const messageInput = chat.querySelector(".chat-message-input");
+  const sendButton = chat.querySelector(".chat-send-button");
+  
+  collapseButton.addEventListener("click", () =&gt; {
+    chat.classList.toggle("collapsed");
+    if (chat.classList.contains("collapsed")) {
+      chat.style.height = "80px";
+    } else {
+      chat.style.height = "256px";
+    }
+  });
+
+  deleteButton.addEventListener("click", async() =&gt; {
+    const result = await confirm("Do you want to delete all messages of this chat?", "Delete Chat", {
+      trueLabel: "Delete"
+    });
+    
+    if (result) {
+      if (local) {
+        removeChatMessages();
+      } else {
+        removeChatMessages(user);
+      }
+    }
+  });
+  
+  closeButton.addEventListener("click", () =&gt; {
+    chat.remove();
+  });
+  
+  const sendMessage = () =&gt; {
+    if (!messageInput.value) {
+      return;
+    }
+    
+    if (local) {
+      sendLocalMessage(messageInput.value);
+    } else {
+      sendDirectMessage(user, messageInput.value);
+    }
+    
+    messageInput.value = "";
+    messageInput.focus();
+  };
+  
+  sendButton.addEventListener("click", () =&gt; sendMessage());
+  
+  messageInput.addEventListener("keydown", e =&gt; {
+    e.stopPropagation();
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+  
+  const chatContainer = document.querySelector("#chat-container");
+  chatContainer.appendChild(chat);
+  
+  const messages = local ? getLocalMessages() : getDirectMessages(user);
+  for (let i = 0; i &lt; messages.length; i++) {
+    addMessage(messages[i], messagesContainer, local);
+  }
+  
+  messageInput.focus();
+};
+
+exports.addMessageToChat = (message, local = false) =&gt; {
+  const id = local ? "local" : message.user;
+  const messagesContainer = document.querySelector(`.chat[data-chat-id="${id}"] .chat-messages-container`);
+  
+  if (messagesContainer) {
+    addMessage(message, messagesContainer, local);
+  } else {
+    exports.addChat(id);
+  }
+};
+
+/******************************************************************************/
+
+const removeChatMessage = (chatMessageId, local = false) =&gt; {
+  let messageRemoved = false;
+  
+  if (local) {
+    const message = document.querySelector(`#local-chat [data-chat-message-id="${chatMessageId}"]`);
+    if (message) {
+      message.remove();
+      messageRemoved = true;
+    }
+  } else {
+    const message = webstrate.messages.filter((message) =&gt; (message.message.chat &amp;&amp; message.message.chat.chatMessageId === chatMessageId));
+    
+    if (message.length &gt; 0) {
+      webstrate.deleteMessage(message[0].messageId);
+      messageRemoved = true;
+    }
+  }
+
+  if (messageRemoved) {
+    webstrate.signal({
+      removeChat: {
+        chatMessageId: chatMessageId,
+        local: local,
+        deletingUser: webstrate.user.userId
+      }
+    });
+  }
+};
+
+const removeChatMessages = (user = false) =&gt; {
+  if (!user) {
+    const messages = getLocalMessages();
+    messages.forEach (message =&gt; removeChatMessage(message.chatMessageId, true));
+  } else {
+    const messages = getDirectMessages(user);
+    messages.forEach (message =&gt; removeChatMessage(message.chatMessageId, false));
+  }
+};
+
+const removeAllChatMessages = () =&gt; {
+  // TODO
+};</pre></div><div class="paragraph code-paragraph collapsed" data-id="NCMdvi6q" name="Chat Listener" run-on-load="true" draggable="false" style="" last-execution-state="success"><pre data-type="content" type="text/javascript">const ChatManager = require("#chat-manager");
+
+/******************************************************************************/
+
+webstrate.on("messageReceived", (message, senderId, messageId) =&gt; {
+  if (message.chat) {
+    ChatManager.addMessageToChat(message.chat);
+  }
+});
+
+webstrate.on("signal", (message, senderId, node) =&gt; {
+  if (!node) {
+    if (message.chat) {
+      ChatManager.addMessageToChat(message.chat, true);
+    } else if (message.removeChat &amp;&amp; (message.removeChat.local || message.removeChat.deletingUser === webstrate.user.userId)) {
+      const messages = Array.from(document.querySelectorAll(`#chat-container [data-chat-message-id="${message.removeChat.chatMessageId}"]`));
+      
+      messages.forEach(message =&gt; message.remove());
+    }
+  }
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="caXkA8mE" name="Chat Draggable" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript">importLib([
+  "interact.min.js"
+]).then(() =&gt; {
+  
+  document.liveQuerySelectorAll(".chat").added((element) =&gt; {
+    
+    interact(element)
+      .draggable({
+      allowFrom: ".chat-title-text",
+      inertia: true,
+      restrict: {
+        restriction: "parent",
+        endOnly: true,
+        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+      },
+      autoScroll: false,
+      onmove: dragMoveListener
+    })
+      .resizable({
+      // resize from all edges and corners
+      edges: { left: true, right: true, bottom: true, top: true },
+
+      // keep the edges inside the parent
+      restrictEdges: {
+        outer: 'parent',
+        endOnly: true,
+      },
+
+      // minimum size
+      restrictSize: {
+        min: { width: 384, height: 256 },
+      },
+
+      inertia: true,
+    })
+      .on('resizemove', function (event) {
+      var target = event.target,
+          x = (parseFloat(target.getAttribute('data-x')) || 0),
+          y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+      // update the element's style
+      target.style.width  = event.rect.width + 'px';
+      target.style.height = event.rect.height + 'px';
+
+      // translate when resizing from top or left edges
+      x += event.deltaRect.left;
+      y += event.deltaRect.top;
+
+      target.style.webkitTransform = target.style.transform =
+        'translate(' + x + 'px,' + y + 'px)';
+
+      target.setAttribute('data-x', x);
+      target.setAttribute('data-y', y);
+    });
+
+    function dragMoveListener (event) {
+      var target = event.target,
+          // keep the dragged position in the data-x/data-y attributes
+          x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+          y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+      // translate the element
+      target.style.webkitTransform =
+        target.style.transform =
+        'translate(' + x + 'px, ' + y + 'px)';
+
+      // update the posiion attributes
+      target.setAttribute('data-x', x);
+      target.setAttribute('data-y', y);
+    }
+  });
+});</pre></div><div class="paragraph code-paragraph collapsed" data-id="qLDLAHmb" name="Chat on Avatars" last-execution-state="success" run-on-load="true"><pre data-type="content" type="text/javascript">const ChatManager = require("#chat-manager");
+
+/******************************************************************************/
+
+const augmentAvatar = (avatar) =&gt; {
+  const clientId = avatar.getAttribute("client-id");
+  const username = avatar.getAttribute("username");
+  const userId = Codestrate.clients.find((client) =&gt; client.id === clientId).userId;
+  
+  const avatarChat = document.createElement("div");
+  avatarChat.classList.add("avatar-chat");
+
+  const icon = document.createElement("i");
+  icon.classList.add("material-icons");
+  avatarChat.appendChild(icon);
+
+  avatarChat.addEventListener("click", (event) =&gt; {
+    ChatManager.addChat(userId);
+  });
+
+  avatar.appendChild(avatarChat);
+};
+
+/******************************************************************************/
+
+document.liveQuerySelectorAll(`.avatars .avatar:not(.self):not([username="anonymous"])`).added(augmentAvatar);</pre></div><div class="paragraph style-paragraph collapsed" data-id="zXE5LGRN" name="Chat on Avatars"><style data-type="content" type="text/css" codemirror="true">.avatars .avatar .avatar-chat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  background-color: var(--material-color-green);
+  border-radius: 50%;
+  box-shadow: var(--material-shadow-z4);
+  opacity: 0;
+  transition: transform var(--navigation-transition), opacity var(--navigation-transition);
+}
+
+.avatars .avatar .avatar-chat i:after {
+  content: "chat";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.avatars .avatar:hover .avatar-chat {
+  opacity: 1.0;
+  transform: translate3d(-56px, 0, 0);
+  pointer-events: all;
+  cursor: pointer;
+}</style></div></div>
